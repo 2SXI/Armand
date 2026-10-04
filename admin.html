@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armand Admin — Management Console</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+@font-face{font-family:'Saira';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/saira-latin-500-normal.woff2') format('woff2');}
+@font-face{font-family:'Saira';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/saira-latin-600-normal.woff2') format('woff2');}
+@font-face{font-family:'Saira';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/saira-latin-700-normal.woff2') format('woff2');}
+@font-face{font-family:'Saira';font-style:normal;font-weight:800;font-display:swap;src:url('fonts/saira-latin-800-normal.woff2') format('woff2');}
+@font-face{font-family:'Saira';font-style:italic;font-weight:800;font-display:swap;src:url('fonts/saira-latin-800-italic.woff2') format('woff2');}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:300;font-display:swap;src:url('fonts/barlow-latin-300-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/barlow-latin-400-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/barlow-latin-500-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/barlow-latin-600-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/barlow-latin-700-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/barlow-semi-condensed-latin-400-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/barlow-semi-condensed-latin-500-normal.woff2') format('woff2');}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/barlow-semi-condensed-latin-600-normal.woff2') format('woff2');}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#2a282b;--navy-deep:#1e1d1f;--navy-darker:#1e1d1f;
+  --steel:#9a979c;--steel-lt:#b4b1b6;
+  --silver:#e2e2e2;--muted:#6a6a6a;--text:#2a282b;
+  --gray-50:#f6f6f6;--gray-100:#ebebeb;--gray-200:#d8d8d8;
+  --green:#25D366;--orange:#F36523;--red:#e84343;
+}
+html{font-size:15px;}
+body{font-family:'Barlow',sans-serif;background:var(--gray-50);color:var(--text);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:inherit;border:none;outline:none;}
+input,select,textarea{font-family:inherit;-webkit-appearance:none;}
+table{border-collapse:collapse;width:100%;}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#1e1d1f;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px;}
+.login-box{background:var(--navy-deep);border:1px solid rgba(255,255,255,.08);border-top:3px solid var(--orange);padding:48px;width:100%;max-width:400px;}
+.login-logo-img{height:40px;width:auto;display:block;margin:0 auto 28px;}
+.login-logo{font-family:'Saira',sans-serif;font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--silver);margin-bottom:6px;}
+.login-sub{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--steel);margin-bottom:36px;}
+.login-label{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(226,226,226,.75);display:block;margin-bottom:6px;}
+.login-input{width:100%;background:rgba(226,226,226,.04);border:1px solid rgba(90,90,90,.2);color:var(--silver);padding:12px 14px;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s;}
+.login-input:focus{border-color:var(--orange);}
+.login-btn{width:100%;padding:14px;background:var(--orange);color:#fff;font-family:'Saira',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;transition:opacity .2s;margin-top:8px;}
+.login-btn:hover{opacity:.88;}
+.login-err{font-size:12px;color:var(--red);margin-top:10px;display:none;}
+#admin-app{display:none;}
+.admin-wrap{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+.sidebar{background:var(--navy-darker);border-right:1px solid rgba(90,90,90,.12);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:50;}
+.sb-logo{padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08);border-top:3px solid var(--orange);}
+.sb-logo-img{height:26px;width:auto;display:block;margin-bottom:10px;}
+.sb-logo-main{font-family:'Saira',sans-serif;font-size:20px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--silver);}
+.sb-logo-sub{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;color:rgba(226,226,226,.3);margin-top:2px;}
+.sb-nav{padding:16px 0;flex:1;}
+.sb-link{display:flex;align-items:center;gap:12px;padding:12px 20px;font-size:13px;font-weight:500;color:rgba(226,226,226,.5);border-left:3px solid transparent;transition:all .2s;cursor:pointer;user-select:none;}
+.sb-link:hover,.sb-link.active{color:var(--silver);border-left-color:#fff;background:rgba(255,255,255,.06);}
+.sb-link svg{opacity:.55;flex-shrink:0;}
+.sb-link.active svg,.sb-link:hover svg{opacity:1;}
+.sb-bottom{padding:16px 20px;border-top:1px solid rgba(90,90,90,.12);}
+.sb-logout{width:100%;padding:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;}
+.sb-logout:hover{background:rgba(255,255,255,.16);}
+.sb-version{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;color:rgba(226,226,226,.12);margin-top:10px;text-align:center;letter-spacing:1px;}
+.main-area{overflow:auto;min-width:0;}
+.page-hdr{background:#fff;border-bottom:1px solid var(--gray-200);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:12px;flex-wrap:wrap;}
+.page-hdr-left{display:flex;align-items:center;gap:12px;}
+.page-title{font-family:'Saira',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);}
+.page-subtitle{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.mob-menu-btn{display:none;width:36px;height:36px;background:var(--gray-100);border:1px solid var(--gray-200);align-items:center;justify-content:center;color:var(--navy);flex-shrink:0;}
+.section{padding:28px 32px;display:none;}
+.section.active{display:block;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:#fff;border:1px solid var(--gray-200);border-top:3px solid var(--orange);padding:18px 16px;}
+.sc-num{font-family:'Saira',sans-serif;font-size:34px;font-weight:900;color:var(--navy);}
+.sc-label{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.table-wrap{background:#fff;border:1px solid var(--gray-200);overflow-x:auto;}
+.tbl-toolbar{padding:14px 18px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tbl-search{flex:1;min-width:160px;background:var(--gray-50);border:1px solid var(--gray-200);padding:8px 12px;font-size:13px;outline:none;color:var(--text);}
+.tbl-search:focus{border-color:var(--steel);}
+table th{background:var(--gray-50);font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--gray-200);white-space:nowrap;}
+table td{padding:11px 14px;border-bottom:1px solid var(--gray-100);font-size:13px;vertical-align:middle;}
+table tr:last-child td{border-bottom:none;}
+table tr:hover td{background:var(--gray-50);}
+.td-name{font-weight:600;color:var(--navy);}
+.td-price{font-family:'Saira',sans-serif;font-size:16px;font-weight:700;color:var(--navy);}
+.td-sku{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;color:var(--muted);}
+.badge{display:inline-block;padding:3px 10px;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:500;}
+.badge-pending{background:rgba(90,90,90,.12);color:var(--steel);}
+.badge-confirmed{background:rgba(90,90,90,.12);color:var(--steel);}
+.badge-shipped{background:rgba(37,211,102,.12);color:#1a8a44;}
+.badge-delivered{background:rgba(37,211,102,.2);color:#156b34;}
+.badge-cancelled{background:rgba(232,67,67,.12);color:var(--red);}
+.badge-trade{background:rgba(90,90,90,.18);color:var(--steel);}
+.badge-low{background:rgba(232,67,67,.12);color:var(--red);}
+.badge-ok{background:rgba(37,211,102,.1);color:#1a8a44;}
+.badge-out{background:rgba(232,67,67,.12);color:var(--red);}
+.badge-active{background:rgba(37,211,102,.1);color:#1a8a44;}
+.badge-inactive{background:rgba(232,67,67,.08);color:var(--red);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .2s;cursor:pointer;white-space:nowrap;}
+.btn-primary{background:var(--navy);color:#fff;border:none;}
+.btn-primary:hover{background:var(--orange);}
+.btn-sm{padding:5px 12px;font-size:11px;}
+.btn-edit{background:rgba(90,90,90,.1);color:var(--steel);border:1px solid rgba(90,90,90,.2);}
+.btn-edit:hover{background:rgba(90,90,90,.2);}
+.btn-delete{background:rgba(232,67,67,.08);color:var(--red);border:1px solid rgba(232,67,67,.15);}
+.btn-delete:hover{background:rgba(232,67,67,.18);}
+.btn-green{background:var(--green);color:#fff;border:none;}
+.btn-green:hover{opacity:.88;}
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(30,29,31,.85);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding:60px 16px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--navy-deep);border:1px solid rgba(90,90,90,.25);width:100%;max-width:560px;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(90,90,90,.15);}
+.modal-title{font-family:'Saira',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--silver);}
+.modal-close{color:rgba(226,226,226,.4);font-size:18px;background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;transition:color .2s;}
+.modal-close:hover{color:var(--silver);}
+.modal-body{padding:24px;max-height:72vh;overflow-y:auto;}
+.modal-footer{padding:16px 24px;border-top:1px solid rgba(90,90,90,.12);display:flex;gap:10px;justify-content:flex-end;}
+.f-group{margin-bottom:14px;}
+.f-label{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(226,226,226,.75);display:block;margin-bottom:6px;}
+.f-input{width:100%;background:rgba(226,226,226,.04);border:1px solid rgba(90,90,90,.2);color:var(--silver);padding:11px 13px;font-size:14px;outline:none;transition:border-color .2s;}
+.f-input:focus{border-color:var(--steel);}
+.f-input::placeholder{color:rgba(226,226,226,.2);}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.f-select{background:rgba(30,29,31,.9);cursor:pointer;color:var(--silver);}
+.f-select option{background:var(--navy-deep);color:var(--silver);}
+.f-error{font-size:11px;color:var(--red);margin-top:6px;display:none;padding:8px 10px;background:rgba(232,67,67,.08);border:1px solid rgba(232,67,67,.2);}
+.f-toggle-row{display:flex;align-items:center;gap:10px;padding:8px 0;}
+.f-toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.f-toggle input{opacity:0;width:0;height:0;}
+.f-toggle-slider{position:absolute;inset:0;background:rgba(90,90,90,.2);border:1px solid rgba(90,90,90,.3);cursor:pointer;transition:.3s;}
+.f-toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:2px;bottom:2px;background:rgba(226,226,226,.4);transition:.3s;}
+.f-toggle input:checked + .f-toggle-slider{background:rgba(37,211,102,.25);border-color:rgba(37,211,102,.5);}
+.f-toggle input:checked + .f-toggle-slider:before{transform:translateX(18px);background:var(--green);}
+.order-items-list{background:rgba(90,90,90,.06);border:1px solid rgba(90,90,90,.12);padding:12px;max-height:220px;overflow-y:auto;}
+.order-item-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(90,90,90,.08);font-size:13px;color:rgba(226,226,226,.7);}
+.order-item-row:last-child{border-bottom:none;}
+#admin-toast{position:fixed;bottom:28px;right:28px;z-index:9999;background:#1e1d1f;color:var(--silver);padding:12px 20px;border:1px solid rgba(90,90,90,.3);font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;max-width:360px;}
+#admin-toast.show{opacity:1;transform:translateY(0);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;line-height:1.7;}
+#confirm-dialog{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;}
+#confirm-dialog.open{display:flex;}
+#confirm-box{background:var(--navy-deep);border:1px solid rgba(90,90,90,.25);padding:32px;max-width:380px;width:90%;text-align:center;}
+#confirm-msg{color:var(--silver);font-size:15px;margin-bottom:24px;line-height:1.6;white-space:pre-line;}
+#confirm-actions{display:flex;gap:10px;justify-content:center;}
+.mob-overlay{position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.4);display:none;}
+.mob-overlay.open{display:block;}
+@media(max-width:768px){
+  .admin-wrap{grid-template-columns:1fr;}
+  .sidebar{position:fixed;left:-240px;top:0;height:100vh;z-index:50;transition:left .3s;width:240px;}
+  .sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.5);}
+  .mob-menu-btn{display:flex;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .section{padding:16px;}
+  .page-hdr{padding:14px 16px;}
+  .f-row{grid-template-columns:1fr;}
+  .modal-overlay{padding:40px 12px;}
+}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <img src="armand-logo-nav.png" alt="Armand Carpentry &amp; Designs" class="login-logo-img">
+    <div class="login-sub">Product &amp; Order Management</div>
+    <label class="login-label" for="adm-user">Email</label>
+    <input id="adm-user" type="email" class="login-input" placeholder="you@example.com" autocomplete="username">
+    <label class="login-label" for="adm-pass">Password</label>
+    <input id="adm-pass" type="password" class="login-input" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="current-password">
+    <button class="login-btn" id="login-btn" onclick="adminLogin()">Sign In &rarr;</button>
+    <div class="login-err" id="login-err">Incorrect email or password.</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <div class="admin-wrap">
+    <div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="adminSidebar">
+      <div class="sb-logo">
+        <img src="armand-logo-nav.png" alt="Armand Carpentry &amp; Designs" class="sb-logo-img">
+        <div class="sb-logo-main">Armand Admin</div>
+        <div class="sb-logo-sub">Management Console</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-link active" onclick="showSection('dashboard')" data-section="dashboard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="sb-link" onclick="showSection('products')" data-section="products">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+          Products
+        </div>
+        <div class="sb-link" onclick="showSection('bulk-images')" data-section="bulk-images">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          Bulk Images
+        </div>
+        <div class="sb-link" onclick="showSection('orders')" data-section="orders">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Orders
+          <span id="sb-pending-badge" style="margin-left:auto;background:#fff;color:var(--charcoal);font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;padding:2px 7px;letter-spacing:1px;display:none;"></span>
+        </div>
+        <div class="sb-link" onclick="showSection('enquiries')" data-section="enquiries">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Enquiries
+        </div>
+      </nav>
+      <div class="sb-bottom">
+        <button class="sb-logout" onclick="adminLogout()">Sign Out</button>
+        <div class="sb-version">Armand Admin v3.1</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-area">
+
+      <!-- DASHBOARD -->
+      <div id="section-dashboard" class="section active">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="mob-menu-btn" onclick="openSidebar()" aria-label="Menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div><div class="page-title">Dashboard</div><div class="page-subtitle">Live overview &middot; Supabase</div></div>
+          </div>
+          <button class="btn btn-primary" onclick="refreshDashboard()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div style="padding:28px 32px;">
+          <div class="stats-row">
+            <div class="stat-card"><div class="sc-num" id="ds-products">&#8212;</div><div class="sc-label">Total Products</div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-orders">&#8212;</div><div class="sc-label">Total Orders</div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-pending">&#8212;</div><div class="sc-label">Pending Orders</div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-revenue">&#8212;</div><div class="sc-label">Revenue (USD)</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div class="table-wrap">
+              <div class="tbl-toolbar" style="border-bottom:1px solid var(--gray-200);">
+                <span style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Recent Orders</span>
+                <button class="btn btn-edit btn-sm" style="margin-left:auto;" onclick="showSection('orders')">View All</button>
+              </div>
+              <table><thead><tr><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody id="dash-recent-orders"><tr><td colspan="3" class="empty-state" style="padding:24px;">Loading...</td></tr></tbody>
+              </table>
+            </div>
+            <div class="table-wrap">
+              <div class="tbl-toolbar" style="border-bottom:1px solid var(--gray-200);">
+                <span style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Low Stock Alert</span>
+                <button class="btn btn-edit btn-sm" style="margin-left:auto;" onclick="showSection('products')">Manage</button>
+              </div>
+              <table><thead><tr><th>Product</th><th>Stock</th></tr></thead>
+              <tbody id="dash-low-stock"><tr><td colspan="2" class="empty-state" style="padding:24px;">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="section-products" class="section">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="mob-menu-btn" onclick="openSidebar()" aria-label="Menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div><div class="page-title">Products</div><div class="page-subtitle">Add &middot; Edit &middot; Delete &middot; Toggle Active</div></div>
+          </div>
+          <button class="btn btn-primary" onclick="openProductModal(null)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Product
+          </button>
+        </div>
+        <div style="padding:28px 32px;">
+          <div class="table-wrap">
+            <div class="tbl-toolbar">
+              <input type="text" class="tbl-search" id="product-search" placeholder="Search name, SKU, category..." oninput="filterProductTable()">
+              <select class="f-input f-select" id="product-cat-filter" style="width:auto;padding:8px 14px;font-size:12px;background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text);" onchange="filterProductTable()">
+                <option value="">All Categories</option>
+                <option value="hinges">Hinges</option><option value="handles">Handles</option>
+                <option value="drawers">Drawers</option><option value="locks">Locks</option>
+                <option value="kitchen">Kitchen</option><option value="lighting">Lighting</option>
+                <option value="construction">Construction</option><option value="closet">Closet</option>
+                <option value="tools">Tools</option>
+              </select>
+              <select class="f-input f-select" id="product-active-filter" style="width:auto;padding:8px 14px;font-size:12px;background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text);" onchange="filterProductTable()">
+                <option value="">All Status</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="loadProducts_Admin()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Refresh
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>Image</th><th>Name / SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="products-tbody"><tr><td colspan="7" class="empty-state">Loading products...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BULK IMAGES -->
+      <div id="section-bulk-images" class="section">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="mob-menu-btn" onclick="openSidebar()" aria-label="Menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div><div class="page-title">Bulk Image Upload</div><div class="page-subtitle">Match filenames to products &middot; Upload to Supabase Storage</div></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-edit btn-sm" id="bi-rematch-btn" onclick="biRematchAll()" style="display:none;">Re-match</button>
+            <button class="btn btn-primary" id="bi-upload-btn" onclick="biStartUpload()" style="display:none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              Upload All Matched
+            </button>
+          </div>
+        </div>
+
+        <div style="padding:28px 32px;">
+
+          <!-- DROP ZONE -->
+          <div id="bi-dropzone" style="border:2px dashed rgba(90,90,90,.3);border-radius:4px;padding:40px 20px;text-align:center;cursor:pointer;background:#fff;transition:all .2s;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" style="margin-bottom:10px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div style="font-family:'Saira',sans-serif;font-size:18px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;">Drop up to 200 images here, or click to browse</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px;">Filenames are auto-matched to product Name / SKU. You can fix any mismatches before uploading.</div>
+            <input type="file" id="bi-file-input" multiple accept="image/*" style="display:none;">
+          </div>
+
+          <!-- SUMMARY BAR -->
+          <div id="bi-summary" style="display:none;margin-top:20px;padding:14px 18px;background:#fff;border:1px solid var(--gray-200);border-radius:4px;display:none;align-items:center;gap:20px;flex-wrap:wrap;font-size:12px;">
+            <span><strong id="bi-count-total">0</strong> files</span>
+            <span style="color:#1a8f4c;"><strong id="bi-count-matched">0</strong> matched</span>
+            <span style="color:var(--steel);"><strong id="bi-count-unmatched">0</strong> unmatched</span>
+            <span style="color:#1a8f4c;"><strong id="bi-count-done">0</strong> uploaded</span>
+            <span style="color:var(--red);"><strong id="bi-count-error">0</strong> failed</span>
+            <div style="flex:1;min-width:120px;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;">
+              <div id="bi-progress-bar" style="height:100%;width:0%;background:var(--charcoal);transition:width .2s;"></div>
+            </div>
+            <span id="bi-progress-label" style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:10px;color:var(--muted);">0%</span>
+          </div>
+
+          <!-- FILE TABLE -->
+          <div class="table-wrap" id="bi-table-wrap" style="display:none;margin-top:20px;">
+            <table>
+              <thead><tr><th style="width:56px;">Preview</th><th>Filename</th><th>Matched Product</th><th style="width:90px;">Confidence</th><th style="width:110px;">Status</th><th style="width:50px;"></th></tr></thead>
+              <tbody id="bi-tbody"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div id="section-orders" class="section">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="mob-menu-btn" onclick="openSidebar()" aria-label="Menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div><div class="page-title">Orders</div><div class="page-subtitle">View &middot; Update Status &middot; WhatsApp Customer</div></div>
+          </div>
+          <select class="f-input f-select" id="order-status-filter"
+            style="width:auto;padding:9px 14px;font-size:12px;background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text);"
+            onchange="loadOrders_Admin()">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div style="padding:28px 32px;">
+          <div class="table-wrap">
+            <div class="tbl-toolbar">
+              <input type="text" class="tbl-search" id="order-search" placeholder="Search customer name or phone..." oninput="filterOrderTable()">
+              <button class="btn btn-primary btn-sm" onclick="loadOrders_Admin()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Refresh
+              </button>
+            </div>
+            <table>
+              <thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>View</th></tr></thead>
+              <tbody id="orders-tbody"><tr><td colspan="9" class="empty-state">Loading orders...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENQUIRIES -->
+      <div id="section-enquiries" class="section">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="mob-menu-btn" onclick="openSidebar()" aria-label="Menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div><div class="page-title">Enquiries</div><div class="page-subtitle">Contact form submissions</div></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadEnquiries_Admin()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div style="padding:28px 32px;">
+          <div class="table-wrap">
+            <div class="tbl-toolbar">
+              <input type="text" class="tbl-search" id="enquiry-search" placeholder="Search name, phone, subject..." oninput="filterEnquiryTable()">
+            </div>
+            <table>
+              <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody id="enquiries-tbody"><tr><td colspan="7" class="empty-state">Loading enquiries...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title" id="product-modal-title">Add Product</div>
+      <button class="modal-close" onclick="closeProductModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pm-id">
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Product Name *</label>
+          <input id="pm-name" class="f-input" type="text" placeholder="e.g. Milano Bar Handle">
+        </div>
+        <div class="f-group">
+          <label class="f-label">SKU</label>
+          <input id="pm-sku" class="f-input" type="text" placeholder="BRC-HDL-042">
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Price (USD) *</label>
+          <input id="pm-price" class="f-input" type="number" step="0.01" min="0" placeholder="0.00">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Was / Old Price</label>
+          <input id="pm-old-price" class="f-input" type="number" step="0.01" min="0" placeholder="0.00">
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Category *</label>
+          <select id="pm-category" class="f-input f-select">
+            <option value="">Select category...</option>
+            <option value="hinges">Hinges</option>
+            <option value="handles">Handles &amp; Knobs</option>
+            <option value="drawers">Drawer Systems</option>
+            <option value="locks">Locks &amp; Security</option>
+            <option value="kitchen">Kitchen Fittings</option>
+            <option value="lighting">Lighting Hardware</option>
+            <option value="construction">Construction</option>
+            <option value="closet">Closet Systems</option>
+            <option value="tools">Tools &amp; Fixings</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Stock Qty</label>
+          <input id="pm-stock" class="f-input" type="number" min="0" placeholder="0">
+        </div>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Image URL (from Supabase Storage)</label>
+        <input id="pm-image" class="f-input" type="url" placeholder="https://nasbxjharopveynnwgrg.supabase.co/storage/v1/object/public/product-images/..." oninput="previewProductImage(this.value)">
+        <div id="pm-image-preview" style="margin-top:8px;display:none;">
+          <img id="pm-img-el" src="" alt="Preview"
+            style="max-width:100px;max-height:100px;object-fit:cover;border:1px solid rgba(90,90,90,.2);"
+            onerror="document.getElementById('pm-image-preview').style.display='none'">
+        </div>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Short description <span style="font-weight:400;opacity:.6;">(one line, shown on product tiles)</span></label>
+        <input id="pm-short-description" class="f-input" type="text" maxlength="60" placeholder="e.g. Cabinet handle, 12 x 128mm">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Full description <span style="font-weight:400;opacity:.6;">(shown on the product page)</span></label>
+        <textarea id="pm-description" class="f-input" style="resize:vertical;min-height:72px;" placeholder="e.g. 128mm centres &middot; 304 SS &middot; Matt finish"></textarea>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Badge</label>
+          <select id="pm-badge" class="f-input f-select">
+            <option value="">None</option>
+            <option value="new">NEW</option>
+            <option value="sale">SALE</option>
+            <option value="hot">HOT</option>
+            <option value="trade">TRADE</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Active (visible on shop)</label>
+          <div class="f-toggle-row">
+            <label class="f-toggle">
+              <input type="checkbox" id="pm-active" checked>
+              <span class="f-toggle-slider"></span>
+            </label>
+            <span id="pm-active-label" style="font-size:12px;color:rgba(226,226,226,.6);">Visible on shop</span>
+          </div>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Featured (shown on homepage)</label>
+          <div class="f-toggle-row">
+            <label class="f-toggle">
+              <input type="checkbox" id="pm-featured">
+              <span class="f-toggle-slider"></span>
+            </label>
+            <span id="pm-featured-label" style="font-size:12px;color:rgba(226,226,226,.6);">Not featured</span>
+          </div>
+        </div>
+      </div>
+      <div class="f-error" id="pm-error"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="background:transparent;border:1px solid rgba(90,90,90,.2);color:rgba(226,226,226,.5);" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-primary" id="pm-save-btn" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-hdr">
+      <div class="modal-title" id="order-modal-title">Order Details</div>
+      <button class="modal-close" onclick="closeOrderModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" id="order-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn" style="background:transparent;border:1px solid rgba(90,90,90,.2);color:rgba(226,226,226,.5);" onclick="closeOrderModal()">Close</button>
+      <button class="btn btn-green" onclick="orderWhatsApp()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+        WhatsApp Customer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ENQUIRY MODAL -->
+<div class="modal-overlay" id="enquiry-modal">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-hdr">
+      <div class="modal-title">Enquiry Details</div>
+      <button class="modal-close" onclick="closeEnquiryModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" id="enquiry-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn" style="background:transparent;border:1px solid rgba(90,90,90,.2);color:rgba(226,226,226,.5);" onclick="closeEnquiryModal()">Close</button>
+      <button class="btn btn-green" id="enquiry-wa-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+        Reply on WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirm-dialog">
+  <div id="confirm-box">
+    <div id="confirm-msg">Are you sure?</div>
+    <div id="confirm-actions">
+      <button class="btn" style="background:transparent;border:1px solid rgba(90,90,90,.2);color:rgba(226,226,226,.5);" onclick="confirmResolve(false)">Cancel</button>
+      <button class="btn btn-delete" onclick="confirmResolve(true)">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="admin-toast"></div>
+
+<script>
+'use strict';
+
+/* ── CONFIG ─────────────────────────────────────────────────── */
+/* Only the public anon key belongs here — NEVER put the service_role
+   key in any file that ships to the browser. Access to orders/
+   enquiries/product-writes is enforced by RLS policies that check
+   for a signed-in Supabase Auth session (see supabase-setup.sql).
+   Create admin accounts in Supabase Dashboard → Authentication → Users. */
+const CFG = {
+  supabaseUrl : 'https://nasbxjharopveynnwgrg.supabase.co',
+  supabaseKey : 'sb_publishable_io0oLODozq0xdUJiNT37tQ_u2PWURX0',
+  waNumber    : '263780793585',
+  currency    : 'USD',
+};
+
+const sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+  auth: { persistSession: true, autoRefreshToken: true }
+});
+
+/* ── MOBILE SIDEBAR ─────────────────────────────────────────── */
+function openSidebar()  {
+  document.getElementById('adminSidebar').classList.add('open');
+  document.getElementById('mobOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('mobOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── AUTH (real Supabase Auth session — RLS checks this server-side) ── */
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-app').style.display    = 'block';
+  refreshDashboard();
+}
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-app').style.display    = 'none';
+}
+
+async function adminLogin() {
+  const email = document.getElementById('adm-user').value.trim();
+  const pass  = document.getElementById('adm-pass').value;
+  const err   = document.getElementById('login-err');
+  const btn   = document.getElementById('login-btn');
+  err.style.display = 'none';
+  if (!email || !pass) { return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Sign In →';
+  if (error || !data.session) {
+    err.textContent = 'Incorrect email or password.';
+    err.style.display = 'block';
+    document.getElementById('adm-pass').value = '';
+    document.getElementById('adm-pass').focus();
+    return;
+  }
+  showApp();
+}
+
+async function adminLogout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+document.getElementById('adm-pass').addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
+document.getElementById('adm-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('adm-pass').focus(); });
+
+/* Check for an existing session on load (handles refresh / persisted login) */
+(async () => {
+  const { data } = await sb.auth.getSession();
+  if (data.session) { showApp(); } else { showLogin(); }
+})();
+
+/* Keep the UI in sync if the session expires or the user signs out elsewhere */
+sb.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_OUT') showLogin();
+});
+
+/* ── NAVIGATION ─────────────────────────────────────────────── */
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('section-' + name)?.classList.add('active');
+  document.querySelector('.sb-link[data-section="' + name + '"]')?.classList.add('active');
+  closeSidebar();
+  if (name === 'products')  loadProducts_Admin();
+  if (name === 'orders')    loadOrders_Admin();
+  if (name === 'enquiries') loadEnquiries_Admin();
+  if (name === 'bulk-images') { if (!_allProducts.length) loadProducts_Admin(); }
+}
+
+/* ── DASHBOARD ──────────────────────────────────────────────── */
+async function refreshDashboard() {
+  try {
+    const [
+      { count: prodCount },
+      { data: orders, error: oErr },
+      { data: lowStock }
+    ] = await Promise.all([
+      sb.from('products').select('*', { count: 'exact', head: true }),
+      sb.from('orders').select('id,customer_name,total,status,created_at').order('created_at', { ascending: false }),
+      sb.from('products').select('name,stock').lte('stock', 5).order('stock', { ascending: true }).limit(10),
+    ]);
+
+    if (oErr) throw oErr;
+
+    document.getElementById('ds-products').textContent = prodCount ?? 0;
+    document.getElementById('ds-orders').textContent   = orders?.length ?? 0;
+
+    const pending = orders?.filter(o => o.status === 'pending').length ?? 0;
+    document.getElementById('ds-pending').textContent  = pending;
+
+    const revenue = orders?.reduce((s, o) => s + parseFloat(o.total || 0), 0) ?? 0;
+    document.getElementById('ds-revenue').textContent  = revenue.toFixed(2);
+
+    // Pending badge on sidebar nav
+    const badge = document.getElementById('sb-pending-badge');
+    if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? '' : 'none'; }
+
+    // Recent orders table
+    const roTbody = document.getElementById('dash-recent-orders');
+    roTbody.innerHTML = orders?.length
+      ? orders.slice(0, 8).map(o => `
+          <tr>
+            <td class="td-name">${esc(o.customer_name || '—')}</td>
+            <td class="td-price">${CFG.currency} ${parseFloat(o.total || 0).toFixed(2)}</td>
+            <td><span class="badge badge-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+          </tr>`).join('')
+      : '<tr><td colspan="3" class="empty-state" style="padding:20px;font-size:12px;">No orders yet.</td></tr>';
+
+    // Low stock table
+    const lsTbody = document.getElementById('dash-low-stock');
+    lsTbody.innerHTML = lowStock?.length
+      ? lowStock.map(p => `
+          <tr>
+            <td class="td-name">${esc(p.name)}</td>
+            <td><span class="badge ${p.stock === 0 ? 'badge-out' : 'badge-low'}">${p.stock}</span></td>
+          </tr>`).join('')
+      : '<tr><td colspan="2" class="empty-state" style="padding:20px;font-size:12px;">All stock healthy</td></tr>';
+
+  } catch (err) {
+    console.error('[Admin] Dashboard error:', err);
+    adminToast('Dashboard error: ' + err.message + ' — check service role key in CFG', true);
+  }
+}
+
+/* ── PRODUCTS ───────────────────────────────────────────────── */
+let _allProducts = [];
+
+/* Supabase returns at most 1000 rows per request — page through them all. */
+async function fetchAllRows(build) {
+  const size = 1000; let all = [], from = 0;
+  while (true) {
+    const { data, error } = await build().range(from, from + size - 1);
+    if (error) return { data: null, error };
+    all = all.concat(data || []);
+    if (!data || data.length < size) break;
+    from += size;
+  }
+  return { data: all, error: null };
+}
+
+async function loadProducts_Admin() {
+  const tbody = document.getElementById('products-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Loading...</td></tr>';
+  try {
+    const { data, error } = await fetchAllRows(() => sb.from('products').select('*').order('name', { ascending: true }).order('id', { ascending: true }));
+    if (error) throw error;
+    _allProducts = data || [];
+    renderProductTable(_allProducts);
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state" style="color:var(--red);">Error: ${esc(err.message)}</td></tr>`;
+  }
+}
+
+function renderProductTable(products) {
+  const tbody = document.getElementById('products-tbody');
+  if (!products.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No products found. Click "+ Add Product" to start.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = products.map(p => {
+    const stockBadge = p.stock === 0
+      ? `<span class="badge badge-out">Out of Stock</span>`
+      : p.stock <= 10
+        ? `<span class="badge badge-low">${p.stock} left</span>`
+        : `<span class="badge badge-ok">${p.stock}</span>`;
+    const activeBadge = p.active !== false
+      ? `<span class="badge badge-active">Active</span>`
+      : `<span class="badge badge-inactive">Hidden</span>`;
+    const featBadge = p.featured === true
+      ? `<span class="badge badge-confirmed" style="margin-left:4px;" title="Shown on homepage">★ Featured</span>`
+      : '';
+    const thumb = p.image
+      ? `<img src="${esc(p.image)}" alt="${esc(p.name||'Product')}" style="width:44px;height:44px;object-fit:cover;border:1px solid var(--gray-200);display:block;" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="width:44px;height:44px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+         </div>`;
+    return `<tr>
+      <td>${thumb}</td>
+      <td>
+        <div class="td-name">${esc(p.name)}</div>
+        <div class="td-sku">${esc(p.sku || 'BRC-' + p.id)}</div>
+      </td>
+      <td><span class="badge badge-trade">${esc(p.category || '—')}</span></td>
+      <td class="td-price">${CFG.currency} ${parseFloat(p.price || 0).toFixed(2)}</td>
+      <td>${stockBadge}</td>
+      <td>${activeBadge}${featBadge}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-edit btn-sm" onclick="openProductModal(${p.id})">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit
+        </button>
+        <button class="btn btn-delete btn-sm" style="margin-left:4px;" onclick="deleteProduct(${p.id}, '${esc(p.name).replace(/'/g,"\\'")}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Delete
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterProductTable() {
+  const q      = (document.getElementById('product-search')?.value || '').toLowerCase();
+  const cat    = document.getElementById('product-cat-filter')?.value  || '';
+  const active = document.getElementById('product-active-filter')?.value || '';
+  renderProductTable(_allProducts.filter(p => {
+    const mQ = !q || (p.name||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q);
+    const mC = !cat    || (p.category||'') === cat;
+    const mA = !active || (active === 'active' ? p.active !== false : p.active === false);
+    return mQ && mC && mA;
+  }));
+}
+
+/* Product modal */
+function previewProductImage(url) {
+  const preview = document.getElementById('pm-image-preview');
+  const img     = document.getElementById('pm-img-el');
+  if (url && url.startsWith('http')) { img.src = url; preview.style.display = ''; }
+  else { preview.style.display = 'none'; img.src = ''; }
+}
+
+document.getElementById('pm-active').addEventListener('change', function() {
+  document.getElementById('pm-active-label').textContent = this.checked ? 'Visible on shop' : 'Hidden from shop';
+});
+document.getElementById('pm-featured').addEventListener('change', function() {
+  document.getElementById('pm-featured-label').textContent = this.checked ? 'Featured on homepage' : 'Not featured';
+});
+
+function openProductModal(id) {
+  document.getElementById('pm-error').style.display = 'none';
+  if (id === null) {
+    document.getElementById('product-modal-title').textContent = 'Add Product';
+    clearProductForm();
+  } else {
+    document.getElementById('product-modal-title').textContent = 'Edit Product';
+    const p = _allProducts.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pm-id').value          = p.id;
+    document.getElementById('pm-name').value        = p.name        || '';
+    document.getElementById('pm-sku').value         = p.sku         || '';
+    document.getElementById('pm-price').value       = p.price       || '';
+    document.getElementById('pm-old-price').value   = p.old_price   || '';
+    document.getElementById('pm-category').value    = p.category    || '';
+    document.getElementById('pm-stock').value       = (p.stock !== null && p.stock !== undefined) ? p.stock : '';
+    document.getElementById('pm-image').value       = p.image       || '';
+    document.getElementById('pm-short-description').value = p.short_description || '';
+    document.getElementById('pm-description').value = p.description || '';
+    document.getElementById('pm-badge').value       = p.badge       || '';
+    const chk = document.getElementById('pm-active');
+    chk.checked = p.active !== false;
+    document.getElementById('pm-active-label').textContent = chk.checked ? 'Visible on shop' : 'Hidden from shop';
+    const featChk = document.getElementById('pm-featured');
+    featChk.checked = p.featured === true;
+    document.getElementById('pm-featured-label').textContent = featChk.checked ? 'Featured on homepage' : 'Not featured';
+    previewProductImage(p.image || '');
+  }
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
+
+function clearProductForm() {
+  ['pm-id','pm-name','pm-sku','pm-price','pm-old-price','pm-stock','pm-image','pm-short-description','pm-description'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('pm-category').value = '';
+  document.getElementById('pm-badge').value    = '';
+  document.getElementById('pm-active').checked = true;
+  document.getElementById('pm-active-label').textContent = 'Visible on shop';
+  document.getElementById('pm-featured').checked = false;
+  document.getElementById('pm-featured-label').textContent = 'Not featured';
+  document.getElementById('pm-active-label').textContent = 'Visible on shop';
+  previewProductImage('');
+}
+
+async function saveProduct() {
+  const id       = document.getElementById('pm-id').value;
+  const name     = document.getElementById('pm-name').value.trim();
+  const priceVal = document.getElementById('pm-price').value;
+  const price    = parseFloat(priceVal);
+  const category = document.getElementById('pm-category').value;
+  const errEl    = document.getElementById('pm-error');
+  const saveBtn  = document.getElementById('pm-save-btn');
+
+  if (!name)                 { errEl.textContent = 'Product name is required.'; errEl.style.display = 'block'; return; }
+  if (!priceVal || isNaN(price) || price < 0) { errEl.textContent = 'Please enter a valid price.'; errEl.style.display = 'block'; return; }
+  if (!category)             { errEl.textContent = 'Please select a category.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const stockRaw    = document.getElementById('pm-stock').value;
+  const oldPriceRaw = document.getElementById('pm-old-price').value;
+
+  const payload = {
+    name,
+    price,
+    category,
+    active      : document.getElementById('pm-active').checked,
+    featured    : document.getElementById('pm-featured').checked,
+    sku         : document.getElementById('pm-sku').value.trim()         || null,
+    old_price   : oldPriceRaw ? parseFloat(oldPriceRaw) : null,
+    stock       : stockRaw !== '' ? parseInt(stockRaw, 10) : 0,
+    image       : document.getElementById('pm-image').value.trim()       || null,
+    short_description : document.getElementById('pm-short-description').value.trim() || null,
+    description : document.getElementById('pm-description').value.trim() || null,
+    badge       : document.getElementById('pm-badge').value              || null,
+  };
+
+  saveBtn.textContent = 'Saving...';
+  saveBtn.disabled    = true;
+
+  try {
+    let error;
+    if (id) {
+      ({ error } = await sb.from('products').update(payload).eq('id', parseInt(id, 10)));
+    } else {
+      ({ error } = await sb.from('products').insert([payload]));
+    }
+    if (error) throw error;
+    closeProductModal();
+    adminToast(id ? 'Product updated' : 'Product added');
+    loadProducts_Admin();
+  } catch (err) {
+    errEl.textContent = 'Save failed: ' + err.message;
+    errEl.style.display = 'block';
+  } finally {
+    saveBtn.textContent = 'Save Product';
+    saveBtn.disabled    = false;
+  }
+}
+
+async function deleteProduct(id, name) {
+  const ok = await confirmDialog('Delete "' + name + '"?\n\nThis cannot be undone.');
+  if (!ok) return;
+  try {
+    const { error } = await sb.from('products').delete().eq('id', id);
+    if (error) throw error;
+    adminToast('Product deleted');
+    loadProducts_Admin();
+  } catch (err) {
+    adminToast('Delete failed: ' + err.message, true);
+  }
+}
+
+/* ── ORDERS ─────────────────────────────────────────────────── */
+let _allOrders  = [];
+let _activeOrder = null;
+
+async function loadOrders_Admin() {
+  const tbody        = document.getElementById('orders-tbody');
+  const statusFilter = document.getElementById('order-status-filter')?.value || '';
+  tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Loading...</td></tr>';
+  try {
+    let query = sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (statusFilter) query = query.eq('status', statusFilter);
+    const { data, error } = await query;
+    if (error) throw error;
+    _allOrders = data || [];
+    renderOrderTable(_allOrders);
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-state" style="color:var(--red);">
+      Error: ${esc(err.message)}
+    </td></tr>`;
+  }
+}
+
+function renderOrderTable(orders) {
+  const tbody = document.getElementById('orders-tbody');
+  if (!orders.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No orders found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = orders.map(o => {
+    const phone     = o.customer_phone || '—';
+    const items     = _parseItems(o.items);
+    const itemCount = items.reduce((s, i) => s + (i.qty || 1), 0);
+    const dateStr   = o.created_at
+      ? new Date(o.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' })
+      : '—';
+    return `<tr>
+      <td class="td-sku" style="font-weight:600;">#${o.id}</td>
+      <td class="td-name">${esc(o.customer_name || '—')}</td>
+      <td style="font-size:12px;">${esc(phone)}</td>
+      <td style="font-size:12px;text-align:center;">${itemCount}</td>
+      <td class="td-price">${CFG.currency} ${parseFloat(o.total || 0).toFixed(2)}</td>
+      <td style="font-size:11px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(o.payment_method || '—')}</td>
+      <td>
+        <select style="background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text);padding:4px 8px;font-size:11px;outline:none;cursor:pointer;"
+          onchange="updateOrderStatus(${o.id}, this.value)">
+          ${['pending','confirmed','shipped','delivered','cancelled'].map(s =>
+            `<option value="${s}" ${(o.status||'pending')===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td style="font-size:11px;color:var(--muted);white-space:nowrap;">${dateStr}</td>
+      <td><button class="btn btn-edit btn-sm" onclick="openOrderModal(${o.id})">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterOrderTable() {
+  const q = (document.getElementById('order-search')?.value || '').toLowerCase();
+  renderOrderTable(_allOrders.filter(o => {
+    const phone = o.customer_phone || '';
+    return (o.customer_name||'').toLowerCase().includes(q) || phone.toLowerCase().includes(q);
+  }));
+}
+
+async function updateOrderStatus(id, status) {
+  try {
+    const { error } = await sb.from('orders').update({ status }).eq('id', id);
+    if (error) throw error;
+    adminToast('Order #' + id + ' → ' + status);
+    const o = _allOrders.find(x => x.id === id);
+    if (o) o.status = status;
+    // Refresh dashboard pending count
+    const pending = _allOrders.filter(x => x.status === 'pending').length;
+    const badge = document.getElementById('sb-pending-badge');
+    if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? '' : 'none'; }
+    document.getElementById('ds-pending').textContent = pending;
+  } catch (err) {
+    adminToast('Status update failed: ' + err.message, true);
+  }
+}
+
+function openOrderModal(id) {
+  _activeOrder = _allOrders.find(o => o.id === id);
+  if (!_activeOrder) return;
+  const o       = _activeOrder;
+  const phone   = o.customer_phone || '—';
+  const address = o.customer_address || null;
+  const items   = _parseItems(o.items);
+  const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('en-GB') : '—';
+
+  document.getElementById('order-modal-title').textContent = 'Order #' + o.id;
+  document.getElementById('order-modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+      <div><div class="f-label">Customer</div><div style="color:var(--silver);font-size:15px;font-weight:600;">${esc(o.customer_name)}</div></div>
+      <div><div class="f-label">Phone</div><div style="color:var(--silver);font-size:14px;">${esc(phone)}</div></div>
+      <div>
+        <div class="f-label">Update Status</div>
+        <select style="background:rgba(90,90,90,.1);border:1px solid rgba(90,90,90,.25);color:var(--silver);padding:7px 10px;font-size:12px;outline:none;cursor:pointer;width:100%;"
+          onchange="updateOrderStatus(${o.id},this.value)">
+          ${['pending','confirmed','shipped','delivered','cancelled'].map(s =>
+            `<option value="${s}" ${(o.status||'pending')===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+      <div><div class="f-label">Payment</div><div style="color:var(--silver);font-size:13px;">${esc(o.payment_method||'—')}</div></div>
+      ${address ? `<div style="grid-column:1/-1;"><div class="f-label">Delivery Address</div><div style="color:rgba(226,226,226,.7);font-size:13px;">${esc(address)}</div></div>` : ''}
+      ${o.notes  ? `<div style="grid-column:1/-1;"><div class="f-label">Notes</div><div style="color:rgba(226,226,226,.7);font-size:13px;">${esc(o.notes)}</div></div>` : ''}
+      <div style="grid-column:1/-1;"><div class="f-label">Placed</div><div style="color:rgba(226,226,226,.4);font-size:12px;">${dateStr}</div></div>
+    </div>
+    <div class="f-label" style="margin-bottom:10px;">Order Items</div>
+    <div class="order-items-list">
+      ${items.length
+        ? items.map(i => `
+            <div class="order-item-row">
+              <span>${esc(i.name)} <span style="color:rgba(226,226,226,.35);">x${i.qty||1}</span></span>
+              <span style="font-family:'Saira',sans-serif;font-weight:700;color:var(--silver);">
+                ${CFG.currency} ${(parseFloat(i.price||0)*(i.qty||1)).toFixed(2)}
+              </span>
+            </div>`).join('')
+        : '<div style="color:rgba(226,226,226,.3);font-size:12px;padding:8px 0;">No item details recorded.</div>'
+      }
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;margin-top:8px;border-top:1px solid rgba(90,90,90,.15);">
+        <span style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(226,226,226,.3);">TOTAL</span>
+        <span style="font-family:'Saira',sans-serif;font-size:24px;font-weight:900;color:var(--silver);">
+          ${CFG.currency} ${parseFloat(o.total||0).toFixed(2)}
+        </span>
+      </div>
+    </div>`;
+  document.getElementById('order-modal').classList.add('open');
+}
+
+function closeOrderModal() { document.getElementById('order-modal').classList.remove('open'); _activeOrder = null; }
+
+function orderWhatsApp() {
+  if (!_activeOrder) return;
+  const o     = _activeOrder;
+  const phone = (o.customer_phone || CFG.waNumber).replace(/[^0-9]/g, '');
+  const items = _parseItems(o.items);
+  const lines = items.map(i => '  - ' + i.name + ' x' + (i.qty||1) + ' @ ' + CFG.currency + ' ' + (parseFloat(i.price||0)*(i.qty||1)).toFixed(2)).join('\n');
+  const msg   = 'Hello ' + o.customer_name + '!\n\nThank you for your order #' + o.id + ' with Armand Carpentry & Designs.\n\n*Order Summary:*\n' + lines + '\n\n*Total: ' + CFG.currency + ' ' + parseFloat(o.total||0).toFixed(2) + '*\n*Payment: ' + (o.payment_method||'Cash on Delivery') + '*\n*Status: ' + (o.status||'pending') + '*\n\nWe will be in touch shortly. Thank you!';
+  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+}
+
+/* ── ENQUIRIES ──────────────────────────────────────────────── */
+let _allEnquiries = [];
+let _activeEnquiry = null;
+
+async function loadEnquiries_Admin() {
+  const tbody = document.getElementById('enquiries-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Loading...</td></tr>';
+  try {
+    const { data, error } = await sb
+      .from('enquiries')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    _allEnquiries = data || [];
+    renderEnquiryTable(_allEnquiries);
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state" style="color:var(--red);">
+      Error: ${esc(err.message)}
+    </td></tr>`;
+  }
+}
+
+function renderEnquiryTable(enquiries) {
+  const tbody = document.getElementById('enquiries-tbody');
+  if (!enquiries.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No enquiries yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = enquiries.map(e => {
+    // Support both old (full_name/submitted_at/enquiry_type) and new (name/created_at/subject) column names
+    const name    = e.name    || e.full_name    || '—';
+    const phone   = e.phone                     || '—';
+    const email   = e.email                     || '—';
+    const subject = e.subject || e.enquiry_type || '—';
+    const msg     = e.message                   || '—';
+    const dateRaw = e.created_at || e.submitted_at;
+    const dateStr = dateRaw ? new Date(dateRaw).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' }) : '—';
+    const preview = msg.length > 55 ? msg.slice(0, 52) + '…' : msg;
+    return `<tr>
+      <td class="td-name">${esc(name)}</td>
+      <td style="font-size:12px;">${esc(phone)}</td>
+      <td style="font-size:12px;color:var(--muted);">${esc(email)}</td>
+      <td><span class="badge badge-trade" style="font-size:8px;">${esc(subject)}</span></td>
+      <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(msg)}">${esc(preview)}</td>
+      <td style="font-size:11px;color:var(--muted);white-space:nowrap;">${dateStr}</td>
+      <td><button class="btn btn-edit btn-sm" onclick="openEnquiryModal(${e.id})">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterEnquiryTable() {
+  const q = (document.getElementById('enquiry-search')?.value || '').toLowerCase();
+  renderEnquiryTable(!q ? _allEnquiries : _allEnquiries.filter(e => {
+    const name    = (e.name || e.full_name || '').toLowerCase();
+    const phone   = (e.phone || '').toLowerCase();
+    const subject = (e.subject || e.enquiry_type || '').toLowerCase();
+    return name.includes(q) || phone.includes(q) || subject.includes(q);
+  }));
+}
+
+function openEnquiryModal(id) {
+  const e = _allEnquiries.find(x => x.id === id);
+  if (!e) return;
+  _activeEnquiry = e;
+  const name    = e.name    || e.full_name    || '—';
+  const phone   = e.phone                     || '—';
+  const email   = e.email                     || '—';
+  const subject = e.subject || e.enquiry_type || '—';
+  const msg     = e.message                   || '—';
+  const dateRaw = e.created_at || e.submitted_at;
+  const dateStr = dateRaw ? new Date(dateRaw).toLocaleString('en-GB') : '—';
+
+  document.getElementById('enquiry-modal-body').innerHTML = `
+    <div style="display:grid;gap:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><div class="f-label">Name</div><div style="color:var(--silver);font-weight:600;font-size:15px;">${esc(name)}</div></div>
+        <div><div class="f-label">Phone</div><div style="color:var(--silver);">${esc(phone)}</div></div>
+        <div><div class="f-label">Email</div><div style="color:rgba(226,226,226,.65);font-size:13px;">${esc(email)}</div></div>
+        <div><div class="f-label">Subject</div><span class="badge badge-trade">${esc(subject)}</span></div>
+        <div style="grid-column:1/-1;"><div class="f-label">Received</div><div style="color:rgba(226,226,226,.4);font-size:12px;">${dateStr}</div></div>
+      </div>
+      <div>
+        <div class="f-label" style="margin-bottom:8px;">Message</div>
+        <div style="background:rgba(90,90,90,.06);border:1px solid rgba(90,90,90,.12);padding:14px;font-size:13px;color:rgba(226,226,226,.75);line-height:1.75;white-space:pre-wrap;max-height:240px;overflow-y:auto;">${esc(msg)}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('enquiry-wa-btn').onclick = () => {
+    const waPhone = phone.replace(/[^0-9]/g, '') || CFG.waNumber;
+    const waMsg   = 'Hello ' + name + '! Thank you for contacting Armand Carpentry & Designs.\n\nWe received your enquiry about: ' + subject + '.\n\nWe will respond shortly. How can we assist you?';
+    window.open('https://wa.me/' + waPhone + '?text=' + encodeURIComponent(waMsg), '_blank', 'noopener');
+  };
+
+  document.getElementById('enquiry-modal').classList.add('open');
+}
+
+function closeEnquiryModal() { document.getElementById('enquiry-modal').classList.remove('open'); _activeEnquiry = null; }
+
+/* ── CONFIRM DIALOG ─────────────────────────────────────────── */
+let _confirmResolve = null;
+function confirmDialog(msg) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('confirm-dialog').classList.add('open');
+  });
+}
+window.confirmResolve = function(val) {
+  document.getElementById('confirm-dialog').classList.remove('open');
+  if (_confirmResolve) { _confirmResolve(val); _confirmResolve = null; }
+};
+
+/* ── TOAST ──────────────────────────────────────────────────── */
+let _toastTimer;
+function adminToast(msg, isErr = false) {
+  const t = document.getElementById('admin-toast');
+  t.textContent       = msg;
+  t.style.borderColor = isErr ? 'rgba(232,67,67,.4)' : 'rgba(90,90,90,.3)';
+  t.style.color       = isErr ? '#e84343' : 'var(--silver)';
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ── UTILITY ────────────────────────────────────────────────── */
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+function _parseItems(items) {
+  if (Array.isArray(items)) return items;
+  if (typeof items === 'string') { try { return JSON.parse(items) || []; } catch { return []; } }
+  return [];
+}
+
+/* Close modals on overlay click + Escape key */
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeSidebar();
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    document.getElementById('confirm-dialog')?.classList.remove('open');
+  }
+});
+/* ═══════════════════════════════════════════════════════════════
+   BULK IMAGE UPLOAD
+   Matches filenames to products (by name / SKU), uploads to the
+   'product-images' Supabase Storage bucket, then writes the public
+   URL into products.image. Requires an authenticated admin session
+   (storage + product UPDATE policies are gated to `authenticated`).
+═══════════════════════════════════════════════════════════════ */
+const BI_BUCKET = 'product-images';
+let _biFiles = [];   // { uid, file, base, matchedId, matchedName, score, status, msg, previewUrl }
+let _biSeq = 0;
+
+function biNormalize(str) {
+  return (str || '')
+    .toLowerCase()
+    .replace(/\.[a-z0-9]+$/i, '')       // strip extension if present
+    .replace(/[_\-.]+/g, ' ')
+    .replace(/[^a-z0-9 ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/* Pre-compute normalised names/SKUs ONCE (was recomputed for every product on every file). */
+let _biIndex = null, _biIndexSrc = null, _biIndexLen = -1, _biOptionsHtml = null;
+function biBuildIndex() {
+  if (_biIndex && _biIndexSrc === _allProducts && _biIndexLen === _allProducts.length) return;
+  _biIndex = _allProducts.map(p => {
+    const name = biNormalize(p.name);
+    return { p, name, sku: biNormalize(p.sku), tokens: new Set(name.split(' ').filter(Boolean)) };
+  });
+  _biIndexSrc = _allProducts; _biIndexLen = _allProducts.length; _biOptionsHtml = null;
+}
+
+/* Score a filename's normalized text against a product. Higher = better. */
+function biScore(normFile, ix) {
+  const normName = ix.name, normSku = ix.sku;
+  if (normSku && normFile === normSku) return 100;
+  if (normName && normFile === normName) return 100;
+  const stripped = normFile.replace(/\s+\d+$/, '').replace(/\s+[a-z]$/, '');
+  if (normName && stripped === normName) return 95;
+  if (normSku && (normFile.includes(normSku) || normSku.includes(normFile)) && normSku.length > 2) return 85;
+  if (normName && (normFile.includes(normName) || normName.includes(normFile)) && normName.length > 2) return 75;
+  const fTokens = new Set(normFile.split(' ').filter(Boolean));
+  if (!fTokens.size || !ix.tokens.size) return 0;
+  let overlap = 0;
+  fTokens.forEach(t => { if (ix.tokens.has(t)) overlap++; });
+  return Math.round((overlap / Math.max(fTokens.size, ix.tokens.size)) * 60);
+}
+
+function biBestMatch(base) {
+  biBuildIndex();
+  const normFile = biNormalize(base);
+  let best = null, bestScore = 0;
+  for (const ix of _biIndex) {
+    const sc = biScore(normFile, ix);
+    if (sc > bestScore) { bestScore = sc; best = ix.p; if (sc === 100) break; }
+  }
+  if (best && bestScore >= 50) return { id: best.id, name: best.name, score: bestScore };
+  return { id: null, name: null, score: bestScore };
+}
+
+function biInit() {
+  const zone  = document.getElementById('bi-dropzone');
+  const input = document.getElementById('bi-file-input');
+  if (!zone || zone.dataset.bound) return;
+  zone.dataset.bound = '1';
+  zone.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => { const f = Array.from(input.files || []); input.value = ''; biAddFiles(f); });
+  ['dragover','dragenter'].forEach(evt => zone.addEventListener(evt, e => {
+    e.preventDefault(); zone.style.borderColor = 'var(--charcoal)'; zone.style.background = 'rgba(42,40,43,.04)';
+  }));
+  ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e => {
+    e.preventDefault(); zone.style.borderColor = 'rgba(90,90,90,.3)'; zone.style.background = '#fff';
+  }));
+  zone.addEventListener('drop', e => {
+    const files = Array.from(e.dataTransfer?.files || []).filter(f => f.type.startsWith('image/'));
+    biAddFiles(files);
+  });
+}
+
+async function biAddFiles(files) {
+  if (!files.length) return;
+  if (!_allProducts.length) {
+    adminToast('Loading products list — try again in a moment.', true);
+    loadProducts_Admin();
+    return;
+  }
+  biBuildIndex();
+  const seen = new Set(_biFiles.map(r => r.file.name + '|' + r.file.size));
+  const fresh = files.filter(f => !seen.has(f.name + '|' + f.size));
+  const CHUNK = 40;
+  for (let i = 0; i < fresh.length; i += CHUNK) {
+    fresh.slice(i, i + CHUNK).forEach(file => {
+      const match = biBestMatch(file.name);
+      _biFiles.push({
+        uid: ++_biSeq, file, base: file.name,
+        previewUrl: URL.createObjectURL(file),
+        matchedId: match.id, matchedName: match.name, score: match.score,
+        status: match.id ? 'matched' : 'unmatched', msg: ''
+      });
+    });
+    adminToast(`Matching images… ${Math.min(i + CHUNK, fresh.length)} / ${fresh.length}`);
+    await new Promise(r => setTimeout(r, 0));   // let the browser breathe
+  }
+  biRender();
+}
+
+/* Full product list for the dropdown is built once and only injected when a row's dropdown is opened. */
+function biAllOptionsHtml() {
+  if (_biOptionsHtml) return _biOptionsHtml;
+  const sorted = [..._allProducts].sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  let html = '<option value="">— Unmatched —</option>';
+  sorted.forEach(p => { html += `<option value="${p.id}">${esc(p.name)}${p.sku ? ' ('+esc(p.sku)+')' : ''}</option>`; });
+  return (_biOptionsHtml = html);
+}
+function biFillOptions(sel) {
+  if (sel.dataset.full) return;
+  sel.dataset.full = '1';
+  const cur = sel.value;
+  sel.innerHTML = biAllOptionsHtml();
+  sel.value = cur;
+}
+function biSelectStub(row) {
+  return row.matchedId
+    ? `<option value="${row.matchedId}" selected>${esc(row.matchedName)}</option>`
+    : '<option value="" selected>— Unmatched —</option>';
+}
+
+function biStatusBadge(row) {
+  const map = {
+    matched:   ['#e8f5ee','#1a8f4c','Ready'],
+    unmatched: ['#f0f0f0','var(--steel)','No match'],
+    uploading: ['#eef3fb','#2563eb','Uploading…'],
+    done:      ['#e8f5ee','#1a8f4c','Uploaded'],
+    error:     ['#fdeceb','var(--red)','Failed']
+  };
+  const [bg,color,label] = map[row.status] || map.unmatched;
+  return `<span style="background:${bg};color:${color};font-size:10px;font-weight:600;padding:4px 9px;border-radius:20px;letter-spacing:.3px;">${label}</span>`;
+}
+
+function biRowHtml(row) {
+  return `
+    <tr data-uid="${row.uid}">
+      <td><img src="${row.previewUrl}" loading="lazy" decoding="async" style="width:40px;height:40px;object-fit:cover;border:1px solid var(--gray-200);display:block;"></td>
+      <td style="font-size:12px;word-break:break-all;">${esc(row.base)}</td>
+      <td>
+        <select class="f-input f-select" style="width:100%;padding:6px 10px;font-size:12px;" onfocus="biFillOptions(this)" onmousedown="biFillOptions(this)" onchange="biManualMatch(${row.uid}, this.value)">
+          ${biSelectStub(row)}
+        </select>
+      </td>
+      <td style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;color:var(--muted);">${row.matchedId ? row.score + '%' : '—'}</td>
+      <td>${biStatusCell(row)}</td>
+      <td><button class="btn btn-delete btn-sm" style="padding:5px 8px;" onclick="biRemove(${row.uid})" title="Remove" ${row.status==='uploading' ? 'disabled' : ''}>&times;</button></td>
+    </tr>`;
+}
+function biStatusCell(row) {
+  return biStatusBadge(row) + (row.status==='error' ? `<div style="font-size:9px;color:var(--red);margin-top:3px;">${esc(row.msg)}</div>` : '');
+}
+
+function biRender() {
+  const tbody = document.getElementById('bi-tbody');
+  document.getElementById('bi-table-wrap').style.display = _biFiles.length ? 'block' : 'none';
+  document.getElementById('bi-summary').style.display = _biFiles.length ? 'flex' : 'none';
+  document.getElementById('bi-upload-btn').style.display = _biFiles.length ? 'inline-flex' : 'none';
+  document.getElementById('bi-rematch-btn').style.display = _biFiles.length ? 'inline-flex' : 'none';
+  tbody.innerHTML = _biFiles.map(biRowHtml).join('');
+  biUpdateCounts();
+}
+
+/* During an upload only touch the one row that changed — never rebuild the whole table. */
+function biRefreshRow(row) {
+  const tr = document.querySelector(`#bi-tbody tr[data-uid="${row.uid}"]`);
+  if (tr) {
+    tr.children[4].innerHTML = biStatusCell(row);
+    const btn = tr.children[5].querySelector('button');
+    if (btn) btn.disabled = row.status === 'uploading';
+  }
+  biUpdateCounts();
+}
+
+function biManualMatch(uid, productId) {
+  const row = _biFiles.find(r => r.uid === uid);
+  if (!row) return;
+  if (!productId) {
+    row.matchedId = null; row.matchedName = null; row.score = 0; row.status = 'unmatched';
+  } else {
+    const p = _allProducts.find(x => String(x.id) === String(productId));
+    row.matchedId = p.id; row.matchedName = p.name; row.score = 100; row.status = 'matched';
+  }
+  const tr = document.querySelector(`#bi-tbody tr[data-uid="${uid}"]`);
+  if (tr) { tr.outerHTML = biRowHtml(row); biUpdateCounts(); } else { biRender(); }
+}
+
+function biRemove(uid) {
+  const gone = _biFiles.find(r => r.uid === uid);
+  if (gone) URL.revokeObjectURL(gone.previewUrl);
+  _biFiles = _biFiles.filter(r => r.uid !== uid);
+  biRender();
+}
+
+function biRematchAll() {
+  _biFiles.forEach(row => {
+    if (row.status === 'done' || row.status === 'uploading') return;
+    const match = biBestMatch(row.base);
+    row.matchedId = match.id; row.matchedName = match.name; row.score = match.score;
+    row.status = match.id ? 'matched' : 'unmatched';
+  });
+  biRender();
+}
+
+function biUpdateCounts() {
+  const total     = _biFiles.length;
+  const matched   = _biFiles.filter(r => r.status === 'matched').length;
+  const unmatched = _biFiles.filter(r => r.status === 'unmatched').length;
+  const done      = _biFiles.filter(r => r.status === 'done').length;
+  const error     = _biFiles.filter(r => r.status === 'error').length;
+  document.getElementById('bi-count-total').textContent     = total;
+  document.getElementById('bi-count-matched').textContent   = matched;
+  document.getElementById('bi-count-unmatched').textContent = unmatched;
+  document.getElementById('bi-count-done').textContent      = done;
+  document.getElementById('bi-count-error').textContent     = error;
+  const pct = total ? Math.round(((done+error) / total) * 100) : 0;
+  document.getElementById('bi-progress-bar').style.width = pct + '%';
+  document.getElementById('bi-progress-label').textContent = pct + '%';
+}
+
+function biSanitizeName(name) {
+  return name.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/-+/g, '-');
+}
+
+/* Shrink big photos before upload: max 1400px, WebP ~85%. A 4 MB camera photo becomes ~100-200 KB. */
+async function biPrepare(file) {
+  const origExt = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const original = { blob: file, ext: origExt, type: file.type || undefined };
+  try {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return original;
+    const MAX = 1400;
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, MAX / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 300 * 1024) { bmp.close && bmp.close(); return original; }
+    const w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(bmp, 0, 0, w, h);
+    bmp.close && bmp.close();
+    let blob = await new Promise(r => c.toBlob(r, 'image/webp', 0.85));
+    if (!blob || blob.type !== 'image/webp') {            // browser can't encode WebP → JPEG on white
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+      blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.85));
+    }
+    c.width = c.height = 0;
+    if (!blob || blob.size >= file.size) return original;
+    return { blob, ext: blob.type === 'image/webp' ? 'webp' : 'jpg', type: blob.type };
+  } catch (_e) { return original; }
+}
+
+async function biUploadOne(row) {
+  row.status = 'uploading'; row.msg = ''; biRefreshRow(row);
+  try {
+    const prep = await biPrepare(row.file);
+    const path = `bulk/${Date.now()}-${row.uid}-${biSanitizeName(row.base.replace(/\.[^.]+$/, ''))}.${prep.ext}`;
+
+    const { error: upErr } = await sb.storage.from(BI_BUCKET).upload(path, prep.blob, {
+      cacheControl: '31536000',
+      upsert: false,
+      contentType: prep.type
+    });
+    if (upErr) throw upErr;
+
+    const { data: pub } = sb.storage.from(BI_BUCKET).getPublicUrl(path);
+    const publicUrl = pub?.publicUrl;
+    if (!publicUrl) throw new Error('Could not resolve public URL');
+
+    const { error: updErr } = await sb.from('products').update({ image: publicUrl }).eq('id', row.matchedId);
+    if (updErr) throw updErr;
+
+    const p = _allProducts.find(x => x.id === row.matchedId);
+    if (p) p.image = publicUrl;
+
+    row.status = 'done';
+  } catch (err) {
+    row.status = 'error';
+    row.msg = err.message || 'Upload failed';
+  }
+  biRefreshRow(row);
+}
+
+async function biStartUpload() {
+  const queue = _biFiles.filter(r => r.status === 'matched' || r.status === 'error');
+  if (!queue.length) { adminToast('No matched files ready to upload.', true); return; }
+
+  const btn = document.getElementById('bi-upload-btn');
+  btn.disabled = true;
+
+  const CONCURRENCY = 5;
+  let idx = 0, finished = 0;
+  async function worker() {
+    while (idx < queue.length) {
+      const row = queue[idx++];
+      await biUploadOne(row);
+      finished++;
+      btn.textContent = `Uploading ${finished} / ${queue.length}…`;
+    }
+  }
+  btn.textContent = `Uploading 0 / ${queue.length}…`;
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queue.length) }, worker));
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg> Upload All Matched`;
+
+  const failed = _biFiles.filter(r => r.status === 'error').length;
+  const done   = _biFiles.filter(r => r.status === 'done').length;
+  adminToast(failed ? `${done} uploaded, ${failed} failed — fix and retry.` : `${done} images uploaded successfully.`, !!failed);
+  renderProductTable(_allProducts);
+}
+
+biInit();
+</script>
+</body>
+</html>
