@@ -616,22 +616,50 @@ body{background:var(--w-paper);}
 .pdm-nav-btn{padding:6px;}
 
 @media(max-width:600px){
-  /* Bottom sheet: image stays visible above, never fills the whole screen */
+  /* Bottom sheet */
   .pdm-overlay{padding:0;align-items:flex-end;}
   .pdm-box{
-    grid-template-columns:1fr;grid-template-rows:180px minmax(0,1fr);
-    height:auto;max-height:88vh;max-height:88dvh;
+    display:flex;flex-direction:column;
+    height:auto;max-height:86vh;max-height:86dvh;
     width:100%;max-width:none;
+    border-top:0;border-radius:16px 16px 0 0;
     animation:pdmSheet .3s cubic-bezier(.2,.8,.2,1);
   }
-  .pdm-img-panel{min-height:0;height:180px;}
-  .pdm-info{padding:18px 18px 0;height:auto;max-height:none;}
-  .pdm-nav{display:none;}
-  .pdm-img-panel{height:150px;}
-  .pdm-box{grid-template-rows:150px minmax(0,1fr);}
-  .pdm-name{font-size:20px;}
+  .pdm-box::before{ /* grab handle */
+    content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:40px;height:4px;border-radius:2px;background:rgba(0,0,0,.22);z-index:3;
+  }
+  .pdm-close{top:12px;right:12px;width:32px;height:32px;z-index:4;}
+  .pdm-img-panel{flex:0 0 auto;height:200px;min-height:0;}
+  .pdm-img-panel img{padding:16px;}
+  .pdm-img-placeholder{transform:scale(.8);}
+  .pdm-stock-badge{bottom:10px;left:12px;}
+  .pdm-badge{top:16px;left:12px;}
+  .pdm-info{
+    display:block;flex:1 1 auto;height:auto;min-height:0;
+    padding:16px 18px 0;overflow-y:auto;
+  }
+  .pdm-sku{margin-bottom:4px;font-size:10px;}
+  .pdm-name{font-size:19px;line-height:1.25;padding-right:0;margin-bottom:8px;}
+  .pdm-cat-tag{margin-bottom:10px;padding:3px 10px;font-size:10px;}
+  .pdm-price-row{margin-bottom:12px;padding-bottom:12px;}
   .pdm-price{font-size:26px;}
-  .pdm-actions{padding-bottom:calc(14px + env(safe-area-inset-bottom));}
+  .pdm-desc{font-size:13px;line-height:1.65;margin-bottom:12px;}
+  .pdm-specs{margin-bottom:12px;}
+  /* Sticky action bar: [ − 1 + ] [ Add to Cart ] / enquiry link */
+  .pdm-actions{
+    position:sticky;bottom:0;margin:0 -18px;
+    padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+    display:grid;grid-template-columns:auto 1fr;gap:8px 10px;
+    border-top:1px solid #E6E9ED;box-shadow:0 -6px 16px -8px rgba(0,0,0,.14);
+  }
+  .pdm-qty-row{margin:0;}
+  .pdm-qty-label{display:none;}
+  .pdm-qty-btn{width:36px;height:44px;}
+  .pdm-qty-val{width:40px;height:44px;}
+  .pdm-add-btn{margin:0;height:46px;padding:0 12px;font-size:13px;letter-spacing:1.5px;}
+  .pdm-wa-btn{grid-column:1/-1;padding:10px;font-size:12px;}
+  .pdm-nav{display:none;}
 }
 @keyframes pdmSheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.pdm-box{animation:none;}}
