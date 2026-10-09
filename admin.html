@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Armand Admin — Management Console</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -163,7 +164,7 @@ table tr:hover td{background:var(--gray-50);}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <img src="armand-logo-nav.png" alt="Armand Carpentry &amp; Designs" class="login-logo-img">
+    <img src="armand-logo-nav.png" width="400" height="224" alt="Armand Carpentry &amp; Designs" class="login-logo-img">
     <div class="login-sub">Product &amp; Order Management</div>
     <label class="login-label" for="adm-user">Email</label>
     <input id="adm-user" type="email" class="login-input" placeholder="you@example.com" autocomplete="username">
@@ -182,7 +183,7 @@ table tr:hover td{background:var(--gray-50);}
     <!-- SIDEBAR -->
     <aside class="sidebar" id="adminSidebar">
       <div class="sb-logo">
-        <img src="armand-logo-nav.png" alt="Armand Carpentry &amp; Designs" class="sb-logo-img">
+        <img src="armand-logo-nav.png" width="400" height="224" alt="Armand Carpentry &amp; Designs" class="sb-logo-img">
         <div class="sb-logo-main">Armand Admin</div>
         <div class="sb-logo-sub">Management Console</div>
       </div>
@@ -440,7 +441,7 @@ table tr:hover td{background:var(--gray-50);}
         </div>
         <div class="f-group">
           <label class="f-label">SKU</label>
-          <input id="pm-sku" class="f-input" type="text" placeholder="BRC-HDL-042">
+          <input id="pm-sku" class="f-input" type="text" placeholder="ARM-HDL-042">
         </div>
       </div>
       <div class="f-row">
@@ -727,7 +728,7 @@ async function refreshDashboard() {
 
   } catch (err) {
     console.error('[Admin] Dashboard error:', err);
-    adminToast('Dashboard error: ' + err.message + ' — check service role key in CFG', true);
+    adminToast('Dashboard error: ' + err.message + ' — check your connection and that you are signed in', true);
   }
 }
 
@@ -787,7 +788,7 @@ function renderProductTable(products) {
       <td>${thumb}</td>
       <td>
         <div class="td-name">${esc(p.name)}</div>
-        <div class="td-sku">${esc(p.sku || 'BRC-' + p.id)}</div>
+        <div class="td-sku">${esc(p.sku || 'ARM-' + p.id)}</div>
       </td>
       <td><span class="badge badge-trade">${esc(p.category || '—')}</span></td>
       <td class="td-price">${CFG.currency} ${parseFloat(p.price || 0).toFixed(2)}</td>

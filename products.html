@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Browse the Armand Carpentry &amp; Designs catalogue — boards, edging and 5,000+ fittings SKUs covering hinges, handles, drawer systems, locks, kitchen fittings &amp; construction hardware. Bulawayo, Zimbabwe.">
+<meta name="description" content="Browse the Armand Carpentry &amp; Designs catalogue — boards, edging and hundreds of fittings SKUs covering hinges, handles, drawer systems, locks, kitchen fittings &amp; construction hardware. Bulawayo, Zimbabwe.">
 <meta name="keywords" content="boards and panels Bulawayo, edging Zimbabwe, hardware catalogue Zimbabwe, hinges Bulawayo, door handles Zimbabwe, drawer systems, locks, kitchen fittings Bulawayo, Armand Carpentry &amp; Designs products">
 <meta name="author" content="Armand Carpentry &amp; Designs">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.brocfittings.co.zw/products.html">
+<link rel="canonical" href="https://armand.co.zw/products.html">
 <meta property="og:title" content="Product Catalogue | Armand Carpentry &amp; Designs — Bulawayo, Zimbabwe">
-<meta property="og:description" content="Browse the Armand Carpentry &amp; Designs catalogue — boards, edging and 5,000+ fittings SKUs covering hinges, handles, drawer systems, locks, kitchen fittings &amp; construction hardware. Bulawayo, Zimbabwe.">
+<meta property="og:description" content="Browse the Armand Carpentry &amp; Designs catalogue — boards, edging and hundreds of fittings SKUs covering hinges, handles, drawer systems, locks, kitchen fittings &amp; construction hardware. Bulawayo, Zimbabwe.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.brocfittings.co.zw/products.html">
-<meta property="og:image" content="https://www.brocfittings.co.zw/og-card.png">
+<meta property="og:url" content="https://armand.co.zw/products.html">
+<meta property="og:image" content="https://armand.co.zw/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_ZW">
 <meta property="og:site_name" content="Armand Carpentry &amp; Designs">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Product Catalogue | Armand Carpentry &amp; Designs">
-<meta name="twitter:description" content="Browse the Armand Carpentry &amp; Designs catalogue — boards, edging and 5,000+ fittings SKUs covering hinges, handles, drawer systems, locks, kitchen fittings &amp; construction hardware. Bulawayo, Zimbabwe.">
-<meta name="twitter:image" content="https://www.brocfittings.co.zw/og-card.png">
+<meta name="twitter:description" content="Browse the Armand Carpentry &amp; Designs catalogue — boards, edging and hundreds of fittings SKUs covering hinges, handles, drawer systems, locks, kitchen fittings &amp; construction hardware. Bulawayo, Zimbabwe.">
+<meta name="twitter:image" content="https://armand.co.zw/og-card.png">
 <meta name="geo.region" content="ZW-BU">
 <meta name="geo.placename" content="Bulawayo">
 <meta name="geo.position" content="-20.1500;28.5833">
@@ -41,11 +41,11 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "Armand Carpentry & Designs Product Catalogue",
-  "url": "https://www.brocfittings.co.zw/products.html",
+  "url": "https://armand.co.zw/products.html",
   "isPartOf": {
     "@type": "WebSite",
     "name": "Armand Carpentry & Designs",
-    "url": "https://www.brocfittings.co.zw/index.html"
+    "url": "https://armand.co.zw/index.html"
   },
   "about": {
     "@type": "HomeAndConstructionBusiness",
@@ -56,99 +56,135 @@
 <style>
 /* ─── CATALOGUE PAGE LAYOUT ──────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;}
-body{background:#f0f2f5;}
+body{background:#EEF0F2;}
 
 /* Page shell */
 .cat-page{display:grid;grid-template-columns:260px 1fr;gap:0;min-height:100vh;padding-top:0;}
 
 /* ── SIDEBAR ────────────────────────────────────────────────── */
 .cat-sidebar{
-  background:#fff;border-right:1px solid #e2e6eb;
+  background:#fff;border-right:1px solid #DFE3E7;
   position:sticky;top:72px;height:calc(100vh - 72px);
-  overflow-y:auto;padding:0;display:flex;flex-direction:column;
-  z-index:40;
+  overflow-y:auto;overscroll-behavior:contain;padding:0;
+  display:flex;flex-direction:column;z-index:40;
+  scrollbar-width:thin;scrollbar-color:#C9CFD6 transparent; /* overrides the global dark/orange bar */
 }
-.cat-sidebar::-webkit-scrollbar{width:3px;}
-.cat-sidebar::-webkit-scrollbar-thumb{background:#d0d5dd;}
+.cat-sidebar::-webkit-scrollbar{width:6px;}
+.cat-sidebar::-webkit-scrollbar-track{background:transparent;}
+.cat-sidebar::-webkit-scrollbar-thumb{background:#C9CFD6;border-radius:3px;}
+.cat-sidebar::-webkit-scrollbar-thumb:hover{background:#B3BAC2;}
 
-.csb-header{
-  padding:20px 20px 14px;border-bottom:1px solid #eaecef;
-  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
-}
+/* Sticky top: header + search stay visible while categories scroll */
+.csb-top{position:sticky;top:0;z-index:2;background:#fff;flex-shrink:0;border-bottom:1px solid #E6E9ED;}
+.csb-header{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
 .csb-title{
-  font-family:'Saira',sans-serif;font-size:13px;font-weight:800;
+  font-family:'Saira',sans-serif;font-size:14px;font-weight:800;
   text-transform:uppercase;letter-spacing:2px;color:#2a282b;
+  display:flex;align-items:center;gap:8px;
 }
+.csb-badge{
+  display:none;min-width:20px;height:20px;padding:0 6px;border-radius:10px;
+  background:var(--brand-orange);color:#fff;font:700 11px/20px 'Barlow',sans-serif;
+  letter-spacing:0;text-align:center;
+}
+.csb-badge.show{display:inline-block;}
 .csb-clear{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1px;
-  text-transform:uppercase;color:#6a6a6a;cursor:pointer;background:none;border:none;
-  padding:3px 6px;transition:color .2s;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:12px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--brand-orange-dk);cursor:pointer;background:none;border:none;
+  padding:6px 8px;margin-right:-8px;border-radius:3px;
+  opacity:0;pointer-events:none;transition:opacity .15s,background .15s;
 }
-.csb-clear:hover{color:#2a282b;}
+.csb-clear.show{opacity:1;pointer-events:auto;}
+.csb-clear:hover{background:#fdf1ea;}
+.csb-close{display:none;background:none;border:none;font-size:26px;line-height:1;color:#3F4650;cursor:pointer;padding:0 4px;}
 
-/* Search inside sidebar */
-.csb-search{padding:14px 20px;border-bottom:1px solid #eaecef;flex-shrink:0;}
+/* Search */
+.csb-search{padding:0 20px 14px;}
 .csb-search-wrap{
   display:flex;align-items:center;gap:8px;
-  background:#f6f7f8;border:1px solid #e2e6eb;padding:9px 12px;
+  background:#F5F6F8;border:1px solid #DFE3E7;border-radius:4px;padding:0 12px;
+  transition:border-color .15s,box-shadow .15s,background .15s;
 }
+.csb-search-wrap:focus-within{background:#fff;border-color:#2a282b;box-shadow:0 0 0 3px rgba(42,40,43,.08);}
 .csb-search-input{
-  flex:1;background:none;border:none;outline:none;
-  font-family:'Barlow',sans-serif;font-size:13px;color:#2a282b;
+  flex:1;min-width:0;background:none;border:none;outline:none;height:40px;
+  font-family:'Barlow',sans-serif;font-size:14px;color:#2a282b;
 }
-.csb-search-input::placeholder{color:#a0aab4;}
+.csb-search-input::placeholder{color:#5F6872;}
+.csb-search-clear{display:none;background:none;border:none;color:#5F6872;cursor:pointer;font-size:18px;line-height:1;padding:4px;}
+.csb-search-clear.show{display:block;}
+.csb-search-clear:hover{color:#2a282b;}
 
-/* Section labels */
-.csb-section{padding:16px 20px 0;flex-shrink:0;}
-.csb-section-label{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2.5px;
-  text-transform:uppercase;color:#a0aab4;margin-bottom:10px;
+/* Collapsible sections */
+.csb-group{border-bottom:1px solid #eef0f3;flex-shrink:0;}
+.csb-group>summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;user-select:none;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:1.8px;text-transform:uppercase;color:#3F4650;
 }
+.csb-group>summary::-webkit-details-marker{display:none;}
+.csb-group>summary:hover{color:#2a282b;}
+.csb-group>summary:focus-visible{outline:2px solid var(--brand-orange-dk);outline-offset:-2px;}
+.csb-group>summary::after{
+  content:"";width:7px;height:7px;border-right:2px solid #5F6872;border-bottom:2px solid #5F6872;
+  transform:rotate(45deg) translateY(-2px);transition:transform .2s;
+}
+.csb-group[open]>summary::after{transform:rotate(-135deg) translateY(-2px);}
+.csb-group-body{padding:0 12px 14px;}
 
-/* Category buttons */
-.csb-cats{padding:0 12px 12px;flex-shrink:0;}
+/* Category list */
 .csb-cat{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 10px;cursor:pointer;
-  font-size:13px;font-weight:500;color:#4a5568;
-  border-radius:4px;transition:all .15s;margin-bottom:2px;border:none;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:9px 10px 9px 12px;cursor:pointer;position:relative;
+  font-family:'Barlow',sans-serif;font-size:14px;font-weight:500;color:#3A414A;
+  border-radius:4px;transition:background .15s,color .15s;margin-bottom:1px;border:none;
   background:none;width:100%;text-align:left;
 }
-.csb-cat:hover{background:#f0f4f8;color:#2a282b;}
-.csb-cat.active{background:rgba(0,0,0,.07);color:#2a282b;font-weight:600;}
-.csb-cat.active .csb-cat-dot{background:#2a282b;}
-.csb-cat-left{display:flex;align-items:center;gap:9px;}
-.csb-cat-dot{width:6px;height:6px;border-radius:50%;background:#d0d5dd;flex-shrink:0;}
-.csb-cat-count{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;color:#a0aab4;
-  background:#f0f2f5;padding:2px 7px;border-radius:99px;
+.csb-cat::before{
+  content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:2px;
+  background:transparent;transition:background .15s;
 }
+.csb-cat:hover{background:#f3f5f7;color:#2a282b;}
+.csb-cat:focus-visible{outline:2px solid var(--brand-orange-dk);outline-offset:-2px;}
+.csb-cat.active{background:#fdf1ea;color:#2a282b;font-weight:700;}
+.csb-cat.active::before{background:var(--brand-orange);}
+.csb-cat.is-empty{color:#5F6872;}
+.csb-cat-left{display:flex;align-items:center;gap:9px;min-width:0;}
+.csb-cat-dot{display:none;}
+.csb-cat-count{
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:12px;font-weight:600;color:#5C6570;
+  background:#EEF0F2;padding:1px 8px;border-radius:99px;min-width:28px;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.csb-cat.active .csb-cat-count{background:var(--brand-orange);color:#fff;}
 
 /* Filter pills */
-.csb-filters{padding:0 12px 16px;flex-shrink:0;}
-.csb-filter-row{display:flex;flex-wrap:wrap;gap:6px;}
+.csb-filter-row{display:flex;flex-wrap:wrap;gap:8px;padding:0 8px;}
 .csb-pill{
-  padding:5px 12px;border:1px solid #e2e6eb;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1px;
-  text-transform:uppercase;cursor:pointer;color:#6a6a6a;
-  background:none;transition:all .15s;border-radius:2px;
+  padding:7px 14px;border:1px solid #d9dee4;border-radius:99px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:12px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;cursor:pointer;color:#3F4650;
+  background:#fff;transition:all .15s;
 }
-.csb-pill:hover{border-color:#5a5a5a;color:#5a5a5a;}
-.csb-pill.active{border-color:#2a282b;color:#2a282b;background:rgba(42,40,43,.05);}
+.csb-pill:hover{border-color:#2a282b;color:#2a282b;}
+.csb-pill:focus-visible{outline:2px solid var(--brand-orange-dk);outline-offset:2px;}
+.csb-pill.active{border-color:#2a282b;background:#2a282b;color:#fff;}
 
-/* Sidebar sticky bottom */
+/* Sticky bottom: always visible */
 .csb-bottom{
-  margin-top:auto;padding:16px 20px;border-top:1px solid #eaecef;
-  background:#fff;flex-shrink:0;
+  position:sticky;bottom:0;margin-top:auto;padding:14px 20px;border-top:1px solid #E6E9ED;
+  background:#fff;flex-shrink:0;z-index:2;box-shadow:0 -6px 12px -8px rgba(0,0,0,.12);
 }
 .csb-wa{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:11px;background:#F36523;color:#fff;border:none;
+  width:100%;padding:12px;background:var(--brand-orange);color:#fff;border:none;border-radius:3px;
   font-family:'Saira',sans-serif;font-size:12px;font-weight:800;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;
-  transition:opacity .2s;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;text-decoration:none;
+  transition:background .2s;
 }
-.csb-wa:hover{opacity:.88;}
+.csb-wa:hover{background:var(--brand-orange-dk);}
+.csb-wa-note{margin:8px 0 0;text-align:center;font:400 12px 'Barlow',sans-serif;color:#5C6570;}
 
 /* ── MAIN CATALOGUE AREA ──────────────────────────────────── */
 .cat-main{min-width:0;padding:24px 28px;}
@@ -156,47 +192,47 @@ body{background:#f0f2f5;}
 /* Breadcrumb */
 .cat-breadcrumb{
   display:flex;align-items:center;gap:8px;margin-bottom:20px;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:10px;letter-spacing:1px;
-  text-transform:uppercase;color:#a0aab4;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;
+  text-transform:uppercase;color:#5F6872;
 }
 .cat-breadcrumb a{color:#5a5a5a;text-decoration:none;}
 .cat-breadcrumb a:hover{text-decoration:underline;}
-.cat-breadcrumb span{color:#d0d5dd;}
+.cat-breadcrumb span{color:#C9CFD6;}
 
 /* Toolbar */
 .cat-toolbar{
   display:flex;align-items:center;gap:12px;margin-bottom:20px;
-  flex-wrap:wrap;background:#fff;border:1px solid #e2e6eb;
+  flex-wrap:wrap;background:#fff;border:1px solid #DFE3E7;
   padding:12px 16px;
 }
 .cat-toolbar-left{flex:1;display:flex;align-items:center;gap:10px;}
 .cat-result-count{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:10px;letter-spacing:1px;
-  text-transform:uppercase;color:#a0aab4;white-space:nowrap;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;
+  text-transform:uppercase;color:#5F6872;white-space:nowrap;
 }
 .cat-active-filters{display:flex;flex-wrap:wrap;gap:6px;}
 .cat-filter-chip{
   display:inline-flex;align-items:center;gap:6px;
   padding:4px 10px;background:rgba(0,0,0,.06);
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;
   text-transform:uppercase;color:#2a282b;
 }
 .cat-filter-chip button{
-  background:none;border:none;color:#6a6a6a;cursor:pointer;
+  background:none;border:none;color:#5C6570;cursor:pointer;
   padding:0;font-size:12px;line-height:1;display:flex;align-items:center;
 }
 .cat-filter-chip button:hover{color:#2a282b;}
 .cat-sort{
-  background:#f6f7f8;border:1px solid #e2e6eb;padding:8px 12px;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:10px;letter-spacing:1px;
+  background:#F5F6F8;border:1px solid #DFE3E7;padding:8px 12px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;
   text-transform:uppercase;color:#2a282b;cursor:pointer;outline:none;
   -webkit-appearance:none;
 }
 .cat-view-toggle{display:flex;gap:4px;}
 .cat-view-btn{
   width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  background:#f6f7f8;border:1px solid #e2e6eb;cursor:pointer;
-  color:#a0aab4;transition:all .15s;
+  background:#F5F6F8;border:1px solid #DFE3E7;cursor:pointer;
+  color:#5F6872;transition:all .15s;
 }
 .cat-view-btn.active{background:#2a282b;border-color:#2a282b;color:#fff;}
 
@@ -228,23 +264,23 @@ body{background:#f0f2f5;}
 .product-card .pc-wishlist{pointer-events:auto;}
 
 /* ── SKELETON LOADER ─────────────────────────────────────── */
-.skel-card{background:#fff;border:1px solid #e2e6eb;}
-.skel-img{height:200px;background:linear-gradient(90deg,#f0f2f5 25%,#e8eaed 50%,#f0f2f5 75%);background-size:200% 100%;animation:skelShimmer 1.4s ease-in-out infinite;}
+.skel-card{background:#fff;border:1px solid #DFE3E7;}
+.skel-img{height:200px;background:linear-gradient(90deg,#EEF0F2 25%,#e8eaed 50%,#EEF0F2 75%);background-size:200% 100%;animation:skelShimmer 1.4s ease-in-out infinite;}
 .skel-body{padding:16px;}
-.skel-line{height:10px;border-radius:3px;background:linear-gradient(90deg,#f0f2f5 25%,#e8eaed 50%,#f0f2f5 75%);background-size:200% 100%;animation:skelShimmer 1.4s ease-in-out infinite;margin-bottom:8px;}
+.skel-line{height:10px;border-radius:3px;background:linear-gradient(90deg,#EEF0F2 25%,#e8eaed 50%,#EEF0F2 75%);background-size:200% 100%;animation:skelShimmer 1.4s ease-in-out infinite;margin-bottom:8px;}
 @keyframes skelShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* ── EMPTY STATE ─────────────────────────────────────────── */
 .cat-empty{
   grid-column:1/-1;text-align:center;padding:80px 24px;
-  background:#fff;border:1px solid #e2e6eb;
+  background:#fff;border:1px solid #DFE3E7;
 }
-.cat-empty svg{margin-bottom:16px;color:#d0d5dd;}
+.cat-empty svg{margin-bottom:16px;color:#C9CFD6;}
 .cat-empty-title{
   font-family:'Saira',sans-serif;font-size:22px;font-weight:800;
   text-transform:uppercase;letter-spacing:.5px;color:#2a282b;margin-bottom:8px;
 }
-.cat-empty-sub{font-size:13px;color:#6a6a6a;line-height:1.7;margin-bottom:20px;}
+.cat-empty-sub{font-size:13px;color:#5C6570;line-height:1.7;margin-bottom:20px;}
 
 /* ── PRODUCT DETAIL MODAL ─────────────────────────────────── */
 .pdm-overlay{
@@ -273,7 +309,7 @@ body{background:#f0f2f5;}
 
 /* Image panel */
 .pdm-img-panel{
-  background:#f6f7f8;position:relative;
+  background:#F5F6F8;position:relative;
   min-height:380px;display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
@@ -281,7 +317,7 @@ body{background:#f0f2f5;}
   width:100%;height:100%;object-fit:contain;padding:24px;
 }
 .pdm-img-placeholder{
-  display:flex;align-items:center;justify-content:center;color:#d0d5dd;
+  display:flex;align-items:center;justify-content:center;color:#C9CFD6;
 }
 .pdm-badge{
   position:absolute;top:16px;left:16px;
@@ -294,7 +330,7 @@ body{background:#f0f2f5;}
 .pdm-badge.trade{background:#5a5a5a;color:#fff;}
 .pdm-stock-badge{
   position:absolute;bottom:16px;left:16px;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1.5px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1.5px;
   text-transform:uppercase;padding:4px 10px;
 }
 .pdm-stock-ok{background:rgba(243,101,35,.12);color:#156b34;border:1px solid rgba(243,101,35,.3);}
@@ -304,8 +340,8 @@ body{background:#f0f2f5;}
 /* Info panel */
 .pdm-info{padding:32px 28px;display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:80vh;}
 .pdm-sku{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:2px;
-  text-transform:uppercase;color:#a0aab4;margin-bottom:8px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:#5F6872;margin-bottom:8px;
 }
 .pdm-name{
   font-family:'Saira',sans-serif;font-size:26px;font-weight:900;
@@ -315,12 +351,12 @@ body{background:#f0f2f5;}
 .pdm-cat-tag{
   display:inline-flex;align-items:center;
   padding:4px 12px;background:rgba(90,90,90,.1);
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1.5px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1.5px;
   text-transform:uppercase;color:#5a5a5a;margin-bottom:18px;
 }
 .pdm-price-row{
   display:flex;align-items:baseline;gap:10px;margin-bottom:18px;
-  padding-bottom:18px;border-bottom:1px solid #eaecef;
+  padding-bottom:18px;border-bottom:1px solid #E6E9ED;
 }
 .pdm-price{
   font-family:'Saira',sans-serif;font-size:36px;font-weight:900;
@@ -328,45 +364,45 @@ body{background:#f0f2f5;}
 }
 .pdm-old-price{
   font-family:'Saira',sans-serif;font-size:18px;
-  color:#a0aab4;text-decoration:line-through;
+  color:#5F6872;text-decoration:line-through;
 }
 .pdm-save{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;
   text-transform:uppercase;color:#F36523;background:rgba(243,101,35,.1);
   padding:3px 8px;
 }
 .pdm-desc{
-  font-size:13px;color:#4a5568;line-height:1.75;margin-bottom:16px;
+  font-size:13px;color:#3F4650;line-height:1.75;margin-bottom:16px;
   white-space:pre-line;
 }
 .pdm-specs{margin-bottom:20px;}
 .pdm-specs-title{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;
-  text-transform:uppercase;color:#a0aab4;margin-bottom:10px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:#5F6872;margin-bottom:10px;
 }
 .pdm-spec-row{
   display:flex;align-items:baseline;gap:8px;padding:6px 0;
-  border-bottom:1px solid #f0f2f5;font-size:12px;
+  border-bottom:1px solid #EEF0F2;font-size:12px;
 }
 .pdm-spec-row:last-child{border-bottom:none;}
-.pdm-spec-key{color:#a0aab4;min-width:90px;flex-shrink:0;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:.5px;text-transform:uppercase;}
+.pdm-spec-key{color:#5F6872;min-width:90px;flex-shrink:0;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:.5px;text-transform:uppercase;}
 .pdm-spec-val{color:#2a282b;font-weight:500;}
 
 /* Qty + Add to Cart */
-.pdm-actions{margin-top:auto;padding-top:16px;border-top:1px solid #eaecef;}
+.pdm-actions{margin-top:auto;padding-top:16px;border-top:1px solid #E6E9ED;}
 .pdm-qty-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.pdm-qty-label{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#a0aab4;}
-.pdm-qty-ctrl{display:flex;align-items:center;border:1px solid #e2e6eb;}
+.pdm-qty-label{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#5F6872;}
+.pdm-qty-ctrl{display:flex;align-items:center;border:1px solid #DFE3E7;}
 .pdm-qty-btn{
   width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-  background:#f6f7f8;border:none;font-size:18px;cursor:pointer;color:#2a282b;
+  background:#F5F6F8;border:none;font-size:18px;cursor:pointer;color:#2a282b;
   transition:background .15s;
 }
-.pdm-qty-btn:hover:not(:disabled){background:#e8ecf0;}
+.pdm-qty-btn:hover:not(:disabled){background:#E6E9ED;}
 .pdm-qty-btn:disabled{opacity:.35;cursor:not-allowed;}
 .pdm-qty-val{
   width:44px;text-align:center;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:14px;
-  font-weight:500;color:#2a282b;border-left:1px solid #e2e6eb;border-right:1px solid #e2e6eb;
+  font-weight:500;color:#2a282b;border-left:1px solid #DFE3E7;border-right:1px solid #DFE3E7;
   height:36px;display:flex;align-items:center;justify-content:center;user-select:none;
 }
 .pdm-add-btn{
@@ -389,12 +425,12 @@ body{background:#f0f2f5;}
 
 /* Related nav at bottom */
 .pdm-nav{
-  display:flex;gap:8px;padding-top:12px;border-top:1px solid #eaecef;margin-top:12px;
+  display:flex;gap:8px;padding-top:12px;border-top:1px solid #E6E9ED;margin-top:12px;
 }
 .pdm-nav-btn{
-  flex:1;padding:8px;border:1px solid #e2e6eb;background:#f6f7f8;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1.5px;
-  text-transform:uppercase;color:#6a6a6a;cursor:pointer;transition:all .15s;
+  flex:1;padding:8px;border:1px solid #DFE3E7;background:#F5F6F8;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1.5px;
+  text-transform:uppercase;color:#5C6570;cursor:pointer;transition:all .15s;
   display:flex;align-items:center;justify-content:center;gap:6px;
 }
 .pdm-nav-btn:hover:not(:disabled){border-color:#5a5a5a;color:#5a5a5a;background:#f0f4f8;}
@@ -420,9 +456,11 @@ body{background:#f0f2f5;}
   .cat-page{grid-template-columns:1fr;}
   .cat-sidebar{
     position:fixed;left:-280px;top:0;height:100vh;width:280px;
-    z-index:39;transition:left .3s;padding-top:70px;
+    z-index:39;transition:left .3s;padding-top:0;
     box-shadow:4px 0 24px rgba(0,0,0,.2);
   }
+  .csb-close{display:block;}
+  .csb-header{padding-top:16px;}
   .cat-sidebar.open{left:0;}
   .cat-mob-overlay.open{display:block;}
   .cat-sidebar-toggle{display:flex;}
@@ -439,9 +477,105 @@ body{background:#f0f2f5;}
 @media(max-width:380px){
   #catalogueGrid{grid-template-columns:1fr;}
 }
+
+/* ═══ WORKSHOP THEME: warm palette, sentence-case type, material cards ═══ */
+:root{
+  --w-paper:#EEF0F2; --w-card:#FFFFFF; --w-line:#DFE3E7; --w-line-2:#C9CFD6;
+  --w-wood:#9AA3AD; --w-ink:#2a282b; --w-muted:#5C6570; --w-orange:var(--brand-orange-dk);
+}
+body{background:var(--w-paper);}
+.cat-sidebar{background:var(--w-card);border-right-color:var(--w-line);}
+.csb-top,.csb-bottom{background:var(--w-card);}
+.csb-top,.csb-group,.csb-bottom{border-color:var(--w-line);}
+.csb-search-wrap{background:#F4F6F8;border-color:var(--w-line);}
+.csb-pill{background:var(--w-card);border-color:var(--w-line-2);}
+.csb-cat:hover{background:#F1F3F5;}
+.csb-cat-count{background:#E9ECEF;}
+.cat-toolbar{background:var(--w-card);border-color:var(--w-line);}
+.cat-sort,.cat-view-btn{background:#F4F6F8;border-color:var(--w-line);}
+.cat-view-btn.active{background:var(--w-ink);border-color:var(--w-ink);}
+.cat-result-count{color:var(--w-muted);font-size:12px;}
+.cat-breadcrumb{color:var(--w-muted);font-size:11px;}
+
+.cat-title{
+  font-family:'Saira',sans-serif;font-weight:800;font-size:26px;line-height:1.15;
+  letter-spacing:-.2px;color:var(--w-ink);margin:6px 0 20px;max-width:760px;
+  padding-bottom:14px;position:relative;
+}
+.cat-title::after{
+  content:"";position:absolute;left:0;bottom:0;width:64px;height:4px;
+  background:var(--brand-orange);box-shadow:68px 0 0 0 var(--w-wood);
+}
+.cat-title small{display:block;margin-top:6px;font:500 15px 'Barlow',sans-serif;letter-spacing:0;color:var(--w-muted);}
+
+#catalogueGrid{gap:18px;align-items:stretch;}
+#catalogueGrid .product-card{
+  display:flex;flex-direction:column;background:var(--w-card);
+  border:1px solid var(--w-line);border-radius:2px;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+#catalogueGrid .product-card:hover{
+  transform:translateY(-3px);border-color:var(--w-line-2);
+  box-shadow:0 10px 24px -10px rgba(30,34,40,.22);
+}
+#catalogueGrid .product-card:focus-visible{outline:2px solid var(--w-orange);outline-offset:2px;}
+#catalogueGrid .pc-img{
+  background:#ECEFF2;border-bottom:4px solid var(--w-wood);
+  transition:border-color .18s;flex-shrink:0;
+}
+#catalogueGrid .product-card:hover .pc-img{border-bottom-color:var(--brand-orange);}
+#catalogueGrid .pc-body{display:flex;flex-direction:column;flex:1;padding:14px 16px 16px;}
+.pc-cat{
+  font:600 11px 'Barlow Semi Condensed','Barlow',sans-serif;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--w-orange);margin-bottom:6px;
+}
+#catalogueGrid .pc-name{
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:18px;font-weight:600;
+  text-transform:none;letter-spacing:0;line-height:1.22;color:var(--w-ink);margin-bottom:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:2.44em;
+}
+#catalogueGrid .pc-spec{
+  font-size:13px;color:var(--w-muted);margin-bottom:12px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#catalogueGrid .pc-sku{
+  font-size:11px;letter-spacing:1px;color:#6B747E;margin:12px 0 0;
+  padding-top:10px;border-top:1px dashed var(--w-line);
+}
+#catalogueGrid .pc-price-row{margin-top:auto;}
+#catalogueGrid .pc-price{font-size:21px;font-weight:800;letter-spacing:-.2px;}
+#catalogueGrid .pc-price-old{font-size:13px;}
+#catalogueGrid .pc-add{
+  width:auto;height:38px;padding:0 14px;gap:6px;border:1.5px solid var(--w-ink);
+  background:transparent;color:var(--w-ink);border-radius:2px;
+  font:700 12px 'Saira',sans-serif;letter-spacing:1.2px;text-transform:uppercase;
+  transition:background .15s,color .15s,border-color .15s;
+}
+#catalogueGrid .pc-add .pc-add-plus{font-size:16px;line-height:1;font-weight:500;}
+#catalogueGrid .product-card .pc-add:hover,
+#catalogueGrid .product-card:hover .pc-add:hover,
+#catalogueGrid .pc-add:focus-visible{background:var(--brand-orange);border-color:var(--brand-orange);color:#fff;}
+#catalogueGrid .product-card:hover .pc-add{background:transparent;}
+#catalogueGrid .pc-add:disabled{border-color:#b9b0a0;color:#6B747E;background:transparent;}
+
+.pc-badge{font-size:11px !important;font-weight:700;letter-spacing:.8px;border-radius:2px;}
+.pc-badge.new{background:var(--brand-orange);}
+.pc-badge.sale{background:#2f6b3f;}
+.pc-badge.hot{background:#9b2c1c;color:#fff;}
+.pc-wishlist{border-radius:2px;border-color:var(--w-line);}
+
+.pdm-name{font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-weight:600;text-transform:none;font-size:30px;letter-spacing:0;}
+.pdm-sku{font-size:11px;}
+
+
+#catalogueGrid.list-view .product-card{flex-direction:row;}
+#catalogueGrid.list-view .pc-img{border-bottom:0;border-right:4px solid var(--w-wood);}
+#catalogueGrid.list-view .pc-name{min-height:0;}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 <!-- ── ANNOUNCEMENT BAR ─────────────────────── -->
 <div class="announcement-bar" id="announcementBar">
@@ -458,14 +592,14 @@ body{background:#f0f2f5;}
   <div class="topbar-left">
     <span style="display:inline-flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>2142 Khami Rd, Iversens Complex, Bulawayo, Zimbabwe</span>
     <span class="tb-sep">·</span>
-    <span>Mon–Sat: 08:00–17:00</span>
+    <span>Mon–Fri 08:00–17:00 · Sat 08:00–13:00</span>
   </div>
   <div class="topbar-right">
     <a href="tel:+263292265490" class="topbar-link" style="display:inline-flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>+263 292 265 490</a>
     <span class="tb-sep">·</span>
     <a href="tel:+263780793585" class="topbar-link" style="display:inline-flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>0780 793 585</a>
     <span class="tb-sep">·</span>
-    <a href="mailto:brockinteriordesigns@gmail.com" class="topbar-link" style="display:inline-flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>brockinteriordesigns@gmail.com</a>
+    <a href="mailto:armandcarpentry@gmail.com" class="topbar-link" style="display:inline-flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>armandcarpentry@gmail.com</a>
     <span class="tb-sep">·</span>
     <a href="https://wa.me/263780793585" class="topbar-link topbar-wa" style="display:inline-flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>WhatsApp</a>
   </div>
@@ -475,7 +609,7 @@ body{background:#f0f2f5;}
 <nav id="mainNav" aria-label="Main navigation">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand" aria-label="Armand Carpentry &amp; Designs Home">
-      <img src="armand-logo-nav.png" alt="Armand Carpentry &amp; Designs logo" class="nav-logo-img">
+      <img src="armand-logo-nav.png" width="400" height="224" alt="Armand Carpentry &amp; Designs logo" class="nav-logo-img">
     </a>
     <ul class="nav-menu">
       <li><a href="about.html" class="nav-link">About</a></li>
@@ -505,102 +639,109 @@ body{background:#f0f2f5;}
 </nav>
 
 <!-- ── CATALOGUE PAGE ──────────────────────── -->
+<span id="main-content" tabindex="-1"></span>
 <div class="cat-page" style="margin-top:72px;">
 
   <!-- SIDEBAR -->
-  <aside class="cat-sidebar" id="catSidebar">
-    <div class="csb-header">
-      <span class="csb-title">Filter</span>
-      <button class="csb-clear" onclick="clearAllFilters()">Clear All</button>
-    </div>
-
-    <div class="csb-search">
-      <div class="csb-search-wrap">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#a0aab4;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" class="csb-search-input" id="catSearchInput" placeholder="Search products, SKUs..." autocomplete="off">
+  <aside class="cat-sidebar" id="catSidebar" aria-label="Product filters">
+    <div class="csb-top">
+      <div class="csb-header">
+        <span class="csb-title">Filters <span class="csb-badge" id="csbBadge" aria-live="polite"></span></span>
+        <span style="display:flex;align-items:center;gap:4px;">
+          <button class="csb-clear" id="csbClear" onclick="clearAllFilters()">Clear all</button>
+          <button class="csb-close" onclick="toggleCatSidebar()" aria-label="Close filters">&times;</button>
+        </span>
+      </div>
+      <div class="csb-search">
+        <div class="csb-search-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#5F6872;flex-shrink:0" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" class="csb-search-input" id="catSearchInput" placeholder="Search products or SKU" aria-label="Search products or SKU" autocomplete="off">
+          <button class="csb-search-clear" id="csbSearchClear" aria-label="Clear search" onclick="var i=document.getElementById('catSearchInput');i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));i.focus();">&times;</button>
+        </div>
       </div>
     </div>
 
-    <div class="csb-section">
-      <div class="csb-section-label">Category</div>
-    </div>
-    <div class="csb-cats" id="catSidebarCats">
-      <button class="csb-cat active" data-cat="all" onclick="setCatFilter('all',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>All Products</span>
-        <span class="csb-cat-count" id="cnt-all">—</span>
-      </button>
-      <button class="csb-cat" data-cat="hinges" onclick="setCatFilter('hinges',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Hinges &amp; Pivot Systems</span>
-        <span class="csb-cat-count" id="cnt-hinges">—</span>
-      </button>
-      <button class="csb-cat" data-cat="handles" onclick="setCatFilter('handles',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Handles &amp; Knobs</span>
-        <span class="csb-cat-count" id="cnt-handles">—</span>
-      </button>
-      <button class="csb-cat" data-cat="drawers" onclick="setCatFilter('drawers',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Drawer Systems</span>
-        <span class="csb-cat-count" id="cnt-drawers">—</span>
-      </button>
-      <button class="csb-cat" data-cat="locks" onclick="setCatFilter('locks',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Locks &amp; Security</span>
-        <span class="csb-cat-count" id="cnt-locks">—</span>
-      </button>
-      <button class="csb-cat" data-cat="kitchen" onclick="setCatFilter('kitchen',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Kitchen Fittings</span>
-        <span class="csb-cat-count" id="cnt-kitchen">—</span>
-      </button>
-      <button class="csb-cat" data-cat="lighting" onclick="setCatFilter('lighting',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Lighting Hardware</span>
-        <span class="csb-cat-count" id="cnt-lighting">—</span>
-      </button>
-      <button class="csb-cat" data-cat="construction" onclick="setCatFilter('construction',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Construction Hardware</span>
-        <span class="csb-cat-count" id="cnt-construction">—</span>
-      </button>
-      <button class="csb-cat" data-cat="closet" onclick="setCatFilter('closet',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Closet Systems</span>
-        <span class="csb-cat-count" id="cnt-closet">—</span>
-      </button>
-      <button class="csb-cat" data-cat="tools" onclick="setCatFilter('tools',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Tools &amp; Fixings</span>
-        <span class="csb-cat-count" id="cnt-tools">—</span>
-      </button>
-      <button class="csb-cat" data-cat="boards" onclick="setCatFilter('boards',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Boards &amp; Panels</span>
-        <span class="csb-cat-count" id="cnt-boards">—</span>
-      </button>
-      <button class="csb-cat" data-cat="edging" onclick="setCatFilter('edging',this)">
-        <span class="csb-cat-left"><span class="csb-cat-dot"></span>Edging</span>
-        <span class="csb-cat-count" id="cnt-edging">—</span>
-      </button>
-    </div>
-
-    <div class="csb-section">
-      <div class="csb-section-label">Availability</div>
-      <div class="csb-filter-row csb-filters" style="padding:0 0 16px;">
-        <button class="csb-pill" data-stock="all"     onclick="setStockFilter('all',this)">All</button>
-        <button class="csb-pill" data-stock="in"      onclick="setStockFilter('in',this)">In Stock</button>
-        <button class="csb-pill" data-stock="low"     onclick="setStockFilter('low',this)">Low Stock</button>
-        <button class="csb-pill" data-stock="out"     onclick="setStockFilter('out',this)">Out of Stock</button>
+    <details class="csb-group" open>
+      <summary>Category</summary>
+      <div class="csb-group-body csb-cats" id="catSidebarCats">
+        <button class="csb-cat active" data-cat="all" onclick="setCatFilter('all',this)">
+          <span class="csb-cat-left">All Products</span>
+          <span class="csb-cat-count" id="cnt-all">—</span>
+        </button>
+        <button class="csb-cat" data-cat="hinges" onclick="setCatFilter('hinges',this)">
+          <span class="csb-cat-left">Hinges &amp; Pivot Systems</span>
+          <span class="csb-cat-count" id="cnt-hinges">—</span>
+        </button>
+        <button class="csb-cat" data-cat="handles" onclick="setCatFilter('handles',this)">
+          <span class="csb-cat-left">Handles &amp; Knobs</span>
+          <span class="csb-cat-count" id="cnt-handles">—</span>
+        </button>
+        <button class="csb-cat" data-cat="drawers" onclick="setCatFilter('drawers',this)">
+          <span class="csb-cat-left">Drawer Systems</span>
+          <span class="csb-cat-count" id="cnt-drawers">—</span>
+        </button>
+        <button class="csb-cat" data-cat="locks" onclick="setCatFilter('locks',this)">
+          <span class="csb-cat-left">Locks &amp; Security</span>
+          <span class="csb-cat-count" id="cnt-locks">—</span>
+        </button>
+        <button class="csb-cat" data-cat="kitchen" onclick="setCatFilter('kitchen',this)">
+          <span class="csb-cat-left">Kitchen Fittings</span>
+          <span class="csb-cat-count" id="cnt-kitchen">—</span>
+        </button>
+        <button class="csb-cat" data-cat="lighting" onclick="setCatFilter('lighting',this)">
+          <span class="csb-cat-left">Lighting Hardware</span>
+          <span class="csb-cat-count" id="cnt-lighting">—</span>
+        </button>
+        <button class="csb-cat" data-cat="construction" onclick="setCatFilter('construction',this)">
+          <span class="csb-cat-left">Construction Hardware</span>
+          <span class="csb-cat-count" id="cnt-construction">—</span>
+        </button>
+        <button class="csb-cat" data-cat="closet" onclick="setCatFilter('closet',this)">
+          <span class="csb-cat-left">Closet Systems</span>
+          <span class="csb-cat-count" id="cnt-closet">—</span>
+        </button>
+        <button class="csb-cat" data-cat="tools" onclick="setCatFilter('tools',this)">
+          <span class="csb-cat-left">Tools &amp; Fixings</span>
+          <span class="csb-cat-count" id="cnt-tools">—</span>
+        </button>
+        <button class="csb-cat" data-cat="boards" onclick="setCatFilter('boards',this)">
+          <span class="csb-cat-left">Boards &amp; Panels</span>
+          <span class="csb-cat-count" id="cnt-boards">—</span>
+        </button>
+        <button class="csb-cat" data-cat="edging" onclick="setCatFilter('edging',this)">
+          <span class="csb-cat-left">Edging</span>
+          <span class="csb-cat-count" id="cnt-edging">—</span>
+        </button>
       </div>
-    </div>
+    </details>
 
-    <div class="csb-section">
-      <div class="csb-section-label">Badge / Tag</div>
-      <div class="csb-filter-row csb-filters" style="padding:0 0 16px;">
-        <button class="csb-pill" data-badge=""        onclick="setBadgeFilter('',this)">All</button>
-        <button class="csb-pill" data-badge="new"     onclick="setBadgeFilter('new',this)">New</button>
-        <button class="csb-pill" data-badge="sale"    onclick="setBadgeFilter('sale',this)">Sale</button>
-        <button class="csb-pill" data-badge="hot"     onclick="setBadgeFilter('hot',this)">Hot</button>
-        <button class="csb-pill" data-badge="trade"   onclick="setBadgeFilter('trade',this)">Trade</button>
-      </div>
-    </div>
+    <details class="csb-group" open>
+      <summary>Availability</summary>
+      <div class="csb-group-body"><div class="csb-filter-row">
+        <button class="csb-pill active" data-stock="all" onclick="setStockFilter('all',this)">All</button>
+        <button class="csb-pill" data-stock="in"  onclick="setStockFilter('in',this)">In stock</button>
+        <button class="csb-pill" data-stock="low" onclick="setStockFilter('low',this)">Low stock</button>
+        <button class="csb-pill" data-stock="out" onclick="setStockFilter('out',this)">Out of stock</button>
+      </div></div>
+    </details>
+
+    <details class="csb-group">
+      <summary>Tags</summary>
+      <div class="csb-group-body"><div class="csb-filter-row">
+        <button class="csb-pill active" data-badge=""      onclick="setBadgeFilter('',this)">All</button>
+        <button class="csb-pill" data-badge="new"   onclick="setBadgeFilter('new',this)">New</button>
+        <button class="csb-pill" data-badge="sale"  onclick="setBadgeFilter('sale',this)">Sale</button>
+        <button class="csb-pill" data-badge="hot"   onclick="setBadgeFilter('hot',this)">Hot</button>
+        <button class="csb-pill" data-badge="trade" onclick="setBadgeFilter('trade',this)">Trade</button>
+      </div></div>
+    </details>
 
     <div class="csb-bottom">
       <a href="https://wa.me/263780793585" class="csb-wa" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-        WhatsApp for Stock Check
+        Check stock on WhatsApp
       </a>
+      <p class="csb-wa-note">Boards cut to size? Send us your dimensions.</p>
     </div>
   </aside>
 
@@ -613,7 +754,7 @@ body{background:#f0f2f5;}
       <span id="bc-cat">All Products</span>
     </div>
 
-    <h1 style="font-family:'Saira',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:0.3px;color:var(--charcoal);margin:4px 0 16px;">Boards, Fittings &amp; Hardware Catalogue — Bulawayo, Zimbabwe</h1>
+    <h1 class="cat-title">Boards, fittings &amp; hardware<small>Bulawayo, Zimbabwe</small></h1>
 
     <div class="cat-toolbar">
       <div class="cat-toolbar-left">
@@ -668,12 +809,12 @@ body{background:#f0f2f5;}
   <div class="footer-main container">
     <div class="fm-brand">
       <div class="fm-logo-row">
-        <img src="armand-logo-nav.png" alt="Armand Carpentry &amp; Designs" class="footer-logo-img">
+        <img src="armand-logo-nav.png" width="400" height="224" alt="Armand Carpentry &amp; Designs" class="footer-logo-img">
       </div>
       <p class="fm-tagline">Boards, cutting and fittings — melamine, super wood and granite tops, precision cut and edged, plus a full range of hardware and kitchen fittings. Serving trade and retail across Zimbabwe.</p>
       <div class="fm-social">
         <a href="https://wa.me/263780793585" class="fms-link" target="_blank" rel="noopener" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg></a>
-        <a href="mailto:brockinteriordesigns@gmail.com" class="fms-link" aria-label="Email"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
+        <a href="mailto:armandcarpentry@gmail.com" class="fms-link" aria-label="Email"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
         <a href="tel:+263780793585" class="fms-link" aria-label="Call"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
       </div>
       <div class="fm-reg">
@@ -702,7 +843,7 @@ body{background:#f0f2f5;}
         <li><a href="portfolio.html">Supply Portfolio</a></li>
         <li><a href="trade.html">Trade Accounts</a></li>
         <li><a href="contact.html">Contact Us</a></li>
-        <li><a href="mailto:brockinteriordesigns@gmail.com">Email Us</a></li>
+        <li><a href="mailto:armandcarpentry@gmail.com">Email Us</a></li>
       </ul>
     </div>
     <div>
@@ -815,7 +956,7 @@ async function loadCatalogue() {
     }
     _allProducts = data || [];
 
-    // Sync into global Products.cache so broc-shop.js Cart.add() can find items
+    // Sync into global Products.cache so armand-shop.js Cart.add() can find items
     if (typeof Products !== 'undefined') {
       // Merge: add any products not already in cache
       _allProducts.forEach(p => {
@@ -833,7 +974,7 @@ async function loadCatalogue() {
     document.getElementById('catalogueGrid').innerHTML = `
       <div class="cat-empty">
         <div style="font-size:13px;color:#c1392b;margin-bottom:12px;">Could not load products — ${_esc(err.message)}</div>
-        <p style="font-size:12px;color:#6a6a6a;">Check your Supabase connection or <a href="contact.html" style="color:#5a5a5a;">contact us directly</a>.</p>
+        <p style="font-size:12px;color:#5C6570;">Check your Supabase connection or <a href="contact.html" style="color:#5a5a5a;">contact us directly</a>.</p>
       </div>`;
     document.getElementById('resultCount').textContent = 'Error loading';
   }
@@ -876,6 +1017,8 @@ function applyFilters() {
   updateBreadcrumb();
 }
 
+const CAT_LABELS = {hinges:'Hinges & pivots',handles:'Handles & knobs',drawers:'Drawer systems',locks:'Locks & security',kitchen:'Kitchen fittings',lighting:'Lighting hardware',construction:'Construction',closet:'Closet systems',tools:'Tools & fixings',boards:'Boards & panels',edging:'Edging'};
+
 function renderGrid(products) {
   const grid = document.getElementById('catalogueGrid');
   if (!products.length) {
@@ -883,7 +1026,7 @@ function renderGrid(products) {
       <div class="cat-empty">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <div class="cat-empty-title">No products found</div>
-        <div class="cat-empty-sub">Try adjusting your filters or search term.<br>We carry 5,000+ products — contact us for a full list.</div>
+        <div class="cat-empty-sub">Try adjusting your filters or search term.<br>Can't find it? WhatsApp us and we'll check what's in the yard.</div>
         <button onclick="clearAllFilters()" style="padding:10px 24px;background:#2a282b;color:#fff;border:none;font-family:'Saira',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Clear Filters</button>
       </div>`;
     return;
@@ -904,9 +1047,9 @@ function buildCatalogueCard(p, index) {
 
   const badgeHtml = p.badge ? `<span class="pc-badge ${_esc(p.badge.toLowerCase())}">${_esc(p.badge.toUpperCase())}</span>` : '';
   const stockBadge = outOfStock
-    ? `<span class="pc-badge sale" style="top:auto;bottom:10px;left:10px;font-size:8px;">OUT OF STOCK</span>`
+    ? `<span class="pc-badge sale" style="top:auto;bottom:10px;left:10px;">OUT OF STOCK</span>`
     : lowStock
-      ? `<span class="pc-badge trade" style="top:auto;bottom:10px;left:10px;font-size:8px;">LOW: ${stock}</span>`
+      ? `<span class="pc-badge trade" style="top:auto;bottom:10px;left:10px;">LOW: ${stock}</span>`
       : '';
 
   return `
@@ -918,7 +1061,7 @@ function buildCatalogueCard(p, index) {
         <button class="pc-wishlist" aria-label="Save ${_esc(p.name)}" onclick="event.stopPropagation();">♡</button>
       </div>
       <div class="pc-body" style="pointer-events:none;">
-        <div class="pc-sku">SKU: ${_esc(p.sku || 'BRC-' + p.id)}</div>
+        <div class="pc-cat">${_esc(CAT_LABELS[(p.category||'').toLowerCase()] || p.category || '')}</div>
         <div class="pc-name">${_esc(p.name)}</div>
         <div class="pc-spec">${_esc(p.short_description || p.description || '')}</div>
         <div class="pc-price-row">
@@ -927,8 +1070,9 @@ function buildCatalogueCard(p, index) {
             ${oldPrice ? `<span class="pc-price-old">${oldPrice}</span>` : ''}
           </div>
           <button class="pc-add" style="pointer-events:auto;" ${outOfStock ? 'disabled' : ''}
-            onclick="event.stopPropagation();catAddToCart(${p.id},this)" aria-label="Add to cart">+</button>
+            onclick="event.stopPropagation();catAddToCart(${p.id},this)" aria-label="Add ${_esc(p.name)} to cart"><span>Add</span><span class="pc-add-plus" aria-hidden="true">+</span></button>
         </div>
+        <div class="pc-sku">SKU ${_esc(p.sku || 'ARM-' + p.id)}</div>
       </div>
     </div>`;
 }
@@ -950,6 +1094,7 @@ function closeDetail() {
 }
 
 function renderDetail(p, index) {
+  const isSheet = ['boards','edging'].includes((p.category||'').toLowerCase());
   const price    = parseFloat(p.price || 0);
   const oldPrice = p.old_price ? parseFloat(p.old_price) : null;
   const stock    = p.stock;
@@ -991,7 +1136,7 @@ function renderDetail(p, index) {
   const saveAmt = oldPrice ? ((oldPrice - price) / oldPrice * 100).toFixed(0) : null;
 
   document.getElementById('pdmInfo').innerHTML = `
-    <div class="pdm-sku">SKU: ${_esc(p.sku || 'BRC-' + p.id)}</div>
+    <div class="pdm-sku">SKU: ${_esc(p.sku || 'ARM-' + p.id)}</div>
     <div class="pdm-name">${_esc(p.name)}</div>
     <div class="pdm-cat-tag">${_esc((p.category || 'general').toUpperCase())}</div>
     <div class="pdm-price-row">
@@ -1014,9 +1159,11 @@ function renderDetail(p, index) {
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         ${outOfStock ? 'Out of Stock' : 'Add to Cart'}
       </button>
-      <a class="pdm-wa-btn" href="https://wa.me/${CAT_WA}?text=${encodeURIComponent('Hi Armand, I\'m interested in: ' + p.name + ' (SKU: ' + (p.sku||'') + ') — please confirm availability and pricing.')}" target="_blank" rel="noopener">
+      <a class="pdm-wa-btn" href="https://wa.me/${CAT_WA}?text=${encodeURIComponent(isSheet
+          ? 'Hi Armand, I need a cutting quote for: ' + p.name + ' (SKU: ' + (p.sku||'') + '). Sizes needed (length x width, qty): '
+          : 'Hi Armand, I\'m interested in: ' + p.name + ' (SKU: ' + (p.sku||'') + ') — please confirm availability and pricing.')}" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-        Enquire on WhatsApp
+        ${isSheet ? 'Request a cutting quote' : 'Enquire on WhatsApp'}
       </a>
       <div class="pdm-nav">
         <button class="pdm-nav-btn" onclick="detailNav(-1)" id="pdm-prev" ${index === 0 ? 'disabled' : ''}>
@@ -1065,7 +1212,7 @@ function catAddToCart(pid, btn) {
   // Sync product into global Products.cache so Cart.add can find it
   const product = _allProducts.find(x => String(x.id) === String(pid));
   if (product && typeof Products !== 'undefined') {
-    // Ensure it's in the global Products cache used by broc-shop.js Cart
+    // Ensure it's in the global Products cache used by armand-shop.js Cart
     if (!Products.cache.find(p => String(p.id) === String(pid))) {
       Products.cache.push(product);
     }
@@ -1138,7 +1285,7 @@ function updateCounts(products) {
   document.getElementById('cnt-all').textContent = products.length;
   ['hinges','handles','drawers','locks','kitchen','lighting','construction','closet','tools','boards','edging'].forEach(cat => {
     const el = document.getElementById('cnt-'+cat);
-    if (el) el.textContent = counts[cat] || 0;
+    if (el) { el.textContent = counts[cat] || 0; el.closest('.csb-cat').classList.toggle('is-empty', !counts[cat]); }
   });
 }
 
@@ -1146,7 +1293,19 @@ function updateResultCount(n) {
   document.getElementById('resultCount').textContent = `${n} product${n !== 1 ? 's' : ''}`;
 }
 
+function syncSidebarState() {
+  const n = (_activeCat !== 'all') + (_activeStock !== 'all') + (_activeBadge ? 1 : 0) + (_searchQ ? 1 : 0);
+  const badge = document.getElementById('csbBadge'), clr = document.getElementById('csbClear');
+  if (badge) { badge.textContent = n; badge.classList.toggle('show', n > 0); }
+  if (clr) clr.classList.toggle('show', n > 0);
+  const sc = document.getElementById('csbSearchClear');
+  if (sc) sc.classList.toggle('show', !!_searchQ);
+  // open the Tags group automatically if a tag filter is active
+  if (_activeBadge) { const d = document.querySelector('[data-badge]'); if (d) d.closest('details').open = true; }
+}
+
 function updateActiveChips() {
+  syncSidebarState();
   const chips = [];
   if (_activeCat !== 'all')     chips.push({ label: _activeCat,         clear: () => { _activeCat='all';   document.querySelector('.csb-cat[data-cat="all"]').click(); } });
   if (_activeStock !== 'all')   chips.push({ label: `Stock: ${_activeStock}`, clear: () => { _activeStock='all'; document.querySelector('[data-stock="all"]').click(); } });
@@ -1238,6 +1397,6 @@ if (_urlCat) {
 
 window.addEventListener('load', loadCatalogue);
 </script>
-<script src="broc-shop.js"></script>
+<script src="armand-shop.js"></script>
 </body>
 </html>

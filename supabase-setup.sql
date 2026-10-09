@@ -5,8 +5,9 @@
 --
 -- AUTH MODEL (read this before running):
 -- The storefront (index/products/product/trade/contact) uses the
--- public anon key and can only read ACTIVE products and INSERT
--- orders/enquiries. It can never read customer data.
+-- public anon key and can only read ACTIVE products, INSERT
+-- enquiries and place orders ONLY through the place_order() function
+-- (section 7). It can never read customer data.
 --
 -- admin.html signs in with real Supabase Auth (email + password).
 -- Every policy that touches orders, enquiries, inactive products,
@@ -172,3 +173,158 @@ CREATE POLICY "Admin can manage product images"
 -- INSERT INTO products (name, sku, price, category, description, badge, stock, active, featured)
 -- VALUES ('Milano Bar Handle', 'BRC-HDL-042', 12.50, 'handles', '128mm centres · 304 Stainless Steel · Matt finish', 'new', 50, true, true)
 -- ON CONFLICT DO NOTHING;
+
+
+-- 7. ORDER INTEGRITY, STOCK AND ABUSE PROTECTION
+-- ─────────────────────────────────────────────────────────────
+-- The browser can no longer INSERT into orders directly. Orders go
+-- through place_order(), which looks prices up from the products
+-- table, checks and reserves stock, forces status = 'pending', and
+-- rate-limits repeat submissions. Client-sent prices/totals/status
+-- are ignored. Safe to re-run.
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'unpaid';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS stock_restored BOOLEAN DEFAULT FALSE;
+
+-- Remove the open insert policy: anon can no longer write orders directly.
+DROP POLICY IF EXISTS "Anyone can place orders" ON orders;
+
+CREATE OR REPLACE FUNCTION place_order(
+  p_name    TEXT,
+  p_phone   TEXT,
+  p_address TEXT,
+  p_notes   TEXT,
+  p_method  TEXT,
+  p_items   JSONB
+) RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_item     JSONB;
+  v_prod     products%ROWTYPE;
+  v_qty      INTEGER;
+  v_total    NUMERIC(10,2) := 0;
+  v_lines    JSONB := '[]'::JSONB;
+  v_order_id BIGINT;
+  v_name     TEXT := btrim(coalesce(p_name, ''));
+  v_phone    TEXT := btrim(coalesce(p_phone, ''));
+BEGIN
+  IF char_length(v_name) < 2 OR char_length(v_name) > 100 THEN
+    RAISE EXCEPTION 'Please enter a valid name.' USING ERRCODE = 'P0001';
+  END IF;
+  IF v_phone !~ '^[0-9+() -]{7,30}$' THEN
+    RAISE EXCEPTION 'Please enter a valid phone number.' USING ERRCODE = 'P0001';
+  END IF;
+  IF char_length(coalesce(p_address, '')) > 300 OR char_length(coalesce(p_notes, '')) > 1000 THEN
+    RAISE EXCEPTION 'Address or notes too long.' USING ERRCODE = 'P0001';
+  END IF;
+  IF p_method IS NULL OR p_method NOT IN
+     ('EcoCash','OneMoney','Cash on Delivery','Bank Transfer / EFT','Paynow','PayPal') THEN
+    RAISE EXCEPTION 'Invalid payment method.' USING ERRCODE = 'P0001';
+  END IF;
+  IF p_items IS NULL OR jsonb_typeof(p_items) <> 'array'
+     OR jsonb_array_length(p_items) = 0 OR jsonb_array_length(p_items) > 50 THEN
+    RAISE EXCEPTION 'Your cart is empty or invalid.' USING ERRCODE = 'P0001';
+  END IF;
+
+  -- Rate limit: max 5 orders per phone number per hour.
+  IF (SELECT count(*) FROM orders
+       WHERE customer_phone = v_phone
+         AND created_at > now() - interval '1 hour') >= 5 THEN
+    RAISE EXCEPTION 'Too many orders from this number. Please WhatsApp us instead.' USING ERRCODE = 'P0001';
+  END IF;
+
+  FOR v_item IN SELECT * FROM jsonb_array_elements(p_items) LOOP
+    BEGIN
+      v_qty := (v_item->>'qty')::INTEGER;
+      SELECT * INTO v_prod FROM products
+       WHERE id = (v_item->>'id')::BIGINT AND active = TRUE
+       FOR UPDATE;
+    EXCEPTION WHEN others THEN
+      RAISE EXCEPTION 'Invalid item in cart.' USING ERRCODE = 'P0001';
+    END;
+
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'A product in your cart is no longer available.' USING ERRCODE = 'P0001';
+    END IF;
+    IF v_qty IS NULL OR v_qty < 1 OR v_qty > 100 THEN
+      RAISE EXCEPTION 'Invalid quantity for %.', v_prod.name USING ERRCODE = 'P0001';
+    END IF;
+    -- stock NULL = not tracked; 0 = out of stock (matches the storefront)
+    IF v_prod.stock IS NOT NULL THEN
+      IF v_prod.stock < v_qty THEN
+        RAISE EXCEPTION 'Not enough stock for % (% left).', v_prod.name, v_prod.stock USING ERRCODE = 'P0001';
+      END IF;
+      UPDATE products SET stock = stock - v_qty WHERE id = v_prod.id;
+    END IF;
+
+    v_total := v_total + (v_prod.price * v_qty);
+    v_lines := v_lines || jsonb_build_object(
+      'id', v_prod.id, 'name', v_prod.name, 'price', v_prod.price,
+      'qty', v_qty, 'image', v_prod.image);
+  END LOOP;
+
+  INSERT INTO orders (customer_name, customer_phone, customer_address, notes,
+                      payment_method, items, total, status, payment_status)
+  VALUES (v_name, v_phone, nullif(btrim(p_address), ''), nullif(btrim(p_notes), ''),
+          p_method, v_lines, v_total, 'pending', 'unpaid')
+  RETURNING id INTO v_order_id;
+
+  RETURN jsonb_build_object('id', v_order_id, 'total', v_total, 'items', v_lines);
+END;
+$$;
+
+REVOKE ALL ON FUNCTION place_order(TEXT,TEXT,TEXT,TEXT,TEXT,JSONB) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION place_order(TEXT,TEXT,TEXT,TEXT,TEXT,JSONB) TO anon, authenticated;
+
+-- Restore reserved stock once when an order is cancelled.
+CREATE OR REPLACE FUNCTION restore_stock_on_cancel() RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE v_line JSONB;
+BEGIN
+  IF NEW.status = 'cancelled' AND OLD.status IS DISTINCT FROM 'cancelled'
+     AND NOT coalesce(NEW.stock_restored, FALSE) THEN
+    FOR v_line IN SELECT * FROM jsonb_array_elements(coalesce(NEW.items, '[]'::JSONB)) LOOP
+      UPDATE products SET stock = stock + (v_line->>'qty')::INTEGER
+       WHERE id = (v_line->>'id')::BIGINT AND stock IS NOT NULL;
+    END LOOP;
+    NEW.stock_restored := TRUE;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_restore_stock_on_cancel ON orders;
+CREATE TRIGGER trg_restore_stock_on_cancel
+  BEFORE UPDATE OF status ON orders
+  FOR EACH ROW EXECUTE FUNCTION restore_stock_on_cancel();
+
+-- Enquiries: server-side validation and rate limit (the anon insert
+-- policy stays, but junk and floods are rejected).
+CREATE OR REPLACE FUNCTION validate_enquiry() RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  NEW.name    := btrim(coalesce(NEW.name, ''));
+  NEW.phone   := btrim(coalesce(NEW.phone, ''));
+  NEW.message := btrim(coalesce(NEW.message, ''));
+  IF char_length(NEW.name) < 2 OR char_length(NEW.name) > 100
+     OR char_length(NEW.phone) < 7 OR char_length(NEW.phone) > 30
+     OR char_length(NEW.message) < 5 OR char_length(NEW.message) > 3000
+     OR char_length(coalesce(NEW.email, '')) > 200
+     OR char_length(coalesce(NEW.subject, '')) > 200 THEN
+    RAISE EXCEPTION 'Invalid enquiry.' USING ERRCODE = 'P0001';
+  END IF;
+  IF (SELECT count(*) FROM enquiries
+       WHERE phone = NEW.phone AND created_at > now() - interval '1 hour') >= 5 THEN
+    RAISE EXCEPTION 'Too many enquiries. Please WhatsApp us instead.' USING ERRCODE = 'P0001';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_validate_enquiry ON enquiries;
+CREATE TRIGGER trg_validate_enquiry
+  BEFORE INSERT ON enquiries
+  FOR EACH ROW EXECUTE FUNCTION validate_enquiry();

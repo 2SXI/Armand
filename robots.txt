@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
 
-Sitemap: https://www.brocfittings.co.zw/sitemap.xml
+Sitemap: https://armand.co.zw/sitemap.xml

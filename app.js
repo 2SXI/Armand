@@ -42,6 +42,12 @@ async function submitEnquiry(e) {
   const submitBtn = document.getElementById('cfSubmitBtn');
   const successEl = document.getElementById('cfSuccess');
   const errorEl   = document.getElementById('cfError');
+  // Honeypot: real visitors never fill this hidden field; bots do.
+  if (document.getElementById('cf-website')?.value) {
+    if (successEl) successEl.style.display = 'block';
+    e.target.reset();
+    return;
+  }
   const name      = document.getElementById('cf-name')?.value?.trim();
   const phone     = document.getElementById('cf-phone')?.value?.trim();
   const email     = document.getElementById('cf-email')?.value?.trim();
@@ -215,7 +221,7 @@ const CartUI = {
 }
 .bcd-badge{
   background:#2a282b;color:#fff;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;font-weight:700;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;font-weight:700;
   padding:2px 7px;letter-spacing:.5px;
   min-width:18px;text-align:center;
   display:none;flex-shrink:0;
@@ -295,7 +301,7 @@ const CartUI = {
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .bcd-iprice{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;
   color:rgba(226,226,226,.32);margin-bottom:9px;
 }
 .bcd-qty-row{display:flex;align-items:center;gap:0;flex-wrap:nowrap;}
@@ -330,7 +336,7 @@ const CartUI = {
 }
 .bcd-remove{
   background:none;border:none;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:1px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1px;
   text-transform:uppercase;color:rgba(255,255,255,.4);
   cursor:pointer;padding:0;transition:color .15s;
   touch-action:manipulation;
@@ -346,11 +352,11 @@ const CartUI = {
   padding-bottom:max(20px,env(safe-area-inset-bottom));
 }
 
-/* Free delivery bar */
+/* Delivery note */
 .bcd-ship{margin-bottom:14px;}
 .bcd-ship-lbl{
   display:flex;justify-content:space-between;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:1.5px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;letter-spacing:1.5px;
   text-transform:uppercase;color:rgba(226,226,226,.28);
   margin-bottom:5px;
 }
@@ -371,7 +377,7 @@ const CartUI = {
   margin-top:6px;padding-top:10px;
 }
 .bcd-slbl{
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;
   letter-spacing:1.5px;text-transform:uppercase;
 }
 .bcd-sval{
@@ -413,7 +419,7 @@ const CartUI = {
   width:100%;padding:7px;
   background:transparent;border:none;
   color:rgba(226,226,226,.16);cursor:pointer;
-  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;
+  font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;
   letter-spacing:1.5px;text-transform:uppercase;
   transition:color .2s;
   touch-action:manipulation;
@@ -432,7 +438,7 @@ const CartUI = {
   .bcd-footer{padding:14px 14px max(16px,env(safe-area-inset-bottom));}
   .bcd-hdr{padding:14px 14px 12px;}
   .bcd-checkout{font-size:12px;letter-spacing:1.5px;}
-  .bcd-wa{font-size:10px;}
+  .bcd-wa{font-size:11px;}
 }
 
 /* ── Safe-area on notched phones ─────────────────────────────── */
@@ -544,23 +550,12 @@ const CartUI = {
     body.innerHTML = `<div class="bcd-items">${items.map(i => this._item(i)).join('')}</div>`;
 
     /* ── Footer ── */
-    const FREE_THRESHOLD = 50;
-    const towards = Math.max(0, FREE_THRESHOLD - total);
-    const pct     = Math.min(100, (total / FREE_THRESHOLD) * 100).toFixed(1);
-    const shipMsg = towards <= 0
-      ? 'Free delivery unlocked ✓'
-      : `USD ${towards.toFixed(2)} away from free delivery`;
+    const shipMsg = 'Delivery cost is confirmed with your order';
 
     footer.style.display = '';
     footer.innerHTML = `
       <div class="bcd-ship">
-        <div class="bcd-ship-lbl">
-          <span>${_e(shipMsg)}</span>
-          <span>${towards > 0 ? '$' + FREE_THRESHOLD : ''}</span>
-        </div>
-        <div class="bcd-ship-track">
-          <div class="bcd-ship-fill" style="width:${pct}%"></div>
-        </div>
+        <div class="bcd-ship-lbl"><span>${_e(shipMsg)}</span></div>
       </div>
       <div class="bcd-sum">
         <div class="bcd-sum-row">
@@ -569,7 +564,7 @@ const CartUI = {
         </div>
         <div class="bcd-sum-row">
           <span class="bcd-slbl">Delivery</span>
-          <span class="bcd-sval">${towards<=0?'Free':'At checkout'}</span>
+          <span class="bcd-sval">Confirmed per order</span>
         </div>
         <div class="bcd-sum-row total">
           <span class="bcd-slbl">Total</span>
@@ -726,44 +721,92 @@ function initMobileNav() {
   const hamburger = document.getElementById('navHamburger');
   if (!hamburger) return;
   let panel = document.querySelector('.mobile-nav-panel');
+  let overlay = document.querySelector('.mnp-overlay');
   if (!panel) {
-    panel = document.createElement('div');
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const item = (href, label) =>
+      `<a href="${href}" class="mnp-link${here === href ? ' is-current' : ''}"${here === href ? ' aria-current="page"' : ''} onclick="closeMobileNav()"><span>${label}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>`;
+    const chip = (cat, label) => `<a href="products.html?cat=${cat}" class="mnp-chip" onclick="closeMobileNav()">${label}</a>`;
+    panel = document.createElement('aside');
     panel.className = 'mobile-nav-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-label', 'Site menu');
     panel.innerHTML = `
-      <button type="button" class="mnp-close" aria-label="Close menu" onclick="closeMobileNav()">&times;</button>
-      <nav>
-        <a href="about.html"      class="mnp-link" onclick="closeMobileNav()">About</a>
-        <a href="products.html"   class="mnp-link" onclick="closeMobileNav()">Products</a>
-        <a href="portfolio.html"  class="mnp-link" onclick="closeMobileNav()">Portfolio</a>
-        <a href="trade.html"      class="mnp-link" onclick="closeMobileNav()">Trade Accounts</a>
-        <a href="contact.html"    class="mnp-link" onclick="closeMobileNav()">Contact</a>
-      </nav>
+      <div class="mnp-head">
+        <span class="mnp-title">Menu</span>
+        <button type="button" class="mnp-close" aria-label="Close menu" onclick="closeMobileNav()">&times;</button>
+      </div>
+      <div class="mnp-scroll">
+        <nav class="mnp-nav" aria-label="Pages">
+          ${item('index.html','Home')}
+          ${item('products.html','Products')}
+          ${item('about.html','About')}
+          ${item('portfolio.html','Portfolio')}
+          ${item('trade.html','Trade accounts')}
+          ${item('contact.html','Contact')}
+        </nav>
+        <div class="mnp-group">
+          <div class="mnp-group-label">Shop by category</div>
+          <div class="mnp-chips">
+            ${chip('boards','Boards')}${chip('edging','Edging')}${chip('hinges','Hinges')}${chip('handles','Handles')}
+            ${chip('drawers','Drawers')}${chip('kitchen','Kitchen')}${chip('locks','Locks')}${chip('tools','Tools &amp; fixings')}
+          </div>
+        </div>
+        <div class="mnp-group mnp-info">
+          <div class="mnp-group-label">Visit us</div>
+          <p>2142 Khami Rd, Iversens Complex, Bulawayo</p>
+          <p>Mon–Fri 08:00–17:00<br>Sat 08:00–13:00</p>
+          <a href="tel:+263780793585">+263 78 079 3585</a>
+        </div>
+      </div>
       <div class="mnp-actions">
         <a href="https://wa.me/${WA_NUMBER}" class="mnp-wa" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0" aria-hidden="true">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
           </svg>
-          WhatsApp Us
+          WhatsApp us
         </a>
-        <a href="contact.html" class="mnp-contact" onclick="closeMobileNav()">Get a Quote</a>
+        <a href="contact.html" class="mnp-contact" onclick="closeMobileNav()">Get a quote</a>
       </div>`;
     document.body.appendChild(panel);
   }
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'mnp-overlay';
+    overlay.addEventListener('click', () => window.closeMobileNav());
+    document.body.appendChild(overlay);
+  }
   hamburger.addEventListener('click', () => {
-    const open = hamburger.classList.contains('open');
-    hamburger.classList.toggle('open');
-    hamburger.setAttribute('aria-expanded', String(!open));
-    panel.classList.toggle('open');
-    document.body.style.overflow = open ? '' : 'hidden';
+    if (panel.classList.contains('open')) { window.closeMobileNav(); return; }
+    hamburger.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    panel.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const c = panel.querySelector('.mnp-close'); if (c) c.focus({ preventScroll: true });
   });
+  /* swipe right to dismiss */
+  let sx = null;
+  panel.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  panel.addEventListener('touchend', e => {
+    if (sx !== null && e.changedTouches[0].clientX - sx > 70) window.closeMobileNav();
+    sx = null;
+  }, { passive: true });
+  /* leaving the mobile layout while open: reset */
+  window.addEventListener('resize', () => { if (window.innerWidth > 1040) window.closeMobileNav(); });
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && window.closeMobileNav) window.closeMobileNav(); });
 window.closeMobileNav = function() {
   const h = document.getElementById('navHamburger');
   const p = document.querySelector('.mobile-nav-panel');
+  const o = document.querySelector('.mnp-overlay');
+  const wasOpen = p && p.classList.contains('open');
   if (h) { h.classList.remove('open'); h.setAttribute('aria-expanded','false'); }
   if (p) p.classList.remove('open');
+  if (o) o.classList.remove('open');
   document.body.style.overflow = '';
+  if (wasOpen && h) h.focus({ preventScroll: true });
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -925,7 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.escapeHtml      = escapeHtml;
 
   console.log('%cArmand Carpentry & Designs', 'font-size:18px;font-weight:bold;color:#5a5a5a;');
-  console.log('%cZimbabwe\'s Premier Hardware Supplier', 'color:#6a6a6a;');
+  console.log('%cBoards | Cutting | Fittings', 'color:#6a6a6a;');
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -995,14 +1038,14 @@ function brocPlaceholderType(category, name) {
 const BROC_PH_DRAW = {
   hinge: f => `
     <rect x="176" y="66" width="36" height="68" rx="5" fill="${f.s}" ${f.E}/>
-    <circle cx="194" cy="80" r="4.5" fill="#4b4f55"/><circle cx="194" cy="120" r="4.5" fill="#4b4f55"/>
+    <circle cx="194" cy="80" r="4.5" fill="#4F4C50"/><circle cx="194" cy="120" r="4.5" fill="#4F4C50"/>
     <rect x="186" y="94" width="16" height="12" rx="2" fill="${f.v}" ${f.E}/>
     <rect x="112" y="91" width="78" height="18" rx="9" fill="${f.v}" ${f.E}/>
     <line x1="122" y1="96" x2="182" y2="96" stroke="#fff" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
     <circle cx="190" cy="100" r="6" fill="${f.r}" ${f.E}/>
     <rect x="30" y="54" width="88" height="92" rx="9" fill="${f.s}" ${f.E}/>
     <circle cx="74" cy="100" r="28" fill="${f.r}" ${f.E}/>
-    <circle cx="74" cy="100" r="21" fill="#a3a9b1" stroke="#7d838c" stroke-opacity=".6"/>
+    <circle cx="74" cy="100" r="21" fill="#a3a9b1" stroke="#85818A" stroke-opacity=".6"/>
     <circle cx="74" cy="100" r="15" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.5"/>
     <circle cx="74" cy="62" r="5" fill="${f.r}" ${f.E}/><line x1="70.5" y1="62" x2="77.5" y2="62" stroke="#5a6068" stroke-width="1.6"/>
     <circle cx="74" cy="138" r="5" fill="${f.r}" ${f.E}/><line x1="70.5" y1="138" x2="77.5" y2="138" stroke="#5a6068" stroke-width="1.6"/>`,
@@ -1011,12 +1054,12 @@ const BROC_PH_DRAW = {
     <rect x="42" y="52" width="74" height="96" rx="3" fill="${f.s}" ${f.E}/>
     <rect x="124" y="52" width="74" height="96" rx="3" fill="${f.s}" ${f.E}/>
     <rect x="110" y="48" width="20" height="104" rx="5" fill="${f.s2}" ${f.E}/>
-    <line x1="110" y1="76" x2="130" y2="76" stroke="#6b717a" stroke-opacity=".7"/>
-    <line x1="110" y1="100" x2="130" y2="100" stroke="#6b717a" stroke-opacity=".7"/>
-    <line x1="110" y1="124" x2="130" y2="124" stroke="#6b717a" stroke-opacity=".7"/>
+    <line x1="110" y1="76" x2="130" y2="76" stroke="#726E73" stroke-opacity=".7"/>
+    <line x1="110" y1="100" x2="130" y2="100" stroke="#726E73" stroke-opacity=".7"/>
+    <line x1="110" y1="124" x2="130" y2="124" stroke="#726E73" stroke-opacity=".7"/>
     ${[72, 100, 128].map(y => `
-    <circle cx="72" cy="${y}" r="6.5" fill="#c9ced5" stroke="#7d838c" stroke-opacity=".6"/><circle cx="72" cy="${y}" r="3.6" fill="#4b4f55"/>
-    <circle cx="168" cy="${y}" r="6.5" fill="#c9ced5" stroke="#7d838c" stroke-opacity=".6"/><circle cx="168" cy="${y}" r="3.6" fill="#4b4f55"/>`).join('')}`,
+    <circle cx="72" cy="${y}" r="6.5" fill="#c9ced5" stroke="#85818A" stroke-opacity=".6"/><circle cx="72" cy="${y}" r="3.6" fill="#4F4C50"/>
+    <circle cx="168" cy="${y}" r="6.5" fill="#c9ced5" stroke="#85818A" stroke-opacity=".6"/><circle cx="168" cy="${y}" r="3.6" fill="#4F4C50"/>`).join('')}`,
 
   handle: f => `
     <g transform="translate(0,8)">
@@ -1044,21 +1087,21 @@ const BROC_PH_DRAW = {
 
   runner: f => `
     <rect x="18" y="72" width="204" height="28" rx="3" fill="${f.v}" ${f.E}/>
-    ${[38, 88, 138, 188].map(x => `<rect x="${x}" y="82" width="24" height="7" rx="3.5" fill="#4b4f55" fill-opacity=".85"/>`).join('')}
+    ${[38, 88, 138, 188].map(x => `<rect x="${x}" y="82" width="24" height="7" rx="3.5" fill="#4F4C50" fill-opacity=".85"/>`).join('')}
     <rect x="36" y="99" width="170" height="6" rx="1" fill="#2f3237"/>
     ${Array.from({ length: 9 }, (_, i) => `<circle cx="${46 + i * 18.5}" cy="102" r="3.7" fill="${f.r}"/>`).join('')}
     <rect x="34" y="104" width="172" height="24" rx="3" fill="${f.s}" ${f.E}/>
     <rect x="204" y="100" width="9" height="34" rx="2" fill="${f.v}" ${f.E}/>
-    ${[62, 112, 162].map(x => `<circle cx="${x}" cy="116" r="3.2" fill="#4b4f55" fill-opacity=".8"/>`).join('')}`,
+    ${[62, 112, 162].map(x => `<circle cx="${x}" cy="116" r="3.2" fill="#4F4C50" fill-opacity=".8"/>`).join('')}`,
 
   padlock: f => `
     <path d="M92 98 V70 a28 28 0 0 1 56 0 V98" fill="none" stroke="#9aa0a9" stroke-width="12"/>
     <path d="M92 98 V70 a28 28 0 0 1 56 0 V98" fill="none" stroke="#f3f5f7" stroke-width="3.5" stroke-opacity=".9"/>
     <rect x="66" y="94" width="108" height="76" rx="12" fill="${f.s}" ${f.E}/>
     <rect x="75" y="102" width="90" height="60" rx="8" fill="none" stroke="#fff" stroke-opacity=".55"/>
-    <circle cx="120" cy="124" r="8.5" fill="#33363b"/>
-    <path d="M116 130 L124 130 L127.5 150 L112.5 150 Z" fill="#33363b"/>
-    <circle cx="82" cy="114" r="2.6" fill="#6b717a"/><circle cx="158" cy="114" r="2.6" fill="#6b717a"/>`,
+    <circle cx="120" cy="124" r="8.5" fill="#353236"/>
+    <path d="M116 130 L124 130 L127.5 150 L112.5 150 Z" fill="#353236"/>
+    <circle cx="82" cy="114" r="2.6" fill="#726E73"/><circle cx="158" cy="114" r="2.6" fill="#726E73"/>`,
 
   camlock: f => `
     <circle cx="100" cy="90" r="40" fill="${f.r}" ${f.E}/>
@@ -1074,12 +1117,12 @@ const BROC_PH_DRAW = {
     <rect x="164" y="52" width="14" height="100" rx="2" fill="${f.v}" ${f.E}/>
     <rect x="178" y="66" width="24" height="20" rx="3" fill="${f.s}" ${f.E}/>
     <rect x="178" y="112" width="24" height="20" rx="3" fill="${f.v}" ${f.E}/>
-    <circle cx="171" cy="60" r="2.8" fill="#4b4f55"/><circle cx="171" cy="144" r="2.8" fill="#4b4f55"/>
+    <circle cx="171" cy="60" r="2.8" fill="#4F4C50"/><circle cx="171" cy="144" r="2.8" fill="#4F4C50"/>
     <rect x="44" y="52" width="122" height="100" rx="5" fill="${f.s}" ${f.E}/>
     <rect x="54" y="62" width="102" height="80" rx="3" fill="none" stroke="#fff" stroke-opacity=".5"/>
-    <circle cx="96" cy="88" r="8" fill="#33363b"/>
-    <path d="M92.5 93 L99.5 93 L102 110 L90 110 Z" fill="#33363b"/>
-    <circle cx="128" cy="118" r="12" fill="${f.r}" ${f.E}/><rect x="124.5" y="112" width="7" height="12" fill="#33363b"/>`,
+    <circle cx="96" cy="88" r="8" fill="#353236"/>
+    <path d="M92.5 93 L99.5 93 L102 110 L90 110 Z" fill="#353236"/>
+    <circle cx="128" cy="118" r="12" fill="${f.r}" ${f.E}/><rect x="124.5" y="112" width="7" height="12" fill="#353236"/>`,
 
   basket: f => `
     <rect x="34" y="88" width="9" height="22" rx="2" fill="${f.s}" ${f.E}/>
@@ -1102,8 +1145,8 @@ const BROC_PH_DRAW = {
   bracket: f => `
     <path d="M62 42 H92 V126 H186 V158 H62 Z" fill="${f.s}" ${f.E}/>
     <path d="M92 84 V126 H148 Z" fill="#c1c6cd" ${f.E}/>
-    <ellipse cx="77" cy="64" rx="5.5" ry="9" fill="#4b4f55"/><ellipse cx="77" cy="100" rx="5.5" ry="9" fill="#4b4f55"/>
-    <ellipse cx="116" cy="142" rx="9" ry="5.5" fill="#4b4f55"/><ellipse cx="160" cy="142" rx="9" ry="5.5" fill="#4b4f55"/>
+    <ellipse cx="77" cy="64" rx="5.5" ry="9" fill="#4F4C50"/><ellipse cx="77" cy="100" rx="5.5" ry="9" fill="#4F4C50"/>
+    <ellipse cx="116" cy="142" rx="9" ry="5.5" fill="#4F4C50"/><ellipse cx="160" cy="142" rx="9" ry="5.5" fill="#4F4C50"/>
     <line x1="66" y1="46" x2="66" y2="150" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>`,
 
   rail: f => `
@@ -1113,8 +1156,8 @@ const BROC_PH_DRAW = {
     <rect x="196" y="66" width="16" height="68" rx="3" fill="${f.s}" ${f.E}/>
     <rect x="44" y="86" width="18" height="28" rx="4" fill="${f.s2}" ${f.E}/>
     <rect x="178" y="86" width="18" height="28" rx="4" fill="${f.s2}" ${f.E}/>
-    <circle cx="36" cy="76" r="3.2" fill="#4b4f55"/><circle cx="36" cy="124" r="3.2" fill="#4b4f55"/>
-    <circle cx="204" cy="76" r="3.2" fill="#4b4f55"/><circle cx="204" cy="124" r="3.2" fill="#4b4f55"/>`,
+    <circle cx="36" cy="76" r="3.2" fill="#4F4C50"/><circle cx="36" cy="124" r="3.2" fill="#4F4C50"/>
+    <circle cx="204" cy="76" r="3.2" fill="#4F4C50"/><circle cx="204" cy="124" r="3.2" fill="#4F4C50"/>`,
 
   screwdriver: f => `
     <g transform="rotate(-24 122 100)">
@@ -1130,10 +1173,10 @@ const BROC_PH_DRAW = {
   bolt: f => `
     <g transform="rotate(-16 122 100)">
       <rect x="42" y="76" width="32" height="48" rx="3" fill="${f.v}" ${f.E}/>
-      <line x1="58" y1="76" x2="58" y2="124" stroke="#7d838c" stroke-opacity=".6"/>
+      <line x1="58" y1="76" x2="58" y2="124" stroke="#85818A" stroke-opacity=".6"/>
       <rect x="74" y="72" width="7" height="56" rx="2" fill="${f.s}" ${f.E}/>
       <rect x="81" y="88" width="112" height="24" fill="${f.v}" ${f.E}/>
-      ${Array.from({ length: 13 }, (_, i) => `<line x1="${92 + i * 8}" y1="88" x2="${98 + i * 8}" y2="112" stroke="#7d838c" stroke-width="1.6" stroke-opacity=".8"/>`).join('')}
+      ${Array.from({ length: 13 }, (_, i) => `<line x1="${92 + i * 8}" y1="88" x2="${98 + i * 8}" y2="112" stroke="#85818A" stroke-width="1.6" stroke-opacity=".8"/>`).join('')}
       <polygon points="193,88 208,93 208,107 193,112" fill="${f.s}" ${f.E}/>
     </g>`,
 
@@ -1154,9 +1197,9 @@ const BROC_PH_DRAW = {
   },
 
   edging: f => `
-    <rect x="96" y="150" width="118" height="8" rx="1.5" fill="#d3ad78" stroke="#a98554" stroke-opacity=".7"/>
+    <rect x="96" y="150" width="118" height="8" rx="1.5" fill="#9AA3AD" stroke="#a98554" stroke-opacity=".7"/>
     <line x1="100" y1="152.5" x2="210" y2="152.5" stroke="#fff" stroke-opacity=".4"/>
-    <circle cx="96" cy="98" r="54" fill="#d3ad78" stroke="#a98554" stroke-opacity=".8"/>
+    <circle cx="96" cy="98" r="54" fill="#9AA3AD" stroke="#a98554" stroke-opacity=".8"/>
     <circle cx="96" cy="98" r="46" fill="none" stroke="#b98f5a" stroke-opacity=".6"/>
     <circle cx="96" cy="98" r="38" fill="none" stroke="#b98f5a" stroke-opacity=".6"/>
     <circle cx="96" cy="98" r="30" fill="none" stroke="#b98f5a" stroke-opacity=".6"/>
@@ -1195,19 +1238,51 @@ function brocPlaceholderSVG(type) {
   </svg>`;
 }
 
+/* ── PLACEHOLDER TILE ─────────────────────────────────────────
+   One consistent monoline icon per category on a light drafting-grid
+   tile. Deliberately generic: it never pretends to show the product. */
+const BROC_PH_ICONS = {
+  hinges:       ['Hinges & pivots',   '<rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/><path d="M10 7h4M10 12h4M10 17h4"/><circle cx="6.5" cy="8" r=".6"/><circle cx="6.5" cy="16" r=".6"/><circle cx="17.5" cy="8" r=".6"/><circle cx="17.5" cy="16" r=".6"/>'],
+  handles:      ['Handles & knobs',   '<path d="M6 14V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><path d="M6 14v4M18 14v4"/><path d="M3 20h18"/>'],
+  drawers:      ['Drawer systems',    '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 12h18M10 8h4M10 16h4"/>'],
+  locks:        ['Locks & security',  '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1"/>'],
+  kitchen:      ['Kitchen fittings',  '<path d="M7 4h6a3 3 0 0 1 3 3v2"/><path d="M7 4v5"/><path d="M3 13h18l-1.5 6a2 2 0 0 1-2 1.5h-11a2 2 0 0 1-2-1.5z"/>'],
+  lighting:     ['Lighting hardware', '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.3 1 2.1h5c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'],
+  construction: ['Construction',       '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 10h18M3 15h18M9 5v5M15 10v5M9 15v4"/>'],
+  closet:       ['Closet systems',    '<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 3v18M10 12v2M14 12v2"/>'],
+  tools:        ['Tools & fixings',   '<path d="M7 3h10v4H7z"/><path d="M9 7v13l3 1.5 3-1.5V7"/><path d="M9 11h6M9 15h6"/>'],
+  boards:       ['Boards & panels',   '<path d="M3 8l9-4 9 4-9 4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/>'],
+  edging:       ['Edging',            '<circle cx="10" cy="11" r="7"/><circle cx="10" cy="11" r="2.5"/><path d="M10 18h10"/>'],
+  generic:      ['Product',           '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>']
+};
+const BROC_PH_MATCH = [
+  [/hinge|pivot/,'hinges'],[/handle|knob|pull/,'handles'],[/drawer|runner|slide/,'drawers'],
+  [/lock|secur|latch/,'locks'],[/kitchen|sink|tap|basket/,'kitchen'],[/light|lamp|led/,'lighting'],
+  [/construct|brick|anchor/,'construction'],[/closet|wardrobe|rail/,'closet'],
+  [/tool|fix|screw|bolt|bit|drill/,'tools'],[/board|panel|melamine|wood|granite/,'boards'],[/edg/,'edging']
+];
+function brocPlaceholderKey(category, name) {
+  const c = String(category || '').toLowerCase();
+  for (const [re, k] of BROC_PH_MATCH) if (re.test(c)) return k;
+  const n = String(name || '').toLowerCase();
+  for (const [re, k] of BROC_PH_MATCH) if (re.test(n)) return k;
+  return 'generic';
+}
+
 function brocPlaceholderHTML(category, compact, name) {
-  const type   = brocPlaceholderType(category, name);
-  const svg    = brocPlaceholderSVG(type);
-  const aria   = _brocPhEsc((name || 'Product') + ' — photo coming soon');
-  const bg     = 'radial-gradient(ellipse at 50% 38%,#ffffff 0%,#f3f4f6 58%,#e7e9ec 100%)';
+  const key   = brocPlaceholderKey(category, name);
+  const [label, paths] = BROC_PH_ICONS[key];
+  const aria  = _brocPhEsc((name || 'Product') + ' — photo to follow');
+  const grid  = 'background-color:#f3f5f7;'
+              + 'background-image:linear-gradient(rgba(95,104,114,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(95,104,114,.08) 1px,transparent 1px),linear-gradient(180deg,#fafbfc,#e9ecef);'
+              + 'background-size:22px 22px,22px 22px,100% 100%;';
+  const icon  = (px) => `<svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="#5f6872" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
   if (compact) {
-    return `<div class="broc-img-ph broc-img-ph--compact" role="img" aria-label="${aria}" data-ph="${type}" style="position:absolute;inset:0;background:${bg};">
-      <div style="position:absolute;inset:2px;">${svg}</div>
-    </div>`;
+    return `<div class="broc-img-ph broc-img-ph--compact" role="img" aria-label="${aria}" data-ph="${key}" style="position:absolute;inset:0;${grid}display:flex;align-items:center;justify-content:center;">${icon(26)}</div>`;
   }
-  return `<div class="broc-img-ph" role="img" aria-label="${aria}" data-ph="${type}" style="position:absolute;inset:0;background:${bg};overflow:hidden;">
-    <div style="position:absolute;left:2%;right:2%;top:3%;bottom:24px;">${svg}</div>
-    <span style="position:absolute;left:0;right:0;bottom:9px;text-align:center;font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:#a0a3a9;">Photo coming soon</span>
+  return `<div class="broc-img-ph" role="img" aria-label="${aria}" data-ph="${key}" style="position:absolute;inset:0;${grid}display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:hidden;">
+    <span style="display:flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:#fff;border:1px solid #dfe3e7;box-shadow:0 6px 16px -8px rgba(30,34,40,.25);">${icon(40)}</span>
+    <span style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:#6b747e;">${_brocPhEsc(label)}</span>
   </div>`;
 }
 
@@ -1224,4 +1299,5 @@ function brocImgFallback(imgEl, category, compact) {
 }
 window.brocPlaceholderHTML = brocPlaceholderHTML;
 window.brocPlaceholderType = brocPlaceholderType;
+window.brocPlaceholderKey  = brocPlaceholderKey;
 window.brocImgFallback     = brocImgFallback;
