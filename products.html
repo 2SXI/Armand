@@ -664,6 +664,7 @@ body{background:var(--w-paper);}
 @keyframes pdmSheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.pdm-box{animation:none;}}
 </style>
+<link rel="stylesheet" href="shop.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -710,7 +711,7 @@ body{background:var(--w-paper);}
       <li><a href="contact.html" class="nav-link">Contact</a></li>
     </ul>
     <div class="nav-actions">
-      <button class="nav-search-btn" id="searchToggle" aria-label="Search" onclick="focusSidebarSearch()">
+      <button class="nav-search-btn" id="searchToggle" aria-label="Search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       </button>
       <button class="nav-cart" id="cartBtn" aria-label="View cart">
@@ -731,169 +732,53 @@ body{background:var(--w-paper);}
 
 <!-- ── CATALOGUE PAGE ──────────────────────── -->
 <span id="main-content" tabindex="-1"></span>
-<div class="cat-page" style="margin-top:72px;">
-
-  <!-- SIDEBAR -->
-  <aside class="cat-sidebar" id="catSidebar" aria-label="Product filters">
-    <div class="csb-top">
-      <div class="csb-header">
-        <span class="csb-title">Filters <span class="csb-badge" id="csbBadge" aria-live="polite"></span></span>
-        <span style="display:flex;align-items:center;gap:4px;">
-          <button class="csb-clear" id="csbClear" onclick="clearAllFilters()">Clear all</button>
-          <button class="csb-close" onclick="toggleCatSidebar()" aria-label="Close filters">&times;</button>
-        </span>
-      </div>
-      <div class="csb-search">
-        <div class="csb-search-wrap">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#5F6872;flex-shrink:0" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="search" class="csb-search-input" id="catSearchInput" placeholder="Search products or SKU" aria-label="Search products or SKU" autocomplete="off">
-          <button class="csb-search-clear" id="csbSearchClear" aria-label="Clear search" onclick="var i=document.getElementById('catSearchInput');i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));i.focus();">&times;</button>
-        </div>
-      </div>
-    </div>
-
-    <details class="csb-group" open>
-      <summary>Category</summary>
-      <div class="csb-group-body csb-cats" id="catSidebarCats">
-        <button class="csb-cat active" data-cat="all" onclick="setCatFilter('all',this)">
-          <span class="csb-cat-left">All Products</span>
-          <span class="csb-cat-count" id="cnt-all">—</span>
-        </button>
-        <button class="csb-cat" data-cat="hinges" onclick="setCatFilter('hinges',this)">
-          <span class="csb-cat-left">Hinges &amp; Pivot Systems</span>
-          <span class="csb-cat-count" id="cnt-hinges">—</span>
-        </button>
-        <button class="csb-cat" data-cat="handles" onclick="setCatFilter('handles',this)">
-          <span class="csb-cat-left">Handles &amp; Knobs</span>
-          <span class="csb-cat-count" id="cnt-handles">—</span>
-        </button>
-        <button class="csb-cat" data-cat="drawers" onclick="setCatFilter('drawers',this)">
-          <span class="csb-cat-left">Drawer Systems</span>
-          <span class="csb-cat-count" id="cnt-drawers">—</span>
-        </button>
-        <button class="csb-cat" data-cat="locks" onclick="setCatFilter('locks',this)">
-          <span class="csb-cat-left">Locks &amp; Security</span>
-          <span class="csb-cat-count" id="cnt-locks">—</span>
-        </button>
-        <button class="csb-cat" data-cat="kitchen" onclick="setCatFilter('kitchen',this)">
-          <span class="csb-cat-left">Kitchen Fittings</span>
-          <span class="csb-cat-count" id="cnt-kitchen">—</span>
-        </button>
-        <button class="csb-cat" data-cat="lighting" onclick="setCatFilter('lighting',this)">
-          <span class="csb-cat-left">Lighting Hardware</span>
-          <span class="csb-cat-count" id="cnt-lighting">—</span>
-        </button>
-        <button class="csb-cat" data-cat="construction" onclick="setCatFilter('construction',this)">
-          <span class="csb-cat-left">Construction Hardware</span>
-          <span class="csb-cat-count" id="cnt-construction">—</span>
-        </button>
-        <button class="csb-cat" data-cat="closet" onclick="setCatFilter('closet',this)">
-          <span class="csb-cat-left">Closet Systems</span>
-          <span class="csb-cat-count" id="cnt-closet">—</span>
-        </button>
-        <button class="csb-cat" data-cat="tools" onclick="setCatFilter('tools',this)">
-          <span class="csb-cat-left">Tools &amp; Fixings</span>
-          <span class="csb-cat-count" id="cnt-tools">—</span>
-        </button>
-        <button class="csb-cat" data-cat="boards" onclick="setCatFilter('boards',this)">
-          <span class="csb-cat-left">Boards &amp; Panels</span>
-          <span class="csb-cat-count" id="cnt-boards">—</span>
-        </button>
-        <button class="csb-cat" data-cat="edging" onclick="setCatFilter('edging',this)">
-          <span class="csb-cat-left">Edging</span>
-          <span class="csb-cat-count" id="cnt-edging">—</span>
-        </button>
-      </div>
-    </details>
-
-    <details class="csb-group" open>
-      <summary>Availability</summary>
-      <div class="csb-group-body"><div class="csb-filter-row">
-        <button class="csb-pill active" data-stock="all" onclick="setStockFilter('all',this)">All</button>
-        <button class="csb-pill" data-stock="in"  onclick="setStockFilter('in',this)">In stock</button>
-        <button class="csb-pill" data-stock="low" onclick="setStockFilter('low',this)">Low stock</button>
-        <button class="csb-pill" data-stock="out" onclick="setStockFilter('out',this)">Out of stock</button>
-      </div></div>
-    </details>
-
-    <details class="csb-group">
-      <summary>Tags</summary>
-      <div class="csb-group-body"><div class="csb-filter-row">
-        <button class="csb-pill active" data-badge=""      onclick="setBadgeFilter('',this)">All</button>
-        <button class="csb-pill" data-badge="new"   onclick="setBadgeFilter('new',this)">New</button>
-        <button class="csb-pill" data-badge="sale"  onclick="setBadgeFilter('sale',this)">Sale</button>
-        <button class="csb-pill" data-badge="hot"   onclick="setBadgeFilter('hot',this)">Hot</button>
-        <button class="csb-pill" data-badge="trade" onclick="setBadgeFilter('trade',this)">Trade</button>
-      </div></div>
-    </details>
-
-    <div class="csb-bottom">
-      <a href="https://wa.me/263780793585" class="csb-wa" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-        Check stock on WhatsApp
-      </a>
-      <p class="csb-wa-note">Boards cut to size? Send us your dimensions.</p>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="cat-main">
-
-    <div class="cat-breadcrumb">
-      <a href="index.html">Home</a>
-      <span>›</span>
-      <span id="bc-cat">All Products</span>
-    </div>
-
-    <h1 class="cat-title">Boards, fittings &amp; hardware<small>Bulawayo, Zimbabwe</small></h1>
-
-    <div class="cat-toolbar">
-      <div class="cat-toolbar-left">
-        <div class="cat-result-count" id="resultCount">Loading...</div>
-        <div class="cat-active-filters" id="activeFilterChips"></div>
-      </div>
-      <select class="cat-sort" id="catSort" onchange="applyCatalogueSort(this.value)">
-        <option value="default">Featured</option>
-        <option value="name">Name A–Z</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="new">Newest First</option>
-        <option value="stock-desc">Highest Stock</option>
-      </select>
-      <div class="cat-view-toggle">
-        <button class="cat-view-btn active" id="gridViewBtn" onclick="setView('grid')" aria-label="Grid view" title="Grid view">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        </button>
-        <button class="cat-view-btn" id="listViewBtn" onclick="setView('list')" aria-label="List view" title="List view">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <div id="catalogueGrid">
-      <!-- Skeleton cards rendered by JS -->
-    </div>
-
-  </main>
-</div>
-
-<!-- ── PRODUCT DETAIL MODAL ───────────────── -->
-<div class="pdm-overlay" id="pdmOverlay" role="dialog" aria-modal="true" aria-label="Product details">
-  <div class="pdm-box" id="pdmBox">
-    <button class="pdm-close" id="pdmClose" aria-label="Close">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
-    <div class="pdm-img-panel" id="pdmImgPanel"></div>
-    <div class="pdm-info" id="pdmInfo"></div>
+<div class="sx">
+<div class="wrap shop-top">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><span id="crumbCat">Shop</span></nav>
+  <h1 id="shopTitle">Shop</h1>
+  <p class="sub">Hardware and fittings for cabinet makers, joiners and homeowners.</p>
+  <div class="shop-bar">
+    <div class="shop-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="shopQ" type="search" placeholder="Search by name, SKU or keyword" aria-label="Search products" autocomplete="off"><button type="button" id="shopQClear" aria-label="Clear search">&times;</button></div>
   </div>
+  <div class="chips-row" id="catChips" role="tablist" aria-label="Departments"></div>
 </div>
+<div class="wrap shop-layout">
+  <aside class="filters" id="filters" aria-label="Filters">
+    <div class="fhead"><h2>Filters</h2><button type="button" class="fclear" id="fClearAll" data-clear="all" hidden>Clear all <b id="fCount"></b></button><button type="button" class="fx" id="fCloseX" aria-label="Close filters"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <details class="fgroup" open><summary>Department</summary><div class="flist" id="fCats"></div></details>
+    <details class="fgroup" open><summary>Price <span class="rlabel" id="rLabel"></span></summary>
+      <div class="range"><div class="range-track" id="rTrack"></div><input type="range" id="rMin" min="0" max="100" value="0" aria-label="Minimum price"><input type="range" id="rMax" min="0" max="100" value="100" aria-label="Maximum price"></div>
+      <div class="price-inputs"><input id="pMin" type="number" min="0" inputmode="decimal" placeholder="Min" aria-label="Minimum price"><span>to</span><input id="pMax" type="number" min="0" inputmode="decimal" placeholder="Max" aria-label="Maximum price"></div>
+      <div class="price-quick" id="pQuick"></div><button type="button" class="linkbtn" id="fPriceReset" hidden>Reset price</button></details>
+    <details class="fgroup" open><summary>Show only</summary>
+      <label class="toggle"><span>In stock</span><input type="checkbox" id="fStock"><i></i></label>
+      <label class="toggle"><span>On sale</span><input type="checkbox" id="fSale"><i></i></label>
+      <label class="toggle"><span>Saved items (<b id="wishN">0</b>)</span><input type="checkbox" id="fWish"><i></i></label></details>
+    <div class="help-box"><b>Can't find it?</b><p>We stock more than we list. Tell us what you need and we will check.</p><a class="btn btn-wa btn-sm" href="https://wa.me/263780793585?text=Hi%20Armand%2C%20do%20you%20have%3A%20" target="_blank" rel="noopener">Ask on WhatsApp</a></div>
+    <div class="f-apply" id="fApply" hidden><button class="btn btn-dark btn-block" type="button" id="fClose">Show results</button></div>
+  </aside>
+  <section aria-label="Products">
+    <div class="toolbar">
+      <button class="btn btn-line btn-sm filter-btn" id="fOpen" type="button">Filters</button>
+      <div class="count" id="count" aria-live="polite">Loading…</div>
+      <select class="sel" id="sort" aria-label="Sort products">
+        <option value="featured">Featured</option><option value="name">Name A to Z</option>
+        <option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="sale">Biggest discount</option>
+      </select>
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" data-view="grid" class="on" aria-label="Grid view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></button>
+        <button type="button" data-view="list" aria-label="List view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      </div>
+    </div>
+    <div class="active-chips" id="active"></div>
+    <div class="grid" id="grid"><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div><div class="pcard skel"><div class="pimg"></div><div class="pbody"><i style="width:40%"></i><i style="width:85%;height:16px"></i><i style="width:60%"></i></div></div></div>
+    <div class="more" id="more" hidden><div class="progress"><i id="prog"></i></div><span id="moreTxt"></span><button class="btn btn-line" id="moreBtn" type="button">Load more</button></div>
+  </section>
+</div>
+<div class="modal" id="qvModal" role="dialog" aria-modal="true" aria-label="Quick view"><div class="qv" id="qvBox"></div></div>
 
-<!-- Mobile sidebar toggle -->
-<button class="cat-sidebar-toggle" id="catSidebarToggle" onclick="toggleCatSidebar()">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  Filters
-</button>
-<div class="cat-mob-overlay" id="catMobOverlay" onclick="toggleCatSidebar()"></div>
+
+</div>
 
 <!-- ── FOOTER ───────────────────────────────── -->
 <footer>
@@ -941,7 +826,7 @@ body{background:var(--w-paper);}
       <div class="fm-col-title">Support</div>
       <ul class="fm-links">
         <li><a href="contact.html">Get a Quote</a></li>
-        <li><a href="contact.html">Track My Order</a></li>
+        <li><a href="track.html">Track My Order</a></li>
         <li><a href="legal.html">Shipping Policy</a></li>
         <li><a href="legal.html">Returns Policy</a></li>
         <li><a href="legal.html">Terms of Sale</a></li>
@@ -971,523 +856,8 @@ body{background:var(--w-paper);}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="app.js"></script>
-<script>
-'use strict';
-
-/* ── CONFIG ─────────────────────────────────────────────────── */
-const CAT_SB_URL = 'https://nasbxjharopveynnwgrg.supabase.co';
-const CAT_SB_KEY = 'sb_publishable_io0oLODozq0xdUJiNT37tQ_u2PWURX0';
-const CAT_WA     = '263780793585';
-const CAT_CUR    = 'USD';
-
-let _catSB = null;
-function getCatSB() {
-  if (_catSB) return _catSB;
-  if (typeof supabase !== 'undefined') _catSB = supabase.createClient(CAT_SB_URL, CAT_SB_KEY);
-  return _catSB;
-}
-
-/* ── STATE ──────────────────────────────────────────────────── */
-let _allProducts  = [];
-let _filtered     = [];
-let _activeCat    = 'all';
-let _activeStock  = 'all';
-let _activeBadge  = '';
-let _searchQ      = '';
-let _sortVal      = 'default';
-let _view         = 'grid';
-let _detailIndex  = 0;  // current product index in _filtered for prev/next
-let _detailQty    = 1;
-
-/* ── LOAD PRODUCTS FROM SUPABASE ────────────────────────────── */
-/* Supabase returns at most 1000 rows per request — page through them all. */
-async function fetchAllRows(build) {
-  const size = 1000; let all = [], from = 0;
-  while (true) {
-    const { data, error } = await build().range(from, from + size - 1);
-    if (error) return { data: null, error };
-    all = all.concat(data || []);
-    if (!data || data.length < size) break;
-    from += size;
-  }
-  return { data: all, error: null };
-}
-
-async function loadCatalogue() {
-  renderSkeletons(12);
-  try {
-    const sb = getCatSB();
-    let data, error;
-    if (sb) {
-      // Try with active filter first; fallback if column doesn't exist
-      let result = await fetchAllRows(() => sb.from('products').select('*').eq('active', true).order('name', { ascending: true }).order('id', { ascending: true }));
-      if (result.error && result.error.message.includes('active')) {
-        // active column doesn't exist yet — fetch all
-        result = await fetchAllRows(() => sb.from('products').select('*').order('name', { ascending: true }).order('id', { ascending: true }));
-        if (result.error) throw result.error;
-        data = (result.data || []).filter(p => p.active !== false);
-      } else {
-        if (result.error) throw result.error;
-        data = result.data;
-      }
-      error = null;
-    } else {
-      try {
-        const res = await fetch(`${CAT_SB_URL}/rest/v1/products?select=*&active=eq.true&order=name.asc`, {
-          headers: { apikey: CAT_SB_KEY, Authorization: `Bearer ${CAT_SB_KEY}` }
-        });
-        data = await res.json();
-        if (!Array.isArray(data)) throw new Error(data.message || 'Invalid response');
-      } catch (_e) {
-        const res = await fetch(`${CAT_SB_URL}/rest/v1/products?select=*&order=name.asc`, {
-          headers: { apikey: CAT_SB_KEY, Authorization: `Bearer ${CAT_SB_KEY}` }
-        });
-        data = (await res.json()).filter(p => p.active !== false);
-      }
-    }
-    _allProducts = data || [];
-
-    // Sync into global Products.cache so armand-shop.js Cart.add() can find items
-    if (typeof Products !== 'undefined') {
-      // Merge: add any products not already in cache
-      _allProducts.forEach(p => {
-        if (!Products.cache.find(c => String(c.id) === String(p.id))) {
-          Products.cache.push(p);
-        }
-      });
-      window.products = Products.cache;
-    }
-
-    updateCounts(_allProducts);
-    applyFilters();
-  } catch (err) {
-    console.error('[Catalogue]', err);
-    document.getElementById('catalogueGrid').innerHTML = `
-      <div class="cat-empty">
-        <div style="font-size:13px;color:#c1392b;margin-bottom:12px;">Could not load products — ${_esc(err.message)}</div>
-        <p style="font-size:12px;color:#5C6570;">Check your Supabase connection or <a href="contact.html" style="color:#5a5a5a;">contact us directly</a>.</p>
-      </div>`;
-    document.getElementById('resultCount').textContent = 'Error loading';
-  }
-}
-
-/* ── FILTER + SORT + RENDER ─────────────────────────────────── */
-function applyFilters() {
-  const q = _searchQ.toLowerCase().trim();
-  _filtered = _allProducts.filter(p => {
-    const cat   = (p.category || '').toLowerCase();
-    const badge = (p.badge    || '').toLowerCase();
-    const stock = p.stock;
-    // Category
-    if (_activeCat !== 'all' && cat !== _activeCat) return false;
-    // Stock
-    if (_activeStock === 'in'  && !(stock > 10)) return false;
-    if (_activeStock === 'low' && !(stock > 0 && stock <= 10)) return false;
-    if (_activeStock === 'out' && stock !== 0) return false;
-    // Badge
-    if (_activeBadge && badge !== _activeBadge) return false;
-    // Search
-    if (q) {
-      const haystack = `${p.name} ${p.sku || ''} ${p.category || ''} ${p.short_description || ''} ${p.description || ''}`.toLowerCase();
-      if (!haystack.includes(q)) return false;
-    }
-    return true;
-  });
-
-  // Sort
-  const s = _sortVal;
-  if (s === 'name')       _filtered.sort((a,b) => (a.name||'').localeCompare(b.name||''));
-  else if (s === 'price-asc')  _filtered.sort((a,b) => parseFloat(a.price||0) - parseFloat(b.price||0));
-  else if (s === 'price-desc') _filtered.sort((a,b) => parseFloat(b.price||0) - parseFloat(a.price||0));
-  else if (s === 'new')        _filtered.sort((a,b) => ((b.badge||'').toLowerCase()==='new'?1:0) - ((a.badge||'').toLowerCase()==='new'?1:0));
-  else if (s === 'stock-desc') _filtered.sort((a,b) => (b.stock||0) - (a.stock||0));
-
-  renderGrid(_filtered);
-  updateResultCount(_filtered.length);
-  updateActiveChips();
-  updateBreadcrumb();
-}
-
-const CAT_LABELS = {hinges:'Hinges & pivots',handles:'Handles & knobs',drawers:'Drawer systems',locks:'Locks & security',kitchen:'Kitchen fittings',lighting:'Lighting hardware',construction:'Construction',closet:'Closet systems',tools:'Tools & fixings',boards:'Boards & panels',edging:'Edging'};
-
-function renderGrid(products) {
-  const grid = document.getElementById('catalogueGrid');
-  if (!products.length) {
-    grid.innerHTML = `
-      <div class="cat-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <div class="cat-empty-title">No products found</div>
-        <div class="cat-empty-sub">Try adjusting your filters or search term.<br>Can't find it? WhatsApp us and we'll check what's in the yard.</div>
-        <button onclick="clearAllFilters()" style="padding:10px 24px;background:#2a282b;color:#fff;border:none;font-family:'Saira',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Clear Filters</button>
-      </div>`;
-    return;
-  }
-  grid.innerHTML = products.map((p, i) => buildCatalogueCard(p, i)).join('');
-}
-
-function buildCatalogueCard(p, index) {
-  const price    = parseFloat(p.price || 0).toFixed(2);
-  const oldPrice = p.old_price ? parseFloat(p.old_price).toFixed(2) : null;
-  const stock    = p.stock;
-  const outOfStock = stock === 0;
-  const lowStock   = stock > 0 && stock <= 10;
-
-  const imgHtml = p.image
-    ? `<img src="${_esc(p.image)}" alt="${_esc(p.name)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="brocImgFallback(this,'${_esc(p.category||'')}')">`
-    : brocPlaceholderHTML(p.category, false, p.name);
-
-  const badgeHtml = p.badge ? `<span class="pc-badge ${_esc(p.badge.toLowerCase())}">${_esc(p.badge.toUpperCase())}</span>` : '';
-  const stockBadge = outOfStock
-    ? `<span class="pc-badge sale" style="top:auto;bottom:10px;left:10px;">OUT OF STOCK</span>`
-    : lowStock
-      ? `<span class="pc-badge trade" style="top:auto;bottom:10px;left:10px;">LOW: ${stock}</span>`
-      : '';
-
-  return `
-    <div class="product-card" data-index="${index}" data-product-id="${p.id}" data-price="${price}" data-cat="${_esc(p.category||'')}" onclick="openDetail(${index})" style="cursor:pointer;" tabindex="0" aria-label="View details: ${_esc(p.name)}">
-      <div class="pc-img" style="position:relative;">
-        ${imgHtml}
-        ${badgeHtml}
-        ${stockBadge}
-        <button class="pc-wishlist" aria-label="Save ${_esc(p.name)}" onclick="event.stopPropagation();">♡</button>
-      </div>
-      <div class="pc-body" style="pointer-events:none;">
-        <div class="pc-cat">${_esc(CAT_LABELS[(p.category||'').toLowerCase()] || p.category || '')}</div>
-        <div class="pc-name">${_esc(p.name)}</div>
-        <div class="pc-spec">${_esc(p.short_description || p.description || '')}</div>
-        <div class="pc-price-row">
-          <div>
-            <span class="pc-price">${CAT_CUR} ${price}</span>
-            ${oldPrice ? `<span class="pc-price-old">${oldPrice}</span>` : ''}
-          </div>
-          <button class="pc-add" style="pointer-events:auto;" ${outOfStock ? 'disabled' : ''}
-            onclick="event.stopPropagation();catAddToCart(${p.id},this)" aria-label="Add ${_esc(p.name)} to cart"><span>Add</span><span class="pc-add-plus" aria-hidden="true">+</span></button>
-        </div>
-        <div class="pc-sku">SKU ${_esc(p.sku || 'ARM-' + p.id)}</div>
-      </div>
-    </div>`;
-}
-
-/* ── DETAIL MODAL ───────────────────────────────────────────── */
-function openDetail(index) {
-  _detailIndex = index;
-  _detailQty   = 1;
-  const p = _filtered[index];
-  if (!p) return;
-  renderDetail(p, index);
-  document.getElementById('pdmOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeDetail() {
-  document.getElementById('pdmOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function renderDetail(p, index) {
-  const isSheet = ['boards','edging'].includes((p.category||'').toLowerCase());
-  const price    = parseFloat(p.price || 0);
-  const oldPrice = p.old_price ? parseFloat(p.old_price) : null;
-  const stock    = p.stock;
-  const outOfStock = stock === 0;
-  const isLow      = stock > 0 && stock <= 10;
-  _detailQty = 1;
-
-  // Image panel
-  const imgPanel = document.getElementById('pdmImgPanel');
-  imgPanel.innerHTML = p.image
-    ? `<img src="${_esc(p.image)}" alt="${_esc(p.name)}" loading="lazy" onerror="brocImgFallback(this,'${_esc(p.category||'')}')">`
-    : brocPlaceholderHTML(p.category, false, p.name);
-
-  if (p.badge) imgPanel.insertAdjacentHTML('afterbegin', `<div class="pdm-badge ${_esc(p.badge.toLowerCase())}">${_esc(p.badge.toUpperCase())}</div>`);
-
-  const stockBadgeClass = outOfStock ? 'pdm-stock-out' : isLow ? 'pdm-stock-low' : 'pdm-stock-ok';
-  const stockText       = outOfStock ? 'Out of Stock' : isLow ? `Low Stock — ${stock} left` : `In Stock (${stock})`;
-  imgPanel.insertAdjacentHTML('beforeend', `<div class="pdm-stock-badge ${stockBadgeClass}">${stockText}</div>`);
-
-  // Parse spec lines from description
-  const descRaw  = p.description || '';
-  const specParts = descRaw.split('·').map(s => s.trim()).filter(Boolean);
-
-  // Build spec rows  
-  let specsHtml = '';
-  if (specParts.length > 1) {
-    const specLabels = ['Size / Spec', 'Material', 'Finish', 'Capacity', 'Rating', 'Includes', 'Standard'];
-    specsHtml = `
-      <div class="pdm-specs">
-        <div class="pdm-specs-title">Specifications</div>
-        ${specParts.map((s, i) => `
-          <div class="pdm-spec-row">
-            <span class="pdm-spec-key">${specLabels[i] || 'Spec ' + (i+1)}</span>
-            <span class="pdm-spec-val">${_esc(s)}</span>
-          </div>`).join('')}
-      </div>`;
-  }
-
-  const saveAmt = oldPrice ? ((oldPrice - price) / oldPrice * 100).toFixed(0) : null;
-
-  document.getElementById('pdmInfo').innerHTML = `
-    <div class="pdm-sku">SKU: ${_esc(p.sku || 'ARM-' + p.id)}</div>
-    <div class="pdm-name">${_esc(p.name)}</div>
-    <div class="pdm-cat-tag">${_esc((p.category || 'general').toUpperCase())}</div>
-    <div class="pdm-price-row">
-      <span class="pdm-price">${CAT_CUR} ${price.toFixed(2)}</span>
-      ${oldPrice ? `<span class="pdm-old-price">${CAT_CUR} ${oldPrice.toFixed(2)}</span>` : ''}
-      ${saveAmt  ? `<span class="pdm-save">Save ${saveAmt}%</span>` : ''}
-    </div>
-    ${(p.description || p.short_description) ? `<div class="pdm-desc">${_esc(p.description || p.short_description)}</div>` : ''}
-    ${specsHtml}
-    <div class="pdm-actions">
-      <div class="pdm-qty-row">
-        <span class="pdm-qty-label">Qty</span>
-        <div class="pdm-qty-ctrl">
-          <button class="pdm-qty-btn" id="pdm-qty-dec" onclick="changeDetailQty(-1)" ${outOfStock ? 'disabled' : ''}>−</button>
-          <span class="pdm-qty-val" id="pdm-qty-val">1</span>
-          <button class="pdm-qty-btn" id="pdm-qty-inc" onclick="changeDetailQty(1)" ${outOfStock ? 'disabled' : ''}>+</button>
-        </div>
-      </div>
-      <button class="pdm-add-btn" id="pdm-add-btn" onclick="detailAddToCart(${p.id})" ${outOfStock ? 'disabled' : ''}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        ${outOfStock ? 'Out of Stock' : 'Add to Cart'}
-      </button>
-      <a class="pdm-wa-btn" href="https://wa.me/${CAT_WA}?text=${encodeURIComponent(isSheet
-          ? 'Hi Armand, I need a cutting quote for: ' + p.name + ' (SKU: ' + (p.sku||'') + '). Sizes needed (length x width, qty): '
-          : 'Hi Armand, I\'m interested in: ' + p.name + ' (SKU: ' + (p.sku||'') + ') — please confirm availability and pricing.')}" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-        ${isSheet ? 'Request a cutting quote' : 'Enquire on WhatsApp'}
-      </a>
-      <div class="pdm-nav">
-        <button class="pdm-nav-btn" onclick="detailNav(-1)" id="pdm-prev" ${index === 0 ? 'disabled' : ''}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-          Previous
-        </button>
-        <button class="pdm-nav-btn" onclick="detailNav(1)" id="pdm-next" ${index >= _filtered.length - 1 ? 'disabled' : ''}>
-          Next
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
-      </div>
-    </div>`;
-}
-
-function changeDetailQty(delta) {
-  _detailQty = Math.max(1, _detailQty + delta);
-  document.getElementById('pdm-qty-val').textContent = _detailQty;
-  document.getElementById('pdm-qty-dec').disabled = _detailQty <= 1;
-}
-
-function detailNav(delta) {
-  const newIdx = _detailIndex + delta;
-  if (newIdx < 0 || newIdx >= _filtered.length) return;
-  openDetail(newIdx);
-}
-
-function detailAddToCart(pid) {
-  // Add the selected qty times
-  for (let i = 0; i < _detailQty; i++) {
-    if (typeof Cart !== 'undefined') {
-      Cart.add(String(pid), null);
-    } else {
-      catAddToCart(pid, null);
-    }
-  }
-  const btn = document.getElementById('pdm-add-btn');
-  if (btn) {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Added!';
-    btn.style.background = '#F36523';
-    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 1400);
-  }
-}
-
-function catAddToCart(pid, btn) {
-  // Sync product into global Products.cache so Cart.add can find it
-  const product = _allProducts.find(x => String(x.id) === String(pid));
-  if (product && typeof Products !== 'undefined') {
-    // Ensure it's in the global Products cache used by armand-shop.js Cart
-    if (!Products.cache.find(p => String(p.id) === String(pid))) {
-      Products.cache.push(product);
-    }
-  }
-  if (typeof Cart !== 'undefined') {
-    Cart.add(String(pid), btn ? { target: btn, stopPropagation: () => {} } : null);
-  } else {
-    if (typeof showToast === 'function') showToast('Added to cart: ' + (product ? product.name : 'product'));
-    else alert('Added: ' + (product ? product.name : 'product'));
-  }
-}
-
-/* ── FILTERS ─────────────────────────────────────────────────── */
-function setCatFilter(cat, el) {
-  _activeCat = cat;
-  document.querySelectorAll('.csb-cat').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  applyFilters();
-  closeCatSidebarMob();
-}
-
-function setStockFilter(val, el) {
-  _activeStock = val;
-  document.querySelectorAll('[data-stock]').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  applyFilters();
-}
-
-function setBadgeFilter(val, el) {
-  _activeBadge = val;
-  document.querySelectorAll('[data-badge]').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  applyFilters();
-}
-
-function clearAllFilters() {
-  _activeCat   = 'all';  _activeStock = 'all';
-  _activeBadge = '';     _searchQ = '';
-  _sortVal     = 'default';
-  document.getElementById('catSearchInput').value = '';
-  document.getElementById('catSort').value = 'default';
-  document.querySelectorAll('.csb-cat').forEach(b => b.classList.remove('active'));
-  document.querySelector('.csb-cat[data-cat="all"]').classList.add('active');
-  document.querySelectorAll('[data-stock]').forEach(b => b.classList.remove('active'));
-  document.querySelector('[data-stock="all"]').classList.add('active');
-  document.querySelectorAll('[data-badge]').forEach(b => b.classList.remove('active'));
-  document.querySelector('[data-badge=""]').classList.add('active');
-  applyFilters();
-}
-
-function applyCatalogueSort(val) { _sortVal = val; applyFilters(); }
-
-/* ── UI HELPERS ──────────────────────────────────────────────── */
-function renderSkeletons(n) {
-  document.getElementById('catalogueGrid').innerHTML = Array(n).fill(0).map(() => `
-    <div class="skel-card">
-      <div class="skel-img"></div>
-      <div class="skel-body">
-        <div class="skel-line" style="width:50%;height:8px;"></div>
-        <div class="skel-line" style="width:90%;height:14px;"></div>
-        <div class="skel-line" style="width:65%;height:10px;"></div>
-      </div>
-    </div>`).join('');
-  document.getElementById('resultCount').textContent = 'Loading...';
-}
-
-function updateCounts(products) {
-  const counts = {};
-  products.forEach(p => { const c = (p.category||'').toLowerCase(); counts[c] = (counts[c]||0)+1; });
-  document.getElementById('cnt-all').textContent = products.length;
-  ['hinges','handles','drawers','locks','kitchen','lighting','construction','closet','tools','boards','edging'].forEach(cat => {
-    const el = document.getElementById('cnt-'+cat);
-    if (el) { el.textContent = counts[cat] || 0; el.closest('.csb-cat').classList.toggle('is-empty', !counts[cat]); }
-  });
-}
-
-function updateResultCount(n) {
-  document.getElementById('resultCount').textContent = `${n} product${n !== 1 ? 's' : ''}`;
-}
-
-function syncSidebarState() {
-  const n = (_activeCat !== 'all') + (_activeStock !== 'all') + (_activeBadge ? 1 : 0) + (_searchQ ? 1 : 0);
-  const badge = document.getElementById('csbBadge'), clr = document.getElementById('csbClear');
-  if (badge) { badge.textContent = n; badge.classList.toggle('show', n > 0); }
-  if (clr) clr.classList.toggle('show', n > 0);
-  const sc = document.getElementById('csbSearchClear');
-  if (sc) sc.classList.toggle('show', !!_searchQ);
-  // open the Tags group automatically if a tag filter is active
-  if (_activeBadge) { const d = document.querySelector('[data-badge]'); if (d) d.closest('details').open = true; }
-}
-
-function updateActiveChips() {
-  syncSidebarState();
-  const chips = [];
-  if (_activeCat !== 'all')     chips.push({ label: _activeCat,         clear: () => { _activeCat='all';   document.querySelector('.csb-cat[data-cat="all"]').click(); } });
-  if (_activeStock !== 'all')   chips.push({ label: `Stock: ${_activeStock}`, clear: () => { _activeStock='all'; document.querySelector('[data-stock="all"]').click(); } });
-  if (_activeBadge)             chips.push({ label: `Tag: ${_activeBadge}`,   clear: () => { _activeBadge='';   document.querySelector('[data-badge=""]').click(); } });
-  if (_searchQ)                 chips.push({ label: `"${_searchQ}"`,           clear: () => { _searchQ=''; document.getElementById('catSearchInput').value=''; applyFilters(); } });
-
-  const container = document.getElementById('activeFilterChips');
-  container.innerHTML = chips.map((c, i) => `
-    <div class="cat-filter-chip">
-      ${_esc(c.label)}
-      <button onclick="(${c.clear.toString()})()" aria-label="Remove filter">&times;</button>
-    </div>`).join('');
-}
-
-function updateBreadcrumb() {
-  const names = {
-    all:'All Products', hinges:'Hinges & Pivot Systems', handles:'Handles & Knobs',
-    drawers:'Drawer Systems', locks:'Locks & Security', kitchen:'Kitchen Fittings',
-    lighting:'Lighting Hardware', construction:'Construction Hardware',
-    closet:'Closet Systems', tools:'Tools & Fixings',
-    boards:'Boards & Panels', edging:'Edging'
-  };
-  document.getElementById('bc-cat').textContent = names[_activeCat] || 'All Products';
-}
-
-function setView(v) {
-  _view = v;
-  const grid = document.getElementById('catalogueGrid');
-  grid.classList.toggle('list-view', v === 'list');
-  document.getElementById('gridViewBtn').classList.toggle('active', v === 'grid');
-  document.getElementById('listViewBtn').classList.toggle('active', v === 'list');
-}
-
-/* ── MOBILE SIDEBAR ──────────────────────────────────────────── */
-function toggleCatSidebar() {
-  document.getElementById('catSidebar').classList.toggle('open');
-  document.getElementById('catMobOverlay').classList.toggle('open');
-  document.body.style.overflow = document.getElementById('catSidebar').classList.contains('open') ? 'hidden' : '';
-}
-function closeCatSidebarMob() {
-  if (window.innerWidth <= 900) {
-    document.getElementById('catSidebar').classList.remove('open');
-    document.getElementById('catMobOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-}
-
-function focusSidebarSearch() {
-  if (window.innerWidth <= 900) {
-    document.getElementById('catSidebar').classList.add('open');
-    document.getElementById('catMobOverlay').classList.add('open');
-  }
-  setTimeout(() => document.getElementById('catSearchInput').focus(), 100);
-}
-
-/* ── SEARCH INPUT ────────────────────────────────────────────── */
-document.getElementById('catSearchInput').addEventListener('input', function() {
-  _searchQ = this.value.trim();
-  applyFilters();
-});
-
-/* ── MODAL CLOSE ─────────────────────────────────────────────── */
-document.getElementById('pdmClose').addEventListener('click', closeDetail);
-document.getElementById('pdmOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeDetail(); });
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeDetail();
-  if (document.getElementById('pdmOverlay').classList.contains('open')) {
-    if (e.key === 'ArrowLeft')  detailNav(-1);
-    if (e.key === 'ArrowRight') detailNav(1);
-  }
-});
-
-/* ── UTILITY ─────────────────────────────────────────────────── */
-function _esc(str) {
-  if (!str && str !== 0) return '';
-  const d = document.createElement('div');
-  d.textContent = String(str);
-  return d.innerHTML;
-}
-
-/* ── INIT ────────────────────────────────────────────────────── */
-// Check for deep-link category from index.html
-const _urlCat = new URLSearchParams(location.search).get('cat');
-if (_urlCat) {
-  _activeCat = _urlCat;
-  const btn = document.querySelector(`.csb-cat[data-cat="${_urlCat}"]`);
-  if (btn) { document.querySelector('.csb-cat.active')?.classList.remove('active'); btn.classList.add('active'); }
-}
-
-window.addEventListener('load', loadCatalogue);
-</script>
 <script src="armand-shop.js"></script>
+<script src="sx-lib.js"></script>
+<script src="store.js"></script>
 </body>
 </html>

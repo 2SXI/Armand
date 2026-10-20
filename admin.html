@@ -492,6 +492,26 @@ table tr:hover td{background:var(--gray-50);}
         <label class="f-label">Full description <span style="font-weight:400;opacity:.6;">(shown on the product page)</span></label>
         <textarea id="pm-description" class="f-input" style="resize:vertical;min-height:72px;" placeholder="e.g. 128mm centres &middot; 304 SS &middot; Matt finish"></textarea>
       </div>
+      <div class="f-group">
+        <label class="f-label">Key features <span style="font-weight:400;opacity:.6;">(one per line, as "Title: detail")</span></label>
+        <textarea id="pm-features" class="f-input" style="resize:vertical;min-height:90px;" placeholder="Soft-close: Closes quietly every time&#10;Heavy duty: Holds up to 30kg"></textarea>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Specifications <span style="font-weight:400;opacity:.6;">(one per line, as "Label: value")</span></label>
+        <textarea id="pm-specs" class="f-input" style="resize:vertical;min-height:90px;" placeholder="Material: Stainless steel&#10;Length (mm): 450&#10;Pack size: 2"></textarea>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Matching products <span style="font-weight:400;opacity:.6;">(SKUs, separated by commas)</span></label>
+        <input id="pm-matching" class="f-input" type="text" placeholder="e.g. HD-HNG-002, HD-SCR-010">
+      </div>
+      <div class="f-group">
+        <label class="f-label">How to install <span style="font-weight:400;opacity:.6;">(steps, one per line, or a video link)</span></label>
+        <textarea id="pm-install" class="f-input" style="resize:vertical;min-height:72px;" placeholder="Mark the hinge position&#10;Drill the cup hole&#10;Screw the hinge in place"></textarea>
+      </div>
+      <div class="f-group">
+        <label class="f-label">More photos <span style="font-weight:400;opacity:.6;">(one image link per line)</span></label>
+        <textarea id="pm-images" class="f-input" style="resize:vertical;min-height:60px;" placeholder="https://..."></textarea>
+      </div>
       <div class="f-row">
         <div class="f-group">
           <label class="f-label">Badge</label>
@@ -854,6 +874,11 @@ function openProductModal(id) {
     document.getElementById('pm-image').value       = p.image       || '';
     document.getElementById('pm-short-description').value = p.short_description || '';
     document.getElementById('pm-description').value = p.description || '';
+    document.getElementById('pm-features').value = p.features || '';
+    document.getElementById('pm-specs').value = p.specs || '';
+    document.getElementById('pm-install').value = p.install_guide || '';
+    document.getElementById('pm-matching').value = p.matching || '';
+    document.getElementById('pm-images').value = p.images || '';
     document.getElementById('pm-badge').value       = p.badge       || '';
     const chk = document.getElementById('pm-active');
     chk.checked = p.active !== false;
@@ -869,7 +894,7 @@ function openProductModal(id) {
 function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
 
 function clearProductForm() {
-  ['pm-id','pm-name','pm-sku','pm-price','pm-old-price','pm-stock','pm-image','pm-short-description','pm-description'].forEach(id => {
+  ['pm-id','pm-name','pm-sku','pm-price','pm-old-price','pm-stock','pm-image','pm-short-description','pm-description','pm-features','pm-specs','pm-install','pm-matching','pm-images'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('pm-category').value = '';
@@ -913,6 +938,12 @@ async function saveProduct() {
     description : document.getElementById('pm-description').value.trim() || null,
     badge       : document.getElementById('pm-badge').value              || null,
   };
+  // optional detail fields: only sent when filled in (or cleared on an existing product)
+  const _prev = id ? (_allProducts.find(x => x.id === parseInt(id, 10)) || {}) : {};
+  [['features','pm-features'], ['specs','pm-specs'], ['install_guide','pm-install'], ['matching','pm-matching'], ['images','pm-images']].forEach(([col, el]) => {
+    const v = document.getElementById(el).value.trim();
+    if (v) payload[col] = v; else if (_prev[col]) payload[col] = null;
+  });
 
   saveBtn.textContent = 'Saving...';
   saveBtn.disabled    = true;

@@ -1,0 +1,81 @@
+/* checkout styles */
+#broc-checkout-modal .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:999px;border:1.5px solid transparent;font:600 15px/1 var(--sans);text-decoration:none;transition:background .18s,color .18s,border-color .18s,transform .18s;white-space:nowrap}
+#broc-checkout-modal .btn:active{transform:translateY(1px)}
+#broc-checkout-modal .btn-primary{background:var(--brand);color:#fff}
+#broc-checkout-modal .btn-primary:hover{background:var(--brand-dk)}
+#broc-checkout-modal .btn-dark{background:var(--ink);color:#fff}
+#broc-checkout-modal .btn-dark:hover{background:#000}
+#broc-checkout-modal .btn-line{border-color:var(--ink);color:var(--ink);background:transparent}
+#broc-checkout-modal .btn-line:hover{background:var(--ink);color:#fff}
+#broc-checkout-modal .btn-line-light{border-color:rgba(255,255,255,.4);color:#fff}
+#broc-checkout-modal .btn-line-light:hover{background:#fff;color:var(--ink)}
+#broc-checkout-modal .btn-wa{background:#1f9d55;color:#fff}
+#broc-checkout-modal .btn-wa:hover{background:#177a42}
+#broc-checkout-modal .btn-sm{height:40px;padding:0 18px;font-size:14px}
+#broc-checkout-modal .btn-block{width:100%}
+#broc-checkout-modal .btn[disabled]{opacity:.45;cursor:not-allowed}
+#broc-checkout-modal .link-arrow{display:inline-flex;align-items:center;gap:8px;font-weight:600;text-decoration:none;color:var(--ink);border-bottom:1.5px solid var(--ink);padding-bottom:2px;transition:gap .18s,color .18s,border-color .18s}
+#broc-checkout-modal .link-arrow:hover{gap:12px;color:var(--brand-dk);border-color:var(--brand-dk)}
+#broc-checkout-modal .field{display:grid;gap:7px}
+#broc-checkout-modal .field label{font-size:13.5px;font-weight:600;color:var(--ink)}
+#broc-checkout-modal .field input,#broc-checkout-modal .field select,#broc-checkout-modal .field textarea{width:100%;height:50px;padding:0 16px;border:1.5px solid var(--line-2);border-radius:10px;background:#fff;font:400 16px var(--sans);color:var(--text);transition:border-color .15s,box-shadow .15s}
+#broc-checkout-modal .field textarea{height:auto;min-height:130px;padding:14px 16px;resize:vertical;line-height:1.5}
+#broc-checkout-modal .field input:focus,#broc-checkout-modal .field select:focus,#broc-checkout-modal .field textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(31,29,30,.07)}
+#broc-checkout-modal .field .hint{font-size:12.5px;color:var(--faint)}
+#broc-checkout-modal .x-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:#fff;display:flex;align-items:center;justify-content:center}
+#broc-checkout-modal .x-btn:hover{border-color:var(--ink)}
+#broc-checkout-modal #arm-checkout-modal{position:fixed;inset:0;z-index:140;background:rgba(31,29,30,.6);backdrop-filter:blur(4px);display:none;overflow:auto;padding:24px}
+#broc-checkout-modal .co{width:min(1020px,100%);margin:0 auto;background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);display:grid;grid-template-columns:1.2fr .8fr;overflow:hidden;animation:pop .25s ease}
+#broc-checkout-modal .co-main{padding:40px}
+#broc-checkout-modal .co-side{background:var(--paper);padding:40px 32px;border-left:1px solid var(--line)}
+#broc-checkout-modal .co h2{font-size:1.8rem;margin-bottom:6px}
+#broc-checkout-modal .co .sub{color:var(--muted);font-size:14.5px;margin-bottom:28px}
+#broc-checkout-modal .co fieldset{border:0;padding:0;margin:0 0 26px;display:grid;gap:14px}
+#broc-checkout-modal .co legend{font:600 12.5px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--ink);margin-bottom:14px;padding:0}
+#broc-checkout-modal .opt{display:flex;gap:14px;align-items:flex-start;padding:15px 16px;border:1.5px solid var(--line-2);border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
+#broc-checkout-modal .opt:hover{border-color:var(--ink)}
+#broc-checkout-modal .opt:has(input:checked){border-color:var(--ink);background:var(--paper)}
+#broc-checkout-modal .opt input{margin-top:3px;accent-color:var(--brand);width:17px;height:17px;flex-shrink:0}
+#broc-checkout-modal .opt b{display:block;font-weight:600;font-size:15px;color:var(--ink)}
+#broc-checkout-modal .opt span{font-size:13px;color:var(--muted)}
+#broc-checkout-modal .opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#broc-checkout-modal .co-side h3{font-size:1.2rem;margin-bottom:18px}
+#broc-checkout-modal .co-line{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+#broc-checkout-modal .co-line span:first-child{color:var(--text)}
+#broc-checkout-modal .co-line small{color:var(--muted)}
+#broc-checkout-modal .co-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:18px}
+#broc-checkout-modal .co-total b{font:600 26px var(--sans);letter-spacing:-.01em}
+#broc-checkout-modal .co-actions{display:flex;gap:12px;margin-top:8px;align-items:center}
+#broc-checkout-modal .co-err{display:none;padding:12px 14px;border-radius:10px;background:#fbeceb;color:#8a2c22;font-size:14px;margin-bottom:14px}
+#broc-checkout-modal .co-info{display:none;padding:12px 14px;border-radius:10px;background:var(--brand-tint);color:#7a3a14;font-size:13.5px;margin-top:14px}
+#broc-checkout-modal .co-done{padding:64px 40px;text-align:center;grid-column:1/-1}
+#broc-checkout-modal .co-done .ok{width:64px;height:64px;border-radius:50%;background:#e9f5ee;color:var(--ok);display:inline-flex;align-items:center;justify-content:center;margin-bottom:22px}
+#broc-checkout-modal .co-done .ok svg{width:30px;height:30px}
+#broc-checkout-modal .co-done h2{font-size:2.2rem;margin-bottom:14px}
+#broc-checkout-modal .co-done p{color:var(--muted);max-width:480px;margin:0 auto 28px;line-height:1.7}
+#broc-checkout-modal .co-done .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+#broc-checkout-modal .co-x{position:absolute;right:16px;top:16px}
+
+/* Armand checkout (original workshop look) */
+#broc-checkout-modal{--ink:#1e1d1f;--brand:#F36523;--brand-dk:#d4520f;--brand-tint:#fdeee4;--paper:#EEF0F2;--stone:#E6E9ED;--line:#D8DCE1;--line-2:#c4c9cf;--text:#2a282b;--muted:#5C6570;--faint:#8a929b;--ok:#2f7a4d;--serif:'Saira',sans-serif;--sans:'Barlow',sans-serif;
+ position:fixed;inset:0;z-index:2000;background:rgba(20,19,20,.72);display:none;overflow:auto;padding:28px;font-family:var(--sans);color:var(--text);line-height:1.5}
+#broc-checkout-modal *,#broc-checkout-modal *::before,#broc-checkout-modal *::after{box-sizing:border-box;border-radius:0 !important}
+#broc-checkout-modal h2,#broc-checkout-modal h3{font-family:var(--serif);color:var(--ink);margin:0;line-height:1.1}
+#broc-checkout-modal .co{width:min(1020px,100%);margin:0 auto;background:#fff;display:grid;grid-template-columns:1.2fr .8fr;box-shadow:0 30px 80px rgba(0,0,0,.45);border-top:5px solid var(--brand)}
+#broc-checkout-modal .co h2{font-size:1.9rem;font-weight:800;text-transform:uppercase}
+#broc-checkout-modal .co legend{font-family:var(--serif);letter-spacing:.16em}
+#broc-checkout-modal .btn{font-family:var(--serif);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;height:48px;border-radius:0}
+#broc-checkout-modal .btn-primary{background:var(--brand);color:#fff}#broc-checkout-modal .btn-primary:hover{background:var(--brand-dk)}
+#broc-checkout-modal .co-side{background:var(--ink);color:#c9ced4;border-left:0}
+#broc-checkout-modal .co-side h3{color:#fff;text-transform:uppercase;letter-spacing:.06em;font-size:1.05rem}
+#broc-checkout-modal .co-side .co-line{border-color:rgba(255,255,255,.12)}
+#broc-checkout-modal .co-side .co-line span:first-child{color:#e6e9ed}
+#broc-checkout-modal .co-side .co-line small,#broc-checkout-modal .co-side p{color:#9aa3ad !important}
+#broc-checkout-modal .co-total{color:#fff}#broc-checkout-modal .co-total b{font-family:var(--serif);font-weight:800;font-size:28px}
+#broc-checkout-modal .co-x{background:#fff}
+#broc-checkout-modal .opt:has(input:checked){border-color:var(--brand);background:var(--brand-tint)}
+#broc-checkout-modal .opt b{font-family:var(--serif);font-size:15px}
+#broc-checkout-modal .co-done .ok{background:var(--brand-tint);color:var(--brand);border-radius:50% !important}
+#broc-checkout-modal .co-done h2{font-size:2.2rem}
+@media(max-width:1080px){#broc-checkout-modal .co{grid-template-columns:1fr}#broc-checkout-modal .co-side{order:-1}}
+@media(max-width:640px){#broc-checkout-modal{padding:0}#broc-checkout-modal .co{min-height:100%}#broc-checkout-modal .co-main,#broc-checkout-modal .co-side{padding:26px 20px}#broc-checkout-modal .opt-row{grid-template-columns:1fr}}

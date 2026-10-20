@@ -242,6 +242,7 @@
   gap: 16px;
 }
 </style>
+<link rel="stylesheet" href="shop.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -341,16 +342,17 @@
 <!-- ── PRODUCT PAGE CONTENT ──────────────────── -->
 <main style="padding-top: 72px;">
   <span id="main-content" tabindex="-1"></span>
-<div class="product-page" id="productPage">
-    <!-- Loading state -->
-    <div class="pp-loading" id="ppLoading">
-      <div class="pp-loading-spinner"></div>
-      Loading product…
-    </div>
-    <!-- Content injected by JS -->
-    <div id="ppContent" style="display:none;"></div>
-  </div>
-</main>
+<div class="sx">
+<div class="wrap">
+  <nav class="crumbs" style="padding-top:28px" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="products.html">Shop</a><span>/</span><a id="bcCat" href="products.html">Category</a><span>/</span><span id="bcName">Product</span></nav>
+  <div id="pdp"><div class="pdp"><div class="gal skel"><div class="pimg" style="height:100%"></div></div><div><i style="display:block;height:14px;width:30%;background:#efeae1;border-radius:6px;margin-bottom:18px"></i><i style="display:block;height:40px;width:80%;background:#efeae1;border-radius:6px"></i></div></div></div>
+</div>
+<section class="related" id="relatedWrap" hidden><div class="wrap"><div class="sec-head" style="margin-bottom:32px"><h2>Similar products</h2><a class="link-arrow" id="relMore" href="products.html">More in this department</a></div><div class="grid" id="related"></div></div></section>
+<section class="related recent" id="recentWrap" hidden style="border-top:0;background:#fff"><div class="wrap"><div class="sec-head" style="margin-bottom:28px"><h2>Recently viewed</h2></div><div class="grid" id="recent"></div></div></section>
+<div class="sticky-buy" id="stickyBuy" hidden></div>
+
+
+</div>
 
 <!-- ── FOOTER ──────────────────────────────────── -->
 <footer>
@@ -398,7 +400,7 @@
       <div class="fm-col-title">Support</div>
       <ul class="fm-links">
         <li><a href="contact.html">Get a Quote</a></li>
-        <li><a href="contact.html">Track My Order</a></li>
+        <li><a href="track.html">Track My Order</a></li>
         <li><a href="legal.html">Shipping Policy</a></li>
         <li><a href="legal.html">Returns Policy</a></li>
         <li><a href="legal.html">Terms of Sale</a></li>
@@ -425,342 +427,10 @@
   <button class="cn-accept" onclick="acceptCookies()">Accept</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>
-'use strict';
-
-/* ── CONFIG ─────────────────────────────────────────────────── */
-const PP_SB_URL = 'https://nasbxjharopveynnwgrg.supabase.co';
-const PP_SB_KEY = 'sb_publishable_io0oLODozq0xdUJiNT37tQ_u2PWURX0';
-const PP_WA     = '263780793585';
-const PP_CUR    = 'USD';
-
-let _ppSB  = null;
-let _ppQty = 1;
-let _ppProduct = null;
-
-function getPPSB() {
-  if (_ppSB) return _ppSB;
-  if (typeof supabase !== 'undefined') _ppSB = supabase.createClient(PP_SB_URL, PP_SB_KEY);
-  return _ppSB;
-}
-
-function esc(str) {
-  if (str == null) return '';
-  const d = document.createElement('div');
-  d.textContent = String(str);
-  return d.innerHTML;
-}
-
-/* ── LOAD PRODUCT ───────────────────────────────────────────── */
-async function loadProduct() {
-  const params = new URLSearchParams(window.location.search);
-  const id     = params.get('id');
-
-  const loadingEl = document.getElementById('ppLoading');
-  const contentEl = document.getElementById('ppContent');
-
-  if (!id || isNaN(parseInt(id, 10))) {
-    showError('Invalid product link', 'No product ID was provided. Please browse our catalogue to find the product you\'re looking for.');
-    return;
-  }
-
-  try {
-    const sb = getPPSB();
-    let product = null;
-
-    if (sb) {
-      const { data, error } = await sb
-        .from('products')
-        .select('*')
-        .eq('id', parseInt(id, 10))
-        .single();
-      if (error) throw error;
-      product = data;
-    } else {
-      const res = await fetch(`${PP_SB_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}&select=*`, {
-        headers: { apikey: PP_SB_KEY, Authorization: `Bearer ${PP_SB_KEY}` }
-      });
-      const arr = await res.json();
-      if (!Array.isArray(arr) || arr.length === 0) throw new Error('Product not found');
-      product = arr[0];
-    }
-
-    if (!product) { showError('Product not found', 'This product may have been removed or is no longer available.'); return; }
-
-    _ppProduct = product;
-
-    // Sync into Products.cache so Cart.add() can find it by ID
-    if (typeof Products !== 'undefined') {
-      if (!Products.cache.find(p => String(p.id) === String(product.id))) {
-        Products.cache.push(product);
-      }
-    }
-
-    // Update page title
-    const pageTitle = esc(product.name) + ' | Armand Carpentry & Designs — Bulawayo, Zimbabwe';
-    document.title = pageTitle;
-
-    // Update meta description, canonical, OG, Twitter & schema for crawlers that execute JS
-    const prodUrl = `https://armand.co.zw/product.html?id=${encodeURIComponent(product.id)}`;
-    const prodDesc = `${esc(product.name)} — ${esc(product.description || product.category || 'Quality hardware')} from Armand Carpentry & Designs, Bulawayo, Zimbabwe.`.slice(0, 160);
-    const prodImg = product.image || 'https://armand.co.zw/og-card.png';
-
-    const descMeta = document.querySelector('meta[name="description"]');
-    if (descMeta) descMeta.setAttribute('content', prodDesc);
-    const canon = document.getElementById('canonicalLink');
-    if (canon) canon.setAttribute('href', prodUrl);
-    const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el) el.setAttribute('content', val); };
-    setMeta('meta[property="og:title"]', pageTitle);
-    setMeta('meta[property="og:description"]', prodDesc);
-    setMeta('meta[property="og:url"]', prodUrl);
-    setMeta('meta[property="og:image"]', prodImg);
-    setMeta('meta[name="twitter:title"]', pageTitle);
-    setMeta('meta[name="twitter:description"]', prodDesc);
-    setMeta('meta[name="twitter:image"]', prodImg);
-
-    const schemaEl = document.getElementById('productSchema');
-    if (schemaEl) {
-      schemaEl.textContent = JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": product.name,
-        "description": product.description || '',
-        "sku": product.sku || String(product.id),
-        "image": prodImg,
-        "url": prodUrl,
-        "category": product.category || undefined,
-        "offers": {
-          "@type": "Offer",
-          "price": product.price != null ? String(product.price) : undefined,
-          "priceCurrency": "USD",
-          "availability": (product.stock > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-          "seller": { "@type": "Organization", "name": "Armand Carpentry & Designs" }
-        }
-      });
-    }
-
-    renderProduct(product);
-    loadingEl.style.display = 'none';
-    contentEl.style.display = '';
-
-    // Load related products after main content is shown
-    loadRelated(product);
-
-  } catch (err) {
-    console.error('[ProductPage]', err);
-    showError('Could not load product', err.message || 'A network error occurred. Please try again or contact us via WhatsApp.');
-  }
-}
-
-function showError(title, sub) {
-  document.getElementById('ppLoading').style.display = 'none';
-  const el = document.getElementById('ppContent');
-  el.style.display = '';
-  el.innerHTML = `
-    <div class="pp-error">
-      <div class="pp-error-title">${esc(title)}</div>
-      <div class="pp-error-sub">${esc(sub)}</div>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <a href="products.html" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#2a282b;color:#fff;font-family:'Saira',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;text-decoration:none;">Browse All Products →</a>
-        <a href="https://wa.me/${PP_WA}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--brand-orange);color:#fff;font-family:'Saira',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;text-decoration:none;">WhatsApp Us</a>
-      </div>
-    </div>`;
-}
-
-function renderProduct(p) {
-  const price    = parseFloat(p.price || 0);
-  const oldPrice = p.old_price ? parseFloat(p.old_price) : null;
-  const stock    = p.stock;
-  const outOfStock = stock === 0;
-  const isLow      = stock > 0 && stock <= 10;
-  const saveAmt    = oldPrice ? ((oldPrice - price) / oldPrice * 100).toFixed(0) : null;
-
-  // Spec parsing from description
-  const descRaw    = p.description || '';
-  const specParts  = descRaw.split('·').map(s => s.trim()).filter(Boolean);
-  const specLabels = ['Size / Spec', 'Material', 'Finish', 'Capacity', 'Rating', 'Includes', 'Standard', 'Note'];
-  let specsHtml = '';
-  if (specParts.length > 1) {
-    specsHtml = `
-      <div class="pp-specs">
-        <div class="pp-specs-title">Specifications</div>
-        ${specParts.map((s, i) => `
-          <div class="pp-spec-row">
-            <span class="pp-spec-key">${esc(specLabels[i] || 'Spec ' + (i+1))}</span>
-            <span class="pp-spec-val">${esc(s)}</span>
-          </div>`).join('')}
-      </div>`;
-  }
-
-  const waMsg = encodeURIComponent(
-    'Hi Armand Carpentry & Designs! I\'m interested in: ' + p.name +
-    ' (SKU: ' + (p.sku || 'ARM-' + p.id) + ')' +
-    ' — Price: ' + PP_CUR + ' ' + price.toFixed(2) +
-    '. Please confirm availability and any bulk pricing.'
-  );
-
-  document.getElementById('ppContent').innerHTML = `
-    <div class="pp-breadcrumb">
-      <a href="index.html">Home</a>
-      <span>›</span>
-      <a href="products.html">Products</a>
-      <span>›</span>
-      ${p.category ? `<a href="products.html?cat=${esc(p.category)}">${esc(p.category.charAt(0).toUpperCase() + p.category.slice(1))}</a><span>›</span>` : ''}
-      <span style="color:#2a282b;">${esc(p.name)}</span>
-    </div>
-
-    <div class="pp-grid">
-      <!-- IMAGE PANEL -->
-      <div>
-        <div class="pp-img-panel">
-          ${p.image
-            ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" onerror="brocImgFallback(this,'${esc(p.category||'')}')">`
-            : brocPlaceholderHTML(p.category, false, p.name)}
-          ${p.badge ? `<div class="pp-badge ${esc(p.badge.toLowerCase())}">${esc(p.badge.toUpperCase())}</div>` : ''}
-          <div class="pp-stock-badge ${outOfStock ? 'pp-stock-out' : isLow ? 'pp-stock-low' : 'pp-stock-ok'}">
-            ${outOfStock ? 'Out of Stock' : isLow ? `Low Stock — ${stock} left` : `In Stock`}
-          </div>
-        </div>
-      </div>
-
-      <!-- INFO PANEL -->
-      <div class="pp-info">
-        <div class="pp-sku">SKU: ${esc(p.sku || 'ARM-' + p.id)}</div>
-        <h1 class="pp-name">${esc(p.name)}</h1>
-        ${p.category ? `<div class="pp-cat">${esc(p.category.toUpperCase())}</div>` : ''}
-        <div class="pp-price-row">
-          <span class="pp-price">${PP_CUR} ${price.toFixed(2)}</span>
-          ${oldPrice ? `<span class="pp-old-price">${PP_CUR} ${oldPrice.toFixed(2)}</span>` : ''}
-          ${saveAmt  ? `<span class="pp-save">Save ${saveAmt}%</span>` : ''}
-        </div>
-        ${(p.description || p.short_description) ? `<div class="pp-desc">${esc(p.description || p.short_description)}</div>` : ''}
-        ${specsHtml}
-        <div class="pp-actions">
-          <div class="pp-qty-row">
-            <span class="pp-qty-label">Qty</span>
-            <div class="pp-qty-ctrl">
-              <button class="pp-qty-btn" id="ppQtyDec" onclick="changeQty(-1)" ${outOfStock ? 'disabled' : ''} aria-label="Decrease quantity">−</button>
-              <span class="pp-qty-val" id="ppQtyVal">1</span>
-              <button class="pp-qty-btn" id="ppQtyInc" onclick="changeQty(1)"  ${outOfStock ? 'disabled' : ''} aria-label="Increase quantity">+</button>
-            </div>
-          </div>
-          <button class="pp-add-btn" id="ppAddBtn" onclick="ppAddToCart()" ${outOfStock ? 'disabled' : ''}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            ${outOfStock ? 'Out of Stock' : 'Add to Cart'}
-          </button>
-          <a href="https://wa.me/${PP_WA}?text=${waMsg}" class="pp-wa-btn" target="_blank" rel="noopener">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-            Enquire on WhatsApp
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Related products placeholder -->
-    <div id="ppRelated"></div>
-  `;
-}
-
-function changeQty(delta) {
-  _ppQty = Math.max(1, _ppQty + delta);
-  const valEl = document.getElementById('ppQtyVal');
-  const decEl = document.getElementById('ppQtyDec');
-  if (valEl) valEl.textContent = _ppQty;
-  if (decEl) decEl.disabled = (_ppQty <= 1);
-}
-
-function ppAddToCart() {
-  if (!_ppProduct) return;
-  const pid = String(_ppProduct.id);
-
-  // Ensure product is in cache
-  if (typeof Products !== 'undefined' && !Products.cache.find(p => String(p.id) === pid)) {
-    Products.cache.push(_ppProduct);
-  }
-
-  if (typeof Cart !== 'undefined') {
-    // Add qty times (Cart._addItem merges, so we add delta via updateQty after first add)
-    const existingItem = Cart._items.find(i => String(i.id) === pid);
-    if (existingItem) {
-      Cart.updateQty(pid, _ppQty);
-    } else {
-      // Add once then set qty
-      Cart.add(pid, null);
-      if (_ppQty > 1) {
-        Cart.updateQty(pid, _ppQty - 1);
-      }
-    }
-    Cart.save();
-    Cart.syncUI();
-    Cart.renderSidebar();
-  } else if (typeof showToast === 'function') {
-    showToast('Added: ' + _ppProduct.name);
-  }
-
-  // Button feedback
-  const btn = document.getElementById('ppAddBtn');
-  if (btn) {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Added to Cart!';
-    btn.style.background = '#F36523';
-    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 1600);
-  }
-  if (typeof showToast === 'function') showToast(_ppProduct.name + ' added to cart ✓');
-}
-
-/* ── RELATED PRODUCTS ───────────────────────────────────────── */
-async function loadRelated(product) {
-  try {
-    const sb = getPPSB();
-    let related = [];
-    if (sb && product.category) {
-      const { data } = await sb
-        .from('products')
-        .select('*')
-        .eq('active', true)
-        .eq('category', product.category)
-        .neq('id', product.id)
-        .limit(4);
-      related = data || [];
-    }
-    if (!related.length) return; // no related — don't show section
-    const container = document.getElementById('ppRelated');
-    if (!container) return;
-    container.innerHTML = `
-      <div class="pp-related">
-        <div class="pp-related-title">More in ${esc((product.category || 'Products').toUpperCase())}</div>
-        <div class="pp-related-grid">
-          ${related.map(p => buildRelatedCard(p)).join('')}
-        </div>
-      </div>`;
-  } catch (_e) { /* silently skip related */ }
-}
-
-function buildRelatedCard(p) {
-  const price = parseFloat(p.price || 0).toFixed(2);
-  const img   = p.image
-    ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="brocImgFallback(this,'${esc(p.category||'')}')">`
-    : brocPlaceholderHTML(p.category, false, p.name);
-  return `
-    <a href="product.html?id=${p.id}" style="display:block;text-decoration:none;color:inherit;" class="product-card">
-      <div class="pc-img" style="position:relative;">${img}</div>
-      <div class="pc-body">
-        <div class="pc-sku">SKU: ${esc(p.sku || 'ARM-' + p.id)}</div>
-        <div class="pc-name">${esc(p.name)}</div>
-        <div class="pc-price-row">
-          <span class="pc-price">${PP_CUR} ${price}</span>
-        </div>
-      </div>
-    </a>`;
-}
-
-/* ── INIT ────────────────────────────────────────────────────── */
-// Cart is loaded by armand-shop.js — we just load the product
-document.addEventListener('DOMContentLoaded', loadProduct);
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="armand-shop.js"></script>
+<script src="sx-lib.js"></script>
+<script src="product.js"></script>
 </body>
 </html>

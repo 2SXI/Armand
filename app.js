@@ -872,9 +872,23 @@ function initSearch() {
         card.classList.toggle('hidden', !text.includes(q));
       });
     });
+    const go = () => {
+      const q = input.value.trim();
+      const shopBox = document.getElementById('shopQ');
+      if (shopBox) {                      // already on the shop: filter in place
+        shopBox.value = q;
+        shopBox.dispatchEvent(new Event('input', { bubbles: true }));
+        overlay.classList.remove('open');
+        shopBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        location.href = 'products.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+      }
+    };
     input.addEventListener('keydown', e => {
       if (e.key === 'Escape') overlay.classList.remove('open');
+      if (e.key === 'Enter') { e.preventDefault(); go(); }
     });
+    overlay.querySelector('.search-submit')?.addEventListener('click', e => { e.preventDefault(); go(); });
   }
 }
 window.closeSearch = () => document.getElementById('searchOverlay')?.classList.remove('open');

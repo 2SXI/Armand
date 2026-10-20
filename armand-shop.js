@@ -534,245 +534,117 @@ function initSidebarDelegation() { /* no-op — handled by CartUI */ }
    PHASE 3 — CHECKOUT SYSTEM (multi-step modal)
    Steps: 1=Payment method  2=Details+summary  3=Success
 ═════════════════════════════════════════════════════════════ */
+const CK_X = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+const CK_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+const ckMoney = n => SHOP.currency + ' ' + Number(n || 0).toFixed(2);
 const Checkout = {
   _lastOrder : null,
 
-  /* ── Build payment method options dynamically ─────────────── */
-  _buildPaymentOptions() {
-    const methods = [
-      { value: 'EcoCash',             label: 'EcoCash',              desc: 'Mobile money — Zimbabwe' },
-      { value: 'OneMoney',            label: 'OneMoney',             desc: 'NetOne mobile money' },
-      { value: 'Cash on Delivery',    label: 'Cash on Delivery',     desc: 'Pay when you receive' },
-      { value: 'Bank Transfer / EFT', label: 'Bank Transfer / EFT',  desc: 'Direct bank payment' },
+  _methods() {
+    const m = [
+      { value:'EcoCash',             label:'EcoCash',             desc:'Mobile money' },
+      { value:'OneMoney',            label:'OneMoney',            desc:'NetOne mobile money' },
+      { value:'Bank Transfer / EFT', label:'Bank transfer / EFT', desc:'Direct bank payment' },
+      { value:'Cash on Delivery',    label:'Pay on collection or delivery', desc:'Cash when you receive your order' },
     ];
-
-    if (SHOP.paynow.enabled) {
-      methods.unshift({ value: 'Paynow', label: 'Paynow (Online)', desc: 'EcoCash / Visa / Mastercard via Paynow' });
-    }
-    if (SHOP.paypal.enabled) {
-      methods.push({ value: 'PayPal', label: 'PayPal', desc: 'International card / PayPal balance' });
-    }
-
-    return methods.map((m, i) => `
-      <label style="display:flex;align-items:flex-start;gap:14px;padding:14px 18px;
-                    border:1px solid rgba(90,90,90,0.2);cursor:pointer;
-                    transition:border-color .2s;
-                    color:var(--silver,#e2e2e2);">
-        <input type="radio" name="broc_payment" value="${m.value}"
-          style="accent-color:#F36523;width:16px;height:16px;margin-top:3px;flex-shrink:0;"
-          ${i === 0 ? 'checked' : ''}>
-        <span>
-          <span style="font-size:14px;display:block;">${m.label}</span>
-          <span style="font-size:11px;color:rgba(226,226,226,0.68);">${m.desc}</span>
-        </span>
-      </label>`).join('');
+    if (SHOP.paynow.enabled) m.unshift({ value:'Paynow', label:'Paynow', desc:'EcoCash, Visa or Mastercard online' });
+    if (SHOP.paypal.enabled) m.push({ value:'PayPal', label:'PayPal', desc:'PayPal balance or international card' });
+    return m;
   },
 
   mount() {
     if (document.getElementById('broc-checkout-modal')) return;
-
     const modal = document.createElement('div');
     modal.id = 'broc-checkout-modal';
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-label', 'Checkout');
-    modal.style.cssText = `
-      display:none;position:fixed;inset:0;z-index:2000;
-      background:rgba(30,29,31,0.88);backdrop-filter:blur(6px);
-      overflow-y:auto;padding:40px 16px;`;
-
     modal.innerHTML = `
-      <div id="broc-checkout-box" style="
-        max-width:520px;margin:0 auto;
-        background:var(--navy-deep,#1e1d1f);
-        border:1px solid rgba(90,90,90,0.25);
-        box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+<div class="co" style="position:relative">
+  <button class="x-btn co-x" id="broc-co-close-btn" aria-label="Close checkout">${CK_X}</button>
 
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;
-                    padding:22px 28px;border-bottom:1px solid rgba(90,90,90,0.15);">
-          <span style="font-family:'Saira',sans-serif;font-size:20px;font-weight:800;
-                       text-transform:uppercase;letter-spacing:1px;color:var(--silver,#e2e2e2);">
-            Checkout
-          </span>
-          <button id="broc-co-close-btn" style="color:rgba(226,226,226,0.68);font-size:20px;
-                  background:none;border:none;cursor:pointer;padding:4px;" aria-label="Close">✕</button>
+  <div id="broc-step-details" style="display:contents">
+    <div class="co-main">
+      <h2>Checkout</h2>
+      <p class="sub">No account needed. We confirm stock and delivery with you after you place the order.</p>
+
+      <fieldset>
+        <legend>Your details</legend>
+        <div class="opt-row">
+          <div class="field"><label for="broc-co-name">Full name</label><input id="broc-co-name" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="broc-co-phone">Phone / WhatsApp</label><input id="broc-co-phone" type="tel" placeholder="+263 7X XXX XXXX" autocomplete="tel" required></div>
         </div>
+      </fieldset>
 
-        <!-- STEP 1: Payment method -->
-        <div id="broc-step-payment" style="padding:28px;">
-          <div style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:3px;
-                      text-transform:uppercase;color:#9a9a9a;margin-bottom:20px;">
-            Step 1 of 3 — Payment Method
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;" id="broc-payment-options">
-            ${this._buildPaymentOptions()}
-          </div>
-          <p style="font-size:11px;color:rgba(226,226,226,0.68);margin-top:16px;line-height:1.6;">
-            Note: Payment is confirmed in-store or via WhatsApp after order placement.
-          </p>
-          <button id="broc-step1-next"
-            style="margin-top:24px;width:100%;padding:16px;
-                   background:#CC4A14;color:#fff;border:none;cursor:pointer;
-                   font-family:'Saira',sans-serif;font-size:14px;font-weight:800;
-                   letter-spacing:2px;text-transform:uppercase;transition:opacity .2s;">
-            Continue →
-          </button>
+      <fieldset>
+        <legend>Collection or delivery</legend>
+        <div class="opt-row">
+          <label class="opt"><input type="radio" name="co_delivery" value="collect" checked><span><b>Collect in Bulawayo</b><span>2142 Khami Rd, Iversens Complex</span></span></label>
+          <label class="opt"><input type="radio" name="co_delivery" value="deliver"><span><b>Deliver to me</b><span>Cost confirmed before dispatch</span></span></label>
         </div>
+        <div class="field" id="broc-addr-wrap" style="display:none"><label for="broc-co-address">Delivery address</label><input id="broc-co-address" type="text" autocomplete="street-address" placeholder="Street, suburb, city"></div>
+      </fieldset>
 
-        <!-- STEP 2: Order details form -->
-        <div id="broc-step-details" style="padding:28px;display:none;">
-          <div style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:3px;
-                      text-transform:uppercase;color:#9a9a9a;margin-bottom:20px;">
-            Step 2 of 3 — Your Details
-          </div>
-          <div id="broc-order-summary" style="
-            background:rgba(90,90,90,0.06);border:1px solid rgba(90,90,90,0.15);
-            padding:16px;margin-bottom:20px;max-height:180px;overflow-y:auto;"></div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <div>
-              <label style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;
-                            text-transform:uppercase;color:rgba(226,226,226,0.68);display:block;margin-bottom:6px;">
-                Full Name *
-              </label>
-              <input id="broc-co-name" type="text" placeholder="Your full name" autocomplete="name"
-                style="width:100%;background:rgba(226,226,226,0.04);border:1px solid rgba(90,90,90,0.2);
-                       color:var(--silver,#e2e2e2);padding:12px 14px;font-size:14px;
-                       font-family:'Barlow',sans-serif;outline:none;-webkit-appearance:none;">
-            </div>
-            <div>
-              <label style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;
-                            text-transform:uppercase;color:rgba(226,226,226,0.68);display:block;margin-bottom:6px;">
-                Phone / WhatsApp *
-              </label>
-              <input id="broc-co-phone" type="tel" placeholder="+263 7XX XXX XXX" autocomplete="tel"
-                style="width:100%;background:rgba(226,226,226,0.04);border:1px solid rgba(90,90,90,0.2);
-                       color:var(--silver,#e2e2e2);padding:12px 14px;font-size:14px;
-                       font-family:'Barlow',sans-serif;outline:none;-webkit-appearance:none;">
-            </div>
-            <div>
-              <label style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;
-                            text-transform:uppercase;color:rgba(226,226,226,0.68);display:block;margin-bottom:6px;">
-                Delivery Address (optional)
-              </label>
-              <input id="broc-co-address" type="text" placeholder="Leave blank for store pickup" autocomplete="street-address"
-                style="width:100%;background:rgba(226,226,226,0.04);border:1px solid rgba(90,90,90,0.2);
-                       color:var(--silver,#e2e2e2);padding:12px 14px;font-size:14px;
-                       font-family:'Barlow',sans-serif;outline:none;-webkit-appearance:none;">
-            </div>
-            <div>
-              <label style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:8px;letter-spacing:2px;
-                            text-transform:uppercase;color:rgba(226,226,226,0.68);display:block;margin-bottom:6px;">
-                Notes (optional)
-              </label>
-              <textarea id="broc-co-notes" placeholder="Special instructions, preferred delivery time..."
-                style="width:100%;background:rgba(226,226,226,0.04);border:1px solid rgba(90,90,90,0.2);
-                       color:var(--silver,#e2e2e2);padding:12px 14px;font-size:14px;
-                       font-family:'Barlow',sans-serif;outline:none;resize:none;height:80px;-webkit-appearance:none;"></textarea>
-            </div>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:20px;">
-            <button id="broc-step2-back"
-              style="flex:1;padding:14px;background:transparent;
-                     border:1px solid rgba(90,90,90,0.25);color:rgba(226,226,226,0.7);
-                     cursor:pointer;font-family:'Saira',sans-serif;
-                     font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
-              ← Back
-            </button>
-            <button id="broc-place-btn"
-              style="flex:3;padding:14px;background:var(--steel,#5a5a5a);
-                     color:#fff;border:none;cursor:pointer;
-                     font-family:'Saira',sans-serif;font-size:14px;
-                     font-weight:800;letter-spacing:2px;text-transform:uppercase;">
-              Place Order →
-            </button>
-          </div>
-          <div id="broc-co-error" style="display:none;margin-top:12px;padding:10px 14px;
-            background:rgba(193,57,43,0.1);border:1px solid rgba(193,57,43,0.3);
-            font-size:12px;color:#c1392b;line-height:1.5;"></div>
-
-          <!-- PayPal container — hidden unless PayPal selected -->
-          <div id="broc-paypal-container" style="display:none;margin-top:16px;"></div>
-
-          <!-- Paynow redirect notice — hidden unless Paynow selected -->
-          <div id="broc-paynow-notice" style="display:none;margin-top:16px;padding:12px 14px;
-            background:rgba(90,90,90,0.08);border:1px solid rgba(90,90,90,0.2);
-            font-size:12px;color:rgba(226,226,226,0.6);line-height:1.6;text-align:center;">
-            You'll be redirected to Paynow to complete payment securely.<br>
-            Supports EcoCash, OneMoney, Visa & Mastercard.
-          </div>
+      <fieldset>
+        <legend>Payment</legend>
+        <div id="broc-payment-options" style="display:grid;gap:10px">
+          ${this._methods().map((m, i) => `<label class="opt"><input type="radio" name="broc_payment" value="${m.value}" ${i === 0 ? 'checked' : ''}><span><b>${m.label}</b><span>${m.desc}</span></span></label>`).join('')}
         </div>
+        <div class="co-info" id="broc-paynow-notice">You will be taken to Paynow to complete payment securely.</div>
+        <div id="broc-paypal-container" style="display:none;margin-top:14px"></div>
+      </fieldset>
 
-        <!-- STEP 3: Success -->
-        <div id="broc-step-success" style="padding:40px 28px;text-align:center;display:none;">
-          <div id="broc-success-icon" style="font-size:48px;margin-bottom:16px;">✅</div>
-          <div style="font-family:'Saira',sans-serif;font-size:26px;font-weight:900;
-                      text-transform:uppercase;color:var(--silver,#e2e2e2);margin-bottom:10px;">
-            Order Placed!
-          </div>
-          <div id="broc-success-msg" style="font-size:13px;color:rgba(226,226,226,0.55);
-               line-height:1.7;margin-bottom:28px;"></div>
-          <button id="broc-wa-confirm-btn"
-            style="width:100%;padding:16px;background:#CC4A14;color:#fff;border:none;cursor:pointer;
-                   font-family:'Saira',sans-serif;font-size:15px;font-weight:800;
-                   letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">
-            Confirm on WhatsApp
-          </button>
-          <button id="broc-co-done-btn"
-            style="width:100%;padding:12px;background:transparent;
-                   border:1px solid rgba(90,90,90,0.2);color:rgba(226,226,226,0.68);
-                   cursor:pointer;font-family:'Saira',sans-serif;
-                   font-size:12px;letter-spacing:1px;text-transform:uppercase;">
-            Close
-          </button>
-        </div>
+      <div class="field" style="margin-bottom:22px"><label for="broc-co-notes">Order notes <span style="font-weight:400;color:var(--faint)">(optional)</span></label><textarea id="broc-co-notes" style="min-height:90px" placeholder="Board sizes, edging, preferred delivery time…"></textarea></div>
 
-      </div><!-- /box -->
-    `;
+      <div class="co-err" id="broc-co-error" role="alert"></div>
+      <div class="co-actions">
+        <button class="btn btn-primary btn-block" id="broc-place-btn" type="button">Place order</button>
+      </div>
+      <p style="font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.5">By placing your order you agree to our <a href="legal.html" style="color:inherit">terms of sale</a>. Prices are confirmed by us when the order is accepted.</p>
+    </div>
+    <aside class="co-side">
+      <h3>Order summary</h3>
+      <div id="broc-order-summary"></div>
+    </aside>
+  </div>
 
+  <div id="broc-step-success" class="co-done" style="display:none">
+    <div class="ok" id="broc-success-icon">${CK_CHECK}</div>
+    <h2>Order received</h2>
+    <p id="broc-success-msg"></p>
+    <div class="row">
+      <button class="btn btn-wa" id="broc-wa-confirm-btn" type="button">Confirm on WhatsApp</button>
+      <button class="btn btn-line" id="broc-co-done-btn" type="button">Continue shopping</button>
+    </div>
+  </div>
+</div>`;
     document.body.appendChild(modal);
 
-    // Wire up buttons via event listeners (no inline onclick)
     modal.addEventListener('click', e => { if (e.target === modal) this.close(); });
     modal.querySelector('#broc-co-close-btn').addEventListener('click', () => this.close());
-    modal.querySelector('#broc-step1-next').addEventListener('click', () => this.goStep(2));
-    modal.querySelector('#broc-step2-back').addEventListener('click', () => this.goStep(1));
     modal.querySelector('#broc-place-btn').addEventListener('click', () => this.placeOrder());
     modal.querySelector('#broc-wa-confirm-btn').addEventListener('click', () => this.sendWhatsApp());
     modal.querySelector('#broc-co-done-btn').addEventListener('click', () => this.close());
-
-    // Show/hide PayPal & Paynow notices when payment method changes
     modal.addEventListener('change', e => {
-      if (e.target.name === 'broc_payment') {
-        this._onPaymentMethodChange(e.target.value);
+      if (e.target.name === 'broc_payment') this._onPaymentMethodChange(e.target.value);
+      if (e.target.name === 'co_delivery') {
+        modal.querySelector('#broc-addr-wrap').style.display = e.target.value === 'deliver' ? '' : 'none';
       }
     });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') this.close(); });
   },
 
   _onPaymentMethodChange(method) {
-    const ppContainer   = document.getElementById('broc-paypal-container');
-    const pnNotice      = document.getElementById('broc-paynow-notice');
-    const placeBtn      = document.getElementById('broc-place-btn');
-
-    if (ppContainer) ppContainer.style.display = (method === 'PayPal') ? '' : 'none';
-    if (pnNotice)    pnNotice.style.display    = (method === 'Paynow') ? '' : 'none';
-
-    if (placeBtn) {
-      if (method === 'PayPal') {
-        placeBtn.style.display = 'none';
-      } else if (method === 'Paynow') {
-        placeBtn.textContent = 'Pay via Paynow →';
-        placeBtn.style.display = '';
-      } else {
-        placeBtn.textContent = 'Place Order →';
-        placeBtn.style.display = '';
-      }
+    const pp = document.getElementById('broc-paypal-container');
+    const pn = document.getElementById('broc-paynow-notice');
+    const btn = document.getElementById('broc-place-btn');
+    if (pp) pp.style.display = method === 'PayPal' ? '' : 'none';
+    if (pn) pn.style.display = method === 'Paynow' ? 'block' : 'none';
+    if (btn) {
+      btn.style.display = method === 'PayPal' ? 'none' : '';
+      btn.textContent = method === 'Paynow' ? 'Pay with Paynow' : 'Place order';
     }
-
-    // Load PayPal SDK on demand
-    if (method === 'PayPal' && SHOP.paypal.enabled) {
-      PayPalIntegration.loadButton();
-    }
+    if (method === 'PayPal' && SHOP.paypal.enabled) PayPalIntegration.loadButton();
   },
 
   open() {
@@ -782,137 +654,100 @@ const Checkout = {
     document.getElementById('broc-checkout-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
   },
-
   close() {
-    const modal = document.getElementById('broc-checkout-modal');
-    if (modal) modal.style.display = 'none';
+    const m = document.getElementById('broc-checkout-modal');
+    if (m) m.style.display = 'none';
     document.body.style.overflow = '';
   },
 
+  /* 1 and 2 show the form, 3 shows the confirmation */
   goStep(n) {
-    [
-      { id: 'broc-step-payment', step: 1 },
-      { id: 'broc-step-details', step: 2 },
-      { id: 'broc-step-success', step: 3 },
-    ].forEach(({ id, step }) => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = (step === n) ? '' : 'none';
-    });
-
-    if (n === 2) {
+    const form = document.getElementById('broc-step-details');
+    const done = document.getElementById('broc-step-success');
+    if (form) form.style.display = n === 3 ? 'none' : 'contents';
+    if (done) done.style.display = n === 3 ? '' : 'none';
+    if (n !== 3) {
       this._populateSummary();
-      // Trigger payment method UI update for current selection
-      const selected = document.querySelector('input[name="broc_payment"]:checked');
-      if (selected) this._onPaymentMethodChange(selected.value);
+      const sel = document.querySelector('input[name="broc_payment"]:checked');
+      if (sel) this._onPaymentMethodChange(sel.value);
     }
+    document.getElementById('broc-checkout-modal')?.scrollTo({ top: 0 });
   },
 
   _populateSummary() {
     const el = document.getElementById('broc-order-summary');
     if (!el) return;
     el.innerHTML = Cart._items.map(i => `
-      <div style="display:flex;justify-content:space-between;align-items:center;
-                  padding:6px 0;border-bottom:1px solid rgba(90,90,90,0.08);font-size:13px;">
-        <span style="color:rgba(226,226,226,0.7);max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-          ${escSH(i.name)} <span style="color:rgba(226,226,226,0.68);">×${i.qty}</span>
-        </span>
-        <span style="font-family:'Saira',sans-serif;font-weight:700;color:var(--silver,#e2e2e2);">
-          ${SHOP.currency} ${(i.price * i.qty).toFixed(2)}
-        </span>
-      </div>`).join('') +
-      `<div style="display:flex;justify-content:space-between;padding-top:10px;margin-top:4px;">
-         <span style="font-family:'Barlow Semi Condensed','Barlow',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(226,226,226,0.68);">TOTAL</span>
-         <span style="font-family:'Saira',sans-serif;font-size:20px;font-weight:900;color:var(--silver,#e2e2e2);">
-           ${SHOP.currency} ${Cart.total.toFixed(2)}
-         </span>
-       </div>`;
+      <div class="co-line"><span>${escSH(i.name)} <small>× ${i.qty}</small></span><span>${ckMoney(i.price * i.qty)}</span></div>`).join('') +
+      `<div class="co-total"><span>Total</span><b>${ckMoney(Cart.total)}</b></div>
+       <p style="font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.5">Delivery, if chosen, is quoted separately and confirmed with you first.</p>`;
   },
 
   async placeOrder() {
-    const name    = document.getElementById('broc-co-name')?.value?.trim();
-    const phone   = document.getElementById('broc-co-phone')?.value?.trim();
-    const address = document.getElementById('broc-co-address')?.value?.trim();
-    const notes   = document.getElementById('broc-co-notes')?.value?.trim();
+    const v = id => document.getElementById(id)?.value?.trim();
+    const name = v('broc-co-name'), phone = v('broc-co-phone'), notesIn = v('broc-co-notes');
+    const mode = document.querySelector('input[name="co_delivery"]:checked')?.value || 'collect';
+    const address = mode === 'deliver' ? v('broc-co-address') : '';
     const payment = document.querySelector('input[name="broc_payment"]:checked')?.value || 'Cash on Delivery';
-    const errEl   = document.getElementById('broc-co-error');
-    const placeBtn= document.getElementById('broc-place-btn');
+    const errEl = document.getElementById('broc-co-error');
+    const btn = document.getElementById('broc-place-btn');
+    const fail = html => { errEl.innerHTML = html; errEl.style.display = 'block'; };
 
-    if (!name || !phone) {
-      errEl.textContent = 'Please enter your name and phone number.';
-      errEl.style.display = 'block';
-      return;
-    }
+    if (!name || !phone) return fail('Please enter your name and phone number.');
+    if (mode === 'deliver' && !address) return fail('Please enter a delivery address, or choose collection.');
     errEl.style.display = 'none';
 
-    // Handle Paynow redirect flow
+    const notes = [mode === 'deliver' ? 'DELIVERY requested' : 'COLLECTION from Bulawayo', notesIn].filter(Boolean).join(' | ');
+
     if (payment === 'Paynow' && SHOP.paynow.enabled) {
       await PaynowIntegration.initiatePayment({ name, phone, address, notes });
       return;
     }
 
-    // Standard order placement
-    placeBtn.textContent = 'Placing Order...';
-    placeBtn.disabled = true;
-
+    const label = btn.textContent;
+    btn.textContent = 'Placing order…';
+    btn.disabled = true;
     try {
       const saved = await placeOrderServer({ name, phone, address, notes, method: payment });
-
       this._lastOrder = {
         id: saved.id, items: saved.items, total: saved.total,
         customer_name: name, customer_phone: phone,
-        customer_address: address || null, notes: notes || null,
+        customer_address: address || null, notes,
         payment_method: payment, status: 'pending',
       };
-
-      const orderId = saved?.id ? `#${saved.id}` : '';
       document.getElementById('broc-success-msg').innerHTML =
-        `Thank you, <strong style="color:var(--silver,#e2e2e2);">${escSH(name)}</strong>!<br>
-         Your order ${orderId} has been received. Total: <strong style="color:var(--silver,#e2e2e2);">${SHOP.currency} ${Number(saved.total).toFixed(2)}</strong><br>
-         We'll contact you on <strong style="color:var(--silver,#e2e2e2);">${escSH(phone)}</strong> to confirm.<br><br>
-         Tap <em>Confirm on WhatsApp</em> to send us your order instantly.`;
-
+        `Thank you, <strong>${escSH(name)}</strong>. Your order ${saved?.id ? '<strong>#' + saved.id + '</strong> ' : ''}for <strong>${ckMoney(saved.total)}</strong> is in. We will call or message <strong>${escSH(phone)}</strong> to confirm stock${mode === 'deliver' ? ' and delivery' : ' and a collection time'}.<br><br>Tap below to send the order to us on WhatsApp for the fastest confirmation.${saved?.id ? `<br><br><a href="track.html?order=${saved.id}" style="color:#d4520f;font-weight:600">Track this order</a>` : ''}`;
       Cart.clear();
       this.goStep(3);
-
     } catch (err) {
       console.error('[Armand] Order failed:', err);
-      errEl.innerHTML = `Order could not be placed (${escSH(err.message || 'network error')}).
-        <br><a href="https://wa.me/${SHOP.waNumber}" style="color:#9a9a9a;">
-        Order via WhatsApp instead →</a>`;
-      errEl.style.display = 'block';
-      placeBtn.textContent = 'Place Order →';
-      placeBtn.disabled = false;
+      fail(`We could not place the order (${escSH(err.message || 'network error')}). <a href="https://wa.me/${SHOP.waNumber}" style="color:inherit;font-weight:600">Order on WhatsApp instead</a>`);
+      btn.textContent = label;
+      btn.disabled = false;
     }
   },
 
-  /* ── PHASE 4 — WhatsApp confirmation ────────────────────── */
   sendWhatsApp() {
     const o = this._lastOrder;
     if (!o) return;
-
-    const itemLines = (o.items || [])
-      .map(i => `  • ${i.name} ×${i.qty} — ${SHOP.currency} ${(i.price * i.qty).toFixed(2)}`)
-      .join('\n');
-
+    const lines = (o.items || []).map(i => `• ${i.name} × ${i.qty} — ${SHOP.currency} ${(i.price * i.qty).toFixed(2)}`).join('\n');
     const msg =
-`Hello Armand Carpentry & Designs! 👋
+`Hello Armand Carpentry & Designs, I have just placed an order on your website.
 
-I've just placed an order on your website and would like to confirm:
+Order ${o.id ? '#' + o.id : ''}
+${lines}
 
-🧾 *ORDER SUMMARY*
-${itemLines}
+Total: ${SHOP.currency} ${Number(o.total || 0).toFixed(2)}
+Payment: ${o.payment_method}
+Name: ${o.customer_name}
+Phone: ${o.customer_phone}${o.customer_address ? `\nAddress: ${o.customer_address}` : ''}
+${o.notes ? 'Notes: ' + o.notes : ''}
 
-💰 *TOTAL: ${SHOP.currency} ${(o.total || Cart.total).toFixed(2)}*
-💳 *Payment: ${o.payment_method || 'Cash on Delivery'}*
-
-👤 *Name:* ${o.customer_name}
-📞 *Phone:* ${o.customer_phone}${o.customer_address ? `\n📍 *Address:* ${o.customer_address}` : ''}${o.notes ? `\n📝 *Notes:* ${o.notes}` : ''}
-
-Please confirm availability and next steps. Thank you!`;
-
+Please confirm availability and next steps. Thank you.`;
     window.open(`https://wa.me/${SHOP.waNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   },
 };
+
 
 
 /* ═════════════════════════════════════════════════════════════
@@ -1192,6 +1027,7 @@ function shopToast(msg) {
 }
 
 function injectStyles() {
+  if (!document.getElementById('broc-checkout-css')) { const l = document.createElement('link'); l.id = 'broc-checkout-css'; l.rel = 'stylesheet'; l.href = 'checkout.css'; document.head.appendChild(l); }
   if (document.getElementById('broc-shop-css')) return;
   const style = document.createElement('style');
   style.id = 'broc-shop-css';
