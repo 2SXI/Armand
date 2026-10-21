@@ -114,6 +114,20 @@
 .acct-more summary { cursor: pointer; font: 700 11px 'Saira', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.75); min-height: 32px; display: flex; align-items: center; }
 .acct-more summary:hover { color: #fff; }
 
+/* ── Settings layout ── */
+.acct-settings { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: start; }
+.acct-snav { position: sticky; top: 90px; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,.10); background: #2a282b; }
+.acct-snav a { display: flex; align-items: center; min-height: 46px; padding: 0 18px; color: rgba(255,255,255,.7); text-decoration: none; font: 700 12px 'Saira', sans-serif; letter-spacing: 2px; text-transform: uppercase; border-left: 3px solid transparent; }
+.acct-snav a:hover { color: #fff; border-left-color: #F36523; background: rgba(255,255,255,.04); }
+.acct-sbody { display: grid; gap: 20px; min-width: 0; max-width: 720px; }
+.acct-sbody .acct-panel { scroll-margin-top: 90px; }
+.acct-sbody .acct-muted { margin: -6px 0 18px; display: block; }
+@media (max-width: 900px) {
+  .acct-settings { grid-template-columns: 1fr; }
+  .acct-snav { position: static; flex-direction: row; overflow-x: auto; }
+  .acct-snav a { border-left: 0; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .acct-snav a:hover { border-bottom-color: #F36523; }
+}
 @media (max-width: 900px) {
   .acct-split { grid-template-columns: 1fr; }
   .acct-side { padding: 32px 26px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.08); }

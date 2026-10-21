@@ -19,6 +19,7 @@
     $('welcomeName').textContent = first;
     $('acctAvatar').textContent = initials(name, email);
     $('acctEmailLine').textContent = email || '';
+    $('setEmail').textContent = email || '';
   }
 
   const views = ['viewAuth', 'viewAccount', 'viewRecover'];
@@ -275,11 +276,26 @@
     renderOrders();
   }
 
-  $('logoutBtn').addEventListener('click', async () => {
+  async function signOut() {
     await sb.auth.signOut();
     banner('You have been signed out.', 'ok');
     await render();
-  });
+  }
+  $('logoutBtn').addEventListener('click', signOut);
+  $('logoutBtn2').addEventListener('click', signOut);
+
+  /* deep links from the nav menu: account.html#orders / #settings */
+  const TABS = { overview: 'tabOverview', orders: 'tabOrders', settings: 'tabSettings' };
+  function tabFromHash() {
+    const h = location.hash.replace('#', '').toLowerCase();
+    const btn = TABS[h] && $(TABS[h]);
+    if (btn && window.bootstrap && bootstrap.Tab) bootstrap.Tab.getOrCreateInstance(btn).show();
+  }
+  window.addEventListener('hashchange', () => { if (!$('viewAccount').hidden) tabFromHash(); });
+  document.querySelectorAll('.acct-tab').forEach(b => b.addEventListener('shown.bs.tab', () => {
+    const k = Object.keys(TABS).find(x => TABS[x] === b.id);
+    if (k && history.replaceState) history.replaceState(null, '', k === 'overview' ? location.pathname : '#' + k);
+  }));
 
   let recovering = /type=recovery/.test(location.hash);   // arrived from a reset-password email
   async function render() {
@@ -288,6 +304,7 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { show('viewAuth'); return; }
     show('viewAccount');
+    tabFromHash();
     await Promise.all([loadProfile(session.user), loadOrders()]);
   }
 

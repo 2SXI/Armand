@@ -56,6 +56,12 @@ const fake = (list, session = { user: { id: 'u1', email: 'alice@x.com', user_met
   ok(w.document.querySelectorAll('#ordersList .acct-steps')[0].querySelectorAll('li.on').length === 3, 'orders: shipped order highlights 3 of 4 steps');
   ok(w.document.querySelector('.acct-steps.cancelled'), 'orders: cancelled order is styled as cancelled');
 }
+{ // settings tab
+  const w = page(fake([])); await tick(); await tick();
+  const d = w.document;
+  ok(d.getElementById('paneSettings').contains(d.getElementById('profileForm')) && d.getElementById('paneSettings').contains(d.getElementById('pwForm')), 'settings: profile and password live in one Settings tab');
+  ok(d.getElementById('setEmail').textContent === 'alice@x.com', 'settings: session section shows email');
+}
 { // order filters
   const w = page(fake(orders)); await tick(); await tick();
   const d = w.document, n = () => d.querySelectorAll('#ordersList .acct-order').length;

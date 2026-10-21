@@ -21,8 +21,12 @@ async function run(user){
     ok(!w.document.getElementById('broc-co-name').value,'guest: checkout not prefilled'); } else ok(false,'Checkout not exposed '+errs.join(';'));
 }
 { const {w}=await run({id:'u1',email:'alice@x.com',user_metadata:{full_name:'Alice Moyo'}});
-  ok(w.document.querySelector('a.nav-link[href="account.html"]').textContent==='Hi, Alice','signed in: menu says "Hi, Alice"');
-  const nb=w.document.getElementById('navAcct'); ok(nb&&nb.classList.contains('is-in')&&nb.textContent==='AM'&&nb.getAttribute('href')==='account.html','signed in: nav badge shows initials "AM" and links to account');
+  ok(w.document.querySelector('a.nav-link[href="account.html"]').closest('li').hidden===true,'signed in: plain Account link replaced by user menu');
+  const nb=w.document.getElementById('navAcct'); ok(nb&&nb.classList.contains('is-in')&&nb.querySelector('.nav-acct-ini').textContent==='AM'&&/Alice/.test(nb.textContent)&&nb.getAttribute('aria-expanded')==='false','signed in: trigger shows initials AM + first name');
+  const mn=w.document.getElementById('navUserMenu'); ok(mn&&mn.hidden&&/alice@x.com/.test(mn.textContent)&&mn.querySelector('a[href="account.html#orders"]')&&mn.querySelector('a[href="account.html#settings"]')&&mn.querySelector('#navSignOut'),'signed in: dropdown has email, orders, settings, sign out');
+  nb.click(); ok(!mn.hidden&&nb.getAttribute('aria-expanded')==='true','menu: click opens it');
+  w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true})); ok(mn.hidden,'menu: Escape closes it');
+  nb.click(); w.document.body.click(); ok(mn.hidden,'menu: outside click closes it');
   w.Cart._items=[{id:1,name:'Hinge',price:5,qty:1}]; w.Checkout.open(); await tick(150);
   ok(/Signed in as alice@x.com/.test(w.document.getElementById('broc-acct-note').textContent),'signed in: note says order goes to My orders');
   ok(w.document.getElementById('broc-co-name').value==='Alice Moyo'&&w.document.getElementById('broc-co-phone').value==='+263 78 111 2222','signed in: name and phone prefilled from profile');

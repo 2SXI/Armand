@@ -256,8 +256,7 @@
       <ul class="nav acct-tabs" role="tablist" aria-label="Account sections">
         <li role="presentation"><button class="acct-tab active" id="tabOverview" data-bs-toggle="tab" data-bs-target="#paneOverview" type="button" role="tab" aria-controls="paneOverview" aria-selected="true">Overview</button></li>
         <li role="presentation"><button class="acct-tab" id="tabOrders" data-bs-toggle="tab" data-bs-target="#paneOrders" type="button" role="tab" aria-controls="paneOrders" aria-selected="false">Orders <span class="acct-tab-n" id="tabOrdersN">0</span></button></li>
-        <li role="presentation"><button class="acct-tab" id="tabDetails" data-bs-toggle="tab" data-bs-target="#paneDetails" type="button" role="tab" aria-controls="paneDetails" aria-selected="false">Details</button></li>
-        <li role="presentation"><button class="acct-tab" id="tabSecurity" data-bs-toggle="tab" data-bs-target="#paneSecurity" type="button" role="tab" aria-controls="paneSecurity" aria-selected="false">Security</button></li>
+        <li role="presentation"><button class="acct-tab" id="tabSettings" data-bs-toggle="tab" data-bs-target="#paneSettings" type="button" role="tab" aria-controls="paneSettings" aria-selected="false">Settings</button></li>
       </ul>
 
       <div class="tab-content">
@@ -307,34 +306,45 @@
           <p class="acct-help">Questions about an order? <a href="https://wa.me/263780793585" target="_blank" rel="noopener">WhatsApp us</a> or <a href="contact.html">send an enquiry</a>. Ordered as a guest? <a href="track.html">Track it here</a>.</p>
         </div>
 
-        <!-- DETAILS -->
-        <div class="tab-pane fade" id="paneDetails" role="tabpanel" aria-labelledby="tabDetails" tabindex="0">
-          <div class="acct-panel acct-narrow">
-            <h3 class="acct-h3">Your details</h3>
-            <p class="acct-muted">These are filled in for you at checkout.</p>
-            <form id="profileForm" class="row g-3" novalidate>
-              <div class="col-12"><label class="form-label" for="pf-email">Email</label>
-                <input type="email" id="pf-email" class="form-control" readonly aria-readonly="true"></div>
-              <div class="col-md-6"><label class="form-label" for="pf-name">Full name</label>
-                <input type="text" id="pf-name" class="form-control" autocomplete="name" maxlength="100" required></div>
-              <div class="col-md-6"><label class="form-label" for="pf-phone">Phone</label>
-                <input type="tel" id="pf-phone" class="form-control" autocomplete="tel" maxlength="30" required></div>
-              <div class="col-12"><button type="submit" class="btn btn-brand" id="pfBtn">Save details</button></div>
-            </form>
-          </div>
-        </div>
-
-        <!-- SECURITY -->
-        <div class="tab-pane fade" id="paneSecurity" role="tabpanel" aria-labelledby="tabSecurity" tabindex="0">
-          <div class="acct-panel acct-narrow">
-            <h3 class="acct-h3">Change password</h3>
-            <form id="pwForm" class="row g-3" novalidate>
-              <div class="col-12"><label class="form-label" for="pw-new">New password</label>
-                <input type="password" id="pw-new" class="form-control" autocomplete="new-password" maxlength="72" required></div>
-              <div class="col-12"><label class="form-label" for="pw-new2">Confirm new password</label>
-                <input type="password" id="pw-new2" class="form-control" autocomplete="new-password" maxlength="72" required></div>
-              <div class="col-12"><button type="submit" class="btn btn-outline-light" id="pwBtn">Update password</button></div>
-            </form>
+        <!-- SETTINGS -->
+        <div class="tab-pane fade" id="paneSettings" role="tabpanel" aria-labelledby="tabSettings" tabindex="0">
+          <div class="acct-settings">
+            <nav class="acct-snav" aria-label="Settings sections">
+              <a href="#set-profile">Profile</a>
+              <a href="#set-password">Password</a>
+              <a href="#set-session">Session</a>
+            </nav>
+            <div class="acct-sbody">
+              <div class="acct-panel" id="set-profile">
+                <h3 class="acct-h3">Profile</h3>
+                <p class="acct-muted">Your name and phone are filled in for you at checkout. Your email is your sign-in and cannot be changed here.</p>
+                <form id="profileForm" class="row g-3" novalidate>
+                  <div class="col-12"><label class="form-label" for="pf-email">Email</label>
+                    <input type="email" id="pf-email" class="form-control" readonly aria-readonly="true"></div>
+                  <div class="col-md-6"><label class="form-label" for="pf-name">Full name</label>
+                    <input type="text" id="pf-name" class="form-control" autocomplete="name" maxlength="100" required></div>
+                  <div class="col-md-6"><label class="form-label" for="pf-phone">Phone</label>
+                    <input type="tel" id="pf-phone" class="form-control" autocomplete="tel" maxlength="30" required></div>
+                  <div class="col-12"><button type="submit" class="btn btn-brand" id="pfBtn">Save details</button></div>
+                </form>
+              </div>
+              <div class="acct-panel" id="set-password">
+                <h3 class="acct-h3">Password</h3>
+                <p class="acct-muted">Use 8+ characters with a letter and a number.</p>
+                <form id="pwForm" class="row g-3" novalidate>
+                  <div class="col-md-6"><label class="form-label" for="pw-new">New password</label>
+                    <input type="password" id="pw-new" class="form-control" autocomplete="new-password" maxlength="72" required></div>
+                  <div class="col-md-6"><label class="form-label" for="pw-new2">Confirm new password</label>
+                    <input type="password" id="pw-new2" class="form-control" autocomplete="new-password" maxlength="72" required></div>
+                  <div class="col-12"><button type="submit" class="btn btn-outline-light" id="pwBtn">Update password</button></div>
+                </form>
+              </div>
+              <div class="acct-panel" id="set-session">
+                <h3 class="acct-h3">Session</h3>
+                <p class="acct-muted">Signed in as <strong id="setEmail"></strong>. On a shared computer, sign out when you are done.</p>
+                <button type="button" class="btn btn-outline-light" id="logoutBtn2">Sign out</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

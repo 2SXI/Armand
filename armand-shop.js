@@ -1091,43 +1091,94 @@ document.addEventListener('DOMContentLoaded', () => {
     return (String(u.email || 'A').charAt(0) || 'A').toUpperCase();
   };
   const USER_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
-  function navBadge() {
-    let b = document.getElementById('navAcct');
-    if (b) return b;
+  const esc2 = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  function navWrap() {
+    let w = document.getElementById('navUser');
+    if (w) return w;
     const host = document.querySelector('.nav-actions');
     if (!host) return null;
-    b = document.createElement('a');
-    b.id = 'navAcct'; b.className = 'nav-acct'; b.href = 'account.html';
-    const cart = document.getElementById('cartBtn');
-    host.insertBefore(b, cart || host.firstChild);
-    return b;
+    w = document.createElement('div');
+    w.id = 'navUser'; w.className = 'nav-user';
+    host.insertBefore(w, document.getElementById('cartBtn') || host.firstChild);
+    return w;
+  }
+  function closeUserMenu(focus) {
+    const w = document.getElementById('navUser'); if (!w) return;
+    const t = w.querySelector('.nav-acct'), m = w.querySelector('.nav-user-menu');
+    if (m && !m.hidden) { m.hidden = true; if (t) { t.setAttribute('aria-expanded', 'false'); if (focus) t.focus(); } }
+  }
+  function renderNavUser(u) {
+    const w = navWrap(); if (!w) return;
+    if (!u) {
+      w.innerHTML = '<a id="navAcct" class="nav-acct" href="account.html" aria-label="Sign in or create an account" title="Sign in">' + USER_SVG + '</a>';
+      return;
+    }
+    const name = fullName(u) || u.email || 'My account', ini = initialsOf(u);
+    w.innerHTML =
+      '<button type="button" id="navAcct" class="nav-acct is-in" aria-haspopup="true" aria-expanded="false" aria-controls="navUserMenu" aria-label="Account menu for ' + esc2(name) + '">' +
+        '<span class="nav-acct-ini">' + esc2(ini) + '</span><span class="nav-acct-name">' + esc2(firstName(u) || 'Account') + '</span>' +
+        '<svg class="nav-acct-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>' +
+      '<div class="nav-user-menu" id="navUserMenu" role="menu" hidden>' +
+        '<div class="num-head"><b>' + esc2(ini) + '</b><div><span>' + esc2(name) + '</span><small>' + esc2(u.email || '') + '</small></div></div>' +
+        '<a role="menuitem" href="account.html">Overview</a>' +
+        '<a role="menuitem" href="account.html#orders">My orders</a>' +
+        '<a role="menuitem" href="account.html#settings">Account settings</a>' +
+        '<a role="menuitem" href="track.html">Track an order</a>' +
+        '<div class="num-sep" role="separator"></div>' +
+        '<button type="button" role="menuitem" class="num-out" id="navSignOut">Sign out</button>' +
+      '</div>';
+    const t = w.querySelector('.nav-acct'), m = w.querySelector('.nav-user-menu');
+    t.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = m.hidden; m.hidden = !open; t.setAttribute('aria-expanded', String(open));
+      if (open) { const f = m.querySelector('a'); if (f) f.focus({ preventScroll: true }); }
+    });
+    m.addEventListener('keydown', e => {
+      const items = [...m.querySelectorAll('[role="menuitem"]')], i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'Tab') closeUserMenu();
+    });
+    w.querySelector('#navSignOut').addEventListener('click', async () => {
+      try { await acctSB.auth.signOut(); } catch (e) {}
+      closeUserMenu();
+      if (/account\.html$/i.test(location.pathname)) location.reload(); else refreshNavAccount();
+    });
+  }
+  if (!window.__navUserBound) {
+    window.__navUserBound = true;
+    document.addEventListener('click', e => { const w = document.getElementById('navUser'); if (w && !w.contains(e.target)) closeUserMenu(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUserMenu(true); });
   }
   async function refreshNavAccount() {
     if (!acctSB) return;
     const u = await currentUser();
     document.querySelectorAll('a.nav-link[href="account.html"]').forEach(a => {
-      a.textContent = u ? ('Hi, ' + (firstName(u) || 'there')) : 'Account';
-      a.setAttribute('aria-label', u ? 'My account and orders' : 'Sign in or create an account');
+      a.textContent = 'Account';
+      a.setAttribute('aria-label', 'Sign in or create an account');
+      const li = a.closest('li'); if (li) li.hidden = !!u;      // signed in: the user menu replaces this link
     });
-    const b = navBadge();
-    if (b) {
-      b.classList.toggle('is-in', !!u);
-      if (u) { b.textContent = initialsOf(u); b.setAttribute('aria-label', 'My account: ' + (fullName(u) || u.email)); b.title = fullName(u) || u.email || 'My account'; }
-      else { b.innerHTML = USER_SVG; b.setAttribute('aria-label', 'Sign in or create an account'); b.title = 'Sign in'; }
-    }
+    renderNavUser(u);
     const panel = document.querySelector('.mobile-nav-panel');
     if (panel) {
-      panel.querySelectorAll('.mnp-who').forEach(n => n.remove());
-      const link = panel.querySelector('.mnp-link[href="account.html"] span');
-      if (link) link.textContent = u ? 'My account' : 'Sign in / Account';
+      panel.querySelectorAll('.mnp-who, .mnp-acct-links').forEach(n => n.remove());
+      const link = panel.querySelector('.mnp-link[href="account.html"]');
+      if (link) { link.hidden = !!u; }
       const nav = panel.querySelector('.mnp-nav');
       if (u && nav) {
-        const w = document.createElement('a');
-        w.className = 'mnp-who'; w.href = 'account.html';
-        w.innerHTML = '<b></b><div><span></span><small></small></div>';
+        const name = fullName(u) || 'My account';
+        const w = document.createElement('div'); w.className = 'mnp-acct-links';
+        w.innerHTML = '<a class="mnp-who" href="account.html"><b></b><div><span></span><small></small></div></a>' +
+          '<a class="mnp-link" href="account.html#orders"><span>My orders</span></a>' +
+          '<a class="mnp-link" href="account.html#settings"><span>Account settings</span></a>' +
+          '<button type="button" class="mnp-link mnp-out"><span>Sign out</span></button>';
         w.querySelector('b').textContent = initialsOf(u);
-        w.querySelector('span').textContent = fullName(u) || 'My account';
+        w.querySelector('.mnp-who span').textContent = name;
         w.querySelector('small').textContent = u.email || '';
+        w.querySelector('.mnp-out').addEventListener('click', async () => {
+          try { await acctSB.auth.signOut(); } catch (e) {}
+          if (/account\.html$/i.test(location.pathname)) location.reload(); else { if (window.closeMobileNav) window.closeMobileNav(); refreshNavAccount(); }
+        });
         nav.insertAdjacentElement('beforebegin', w);
       }
     }
