@@ -754,6 +754,7 @@ function initMobileNav() {
           ${item('portfolio.html','Portfolio')}
           ${item('trade.html','Trade accounts')}
           ${item('contact.html','Contact')}
+          ${item('account.html','Sign in / Account')}
         </nav>
         <div class="mnp-group">
           <div class="mnp-group-label">Shop by category</div>

@@ -8,6 +8,19 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const sb = (typeof getSB === 'function') ? getSB() : null;   // shared client from armand-shop.js
 
+  function initials(name, email) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (String(email || 'A').charAt(0) || 'A').toUpperCase();
+  }
+  function paintIdentity(name, email) {
+    const first = (name || email || '').split(' ')[0];
+    $('welcomeName').textContent = first;
+    $('acctAvatar').textContent = initials(name, email);
+    $('acctEmailLine').textContent = email || '';
+  }
+
   const views = ['viewAuth', 'viewAccount', 'viewRecover'];
   function show(id) { views.forEach(v => { $(v).hidden = v !== id; }); }
 
@@ -159,10 +172,11 @@
     $('pf-name').value  = (data && data.full_name) || (user.user_metadata && user.user_metadata.full_name) || '';
     $('pf-phone').value = (data && data.phone)     || (user.user_metadata && user.user_metadata.phone)     || '';
     $('pf-email').value = user.email || '';
-    const first = ($('pf-name').value || user.email || '').split(' ')[0];
-    $('welcomeName').textContent = first;
-    $('acctAvatar').textContent = (first.charAt(0) || 'A').toUpperCase();
-    $('acctEmailLine').textContent = user.email || '';
+    paintIdentity($('pf-name').value, user.email);
+    if (user.created_at) {
+      const d = new Date(user.created_at);
+      if (!isNaN(d)) $('acctSince').textContent = 'Member since ' + d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    }
   }
 
   $('profileForm').addEventListener('submit', async e => {
@@ -174,8 +188,8 @@
     const { error } = await sb.from('profiles').update({ full_name: name, phone }).eq('user_id', user.id);
     busy(btn, false);
     if (error) { banner('Could not save your details. Please try again.', 'err'); return; }
-    $('welcomeName').textContent = name.split(' ')[0];
-    $('acctAvatar').textContent = (name.charAt(0) || 'A').toUpperCase();
+    paintIdentity(name, $('pf-email').value);
+    if (window.refreshNavAccount) window.refreshNavAccount();
     banner('Details saved.', 'ok');
   });
 
@@ -192,38 +206,73 @@
   });
 
   const money = n => 'USD ' + Number(n || 0).toFixed(2);
+  const BADGE = { pending: 'secondary', confirmed: 'primary', shipped: 'info', delivered: 'success', cancelled: 'danger' };
+  const STEPS = ['pending', 'confirmed', 'shipped', 'delivered'];
+  const OPEN = ['pending', 'confirmed', 'shipped'];
+  let allOrders = [], activeFilter = 'all';
+
+  function orderCard(o, expanded) {
+    const when = new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const lines = o.items || [];
+    const count = lines.reduce((t, i) => t + (Number(i.qty) || 0), 0);
+    const items = lines.map(i => `<li class="py-1">${esc(i.name)} <b>× ${esc(i.qty)}</b></li>`).join('');
+    const st = esc(o.status || 'pending'), at = STEPS.indexOf(st);
+    const steps = '<ol class="acct-steps' + (st === 'cancelled' ? ' cancelled' : '') + '" aria-label="Order progress">' +
+      STEPS.map((x, i) => '<li' + (at >= i ? ' class="on"' : '') + '>' + x + '</li>').join('') + '</ol>';
+    return `<article class="card mb-3 acct-order">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center"><strong class="acct-order-no">Order #${esc(o.id)}</strong><span class="badge bg-${BADGE[st] || 'secondary'}">${st}</span></div>
+        <div class="acct-muted">${when} · ${esc(o.payment_method || '')}${count ? ' · ' + count + (count === 1 ? ' item' : ' items') : ''}</div>
+        ${steps}
+        ${expanded ? `<ul class="list-unstyled my-3">${items}</ul>` : (items ? `<details class="acct-more"><summary>View items</summary><ul class="list-unstyled my-2">${items}</ul></details>` : '')}
+        <div class="d-flex justify-content-between border-top pt-2 mt-2"><span>Total</span><strong>${money(o.total)}</strong></div>
+      </div>
+    </article>`;
+  }
+
+  function renderOrders() {
+    const list = $('ordersList');
+    const f = activeFilter;
+    const rows = allOrders.filter(o => {
+      const st = o.status || 'pending';
+      return f === 'all' || (f === 'open' ? OPEN.includes(st) : st === f);
+    });
+    if (!allOrders.length) {
+      list.innerHTML = '<div class="acct-empty"><strong>No orders yet</strong>No orders yet. Orders you place while signed in will appear here.<br><a class="btn btn-brand" href="products.html">Browse products</a></div>';
+      return;
+    }
+    list.innerHTML = rows.length ? rows.map(o => orderCard(o, false)).join('')
+      : '<div class="acct-empty"><strong>Nothing here</strong>No orders match this filter.</div>';
+  }
+
+  document.querySelectorAll('.acct-chip').forEach(b => b.addEventListener('click', () => {
+    activeFilter = b.dataset.filter;
+    document.querySelectorAll('.acct-chip').forEach(x => {
+      const on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', String(on));
+    });
+    renderOrders();
+  }));
+
   async function loadOrders() {
     const list = $('ordersList');
     list.innerHTML = '<p class="acct-muted">Loading your orders…</p>';
     const { data, error } = await sb.from('orders')
       .select('id, created_at, status, total, payment_method, items')
       .order('created_at', { ascending: false }).limit(50);
-    if (error) { list.innerHTML = '<p class="acct-muted">Could not load your orders. Please refresh the page.</p>'; return; }
-    const sum = data.filter(o => o.status !== 'cancelled');
-    $('stOrders').textContent = data.length;
-    $('stOpen').textContent = data.filter(o => ['pending', 'confirmed', 'shipped'].includes(o.status || 'pending')).length;
-    $('stSpent').textContent = money(sum.reduce((t, o) => t + Number(o.total || 0), 0));
-    if (!data.length) {
-      list.innerHTML = '<div class="acct-empty"><strong>No orders yet</strong>No orders yet. Orders you place while signed in will appear here.<br><a class="btn btn-brand" href="products.html">Browse products</a></div>';
+    if (error) {
+      list.innerHTML = '<p class="acct-muted">Could not load your orders. Please refresh the page.</p>';
+      $('latestOrder').innerHTML = '<p class="acct-muted">Could not load your orders.</p>';
       return;
     }
-    const BADGE = { pending: 'secondary', confirmed: 'primary', shipped: 'info', delivered: 'success', cancelled: 'danger' };
-    list.innerHTML = data.map(o => {
-      const when = new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const items = (o.items || []).map(i => `<li class="py-1">${esc(i.name)} <b>× ${esc(i.qty)}</b></li>`).join('');
-      const st = esc(o.status || 'pending');
-      const STEPS = ['pending', 'confirmed', 'shipped', 'delivered'], at = STEPS.indexOf(st);
-      const steps = '<ol class="acct-steps' + (st === 'cancelled' ? ' cancelled' : '') + '" aria-label="Order progress">' +
-        STEPS.map((x, i) => '<li' + (at >= i ? ' class="on"' : '') + '>' + x + '</li>').join('') + '</ol>';
-      return `<article class="card mb-3 acct-order">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center"><strong class="acct-order-no">Order #${esc(o.id)}</strong><span class="badge bg-${BADGE[st] || 'secondary'}">${st}</span></div>
-          <div class="acct-muted">${when} · ${esc(o.payment_method || '')}</div>
-          ${steps}<ul class="list-unstyled my-3">${items}</ul>
-          <div class="d-flex justify-content-between border-top pt-2"><span>Total</span><strong>${money(o.total)}</strong></div>
-        </div>
-      </article>`;
-    }).join('');
+    allOrders = data;
+    const sum = data.filter(o => o.status !== 'cancelled');
+    $('stOrders').textContent = data.length;
+    $('tabOrdersN').textContent = data.length;
+    $('stOpen').textContent = data.filter(o => OPEN.includes(o.status || 'pending')).length;
+    $('stSpent').textContent = money(sum.reduce((t, o) => t + Number(o.total || 0), 0));
+    $('latestOrder').innerHTML = data.length ? orderCard(data[0], true)
+      : '<div class="acct-empty"><strong>No orders yet</strong>Your first order will show up here.<br><a class="btn btn-brand" href="products.html">Browse products</a></div>';
+    renderOrders();
   }
 
   $('logoutBtn').addEventListener('click', async () => {

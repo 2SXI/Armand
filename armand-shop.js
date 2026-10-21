@@ -1083,6 +1083,25 @@ document.addEventListener('DOMContentLoaded', () => {
     try { const { data } = await acctSB.auth.getSession(); return data.session ? data.session.user : null; }
     catch (e) { return null; }
   }
+  const fullName = u => String((u.user_metadata && u.user_metadata.full_name) || '').trim();
+  const initialsOf = u => {
+    const p = fullName(u).split(/\s+/).filter(Boolean);
+    if (p.length >= 2) return (p[0][0] + p[p.length - 1][0]).toUpperCase();
+    if (p.length === 1) return p[0].slice(0, 2).toUpperCase();
+    return (String(u.email || 'A').charAt(0) || 'A').toUpperCase();
+  };
+  const USER_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
+  function navBadge() {
+    let b = document.getElementById('navAcct');
+    if (b) return b;
+    const host = document.querySelector('.nav-actions');
+    if (!host) return null;
+    b = document.createElement('a');
+    b.id = 'navAcct'; b.className = 'nav-acct'; b.href = 'account.html';
+    const cart = document.getElementById('cartBtn');
+    host.insertBefore(b, cart || host.firstChild);
+    return b;
+  }
   async function refreshNavAccount() {
     if (!acctSB) return;
     const u = await currentUser();
@@ -1090,7 +1109,30 @@ document.addEventListener('DOMContentLoaded', () => {
       a.textContent = u ? ('Hi, ' + (firstName(u) || 'there')) : 'Account';
       a.setAttribute('aria-label', u ? 'My account and orders' : 'Sign in or create an account');
     });
+    const b = navBadge();
+    if (b) {
+      b.classList.toggle('is-in', !!u);
+      if (u) { b.textContent = initialsOf(u); b.setAttribute('aria-label', 'My account: ' + (fullName(u) || u.email)); b.title = fullName(u) || u.email || 'My account'; }
+      else { b.innerHTML = USER_SVG; b.setAttribute('aria-label', 'Sign in or create an account'); b.title = 'Sign in'; }
+    }
+    const panel = document.querySelector('.mobile-nav-panel');
+    if (panel) {
+      panel.querySelectorAll('.mnp-who').forEach(n => n.remove());
+      const link = panel.querySelector('.mnp-link[href="account.html"] span');
+      if (link) link.textContent = u ? 'My account' : 'Sign in / Account';
+      const nav = panel.querySelector('.mnp-nav');
+      if (u && nav) {
+        const w = document.createElement('a');
+        w.className = 'mnp-who'; w.href = 'account.html';
+        w.innerHTML = '<b></b><div><span></span><small></small></div>';
+        w.querySelector('b').textContent = initialsOf(u);
+        w.querySelector('span').textContent = fullName(u) || 'My account';
+        w.querySelector('small').textContent = u.email || '';
+        nav.insertAdjacentElement('beforebegin', w);
+      }
+    }
   }
+  window.refreshNavAccount = refreshNavAccount;
   if (acctSB) {
     refreshNavAccount();
     acctSB.auth.onAuthStateChange(() => refreshNavAccount());

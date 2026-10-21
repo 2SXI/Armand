@@ -15,12 +15,14 @@ async function run(user){
 }
 { const {w,errs}=await run(null);
   ok(w.document.querySelector('a.nav-link[href="account.html"]').textContent==='Account','guest: menu says "Account"');
+  ok(w.document.getElementById('navAcct')&&!w.document.getElementById('navAcct').classList.contains('is-in'),'guest: nav badge is a plain sign-in icon');
   if(w.Checkout){ w.Cart._items=[{id:1,name:'Hinge',price:5,qty:1}]; w.Checkout.open(); await tick();
     const n=w.document.getElementById('broc-acct-note'); ok(n&&/Sign in or create/.test(n.innerHTML)&&n.querySelector('a[href="account.html"]'),'guest: checkout shows sign-in note with link');
     ok(!w.document.getElementById('broc-co-name').value,'guest: checkout not prefilled'); } else ok(false,'Checkout not exposed '+errs.join(';'));
 }
 { const {w}=await run({id:'u1',email:'alice@x.com',user_metadata:{full_name:'Alice Moyo'}});
   ok(w.document.querySelector('a.nav-link[href="account.html"]').textContent==='Hi, Alice','signed in: menu says "Hi, Alice"');
+  const nb=w.document.getElementById('navAcct'); ok(nb&&nb.classList.contains('is-in')&&nb.textContent==='AM'&&nb.getAttribute('href')==='account.html','signed in: nav badge shows initials "AM" and links to account');
   w.Cart._items=[{id:1,name:'Hinge',price:5,qty:1}]; w.Checkout.open(); await tick(150);
   ok(/Signed in as alice@x.com/.test(w.document.getElementById('broc-acct-note').textContent),'signed in: note says order goes to My orders');
   ok(w.document.getElementById('broc-co-name').value==='Alice Moyo'&&w.document.getElementById('broc-co-phone').value==='+263 78 111 2222','signed in: name and phone prefilled from profile');

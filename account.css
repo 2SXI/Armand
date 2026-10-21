@@ -62,7 +62,8 @@
 
 /* ── Signed-in dashboard ── */
 .acct-head { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 28px 32px; background: linear-gradient(120deg, #3a383b, #2a282b); border: 1px solid rgba(255,255,255,.10); border-left: 4px solid #F36523; margin-bottom: 20px; }
-.acct-avatar { width: 64px; height: 64px; flex: 0 0 64px; display: grid; place-items: center; background: #F36523; color: #fff; font: 800 26px 'Saira', sans-serif; }
+.acct-avatar { width: 72px; height: 72px; flex: 0 0 72px; display: grid; place-items: center; background: #F36523; color: #fff; font: 800 28px 'Saira', sans-serif; letter-spacing: 1px; box-shadow: 0 0 0 4px rgba(243,101,35,.22); }
+.acct-eyebrow { font: 700 11px 'Saira', sans-serif; letter-spacing: 3px; text-transform: uppercase; color: #F36523; margin-bottom: 6px; }
 .acct-head-text { flex: 1 1 240px; min-width: 0; }
 .acct-head-text .acct-muted { overflow-wrap: anywhere; font-size: 14px; }
 .acct-head-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -89,6 +90,30 @@
 .acct-empty strong { display: block; font: 700 18px 'Saira', sans-serif; color: #fff; margin-bottom: 8px; }
 .acct-empty .btn { margin-top: 16px; }
 
+/* ── Dashboard tabs ── */
+.acct-tabs { display: flex; gap: 4px; margin: 0 0 24px; padding: 0; list-style: none; border-bottom: 1px solid rgba(255,255,255,.10); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.acct-tab { background: transparent; border: 0; border-bottom: 3px solid transparent; color: rgba(255,255,255,.62); font: 700 13px 'Saira', sans-serif; letter-spacing: 2px; text-transform: uppercase; padding: 14px 20px; min-height: 48px; white-space: nowrap; cursor: pointer; margin-bottom: -1px; }
+.acct-tab:hover { color: #fff; }
+.acct-tab.active { color: #fff; border-bottom-color: #F36523; }
+.acct-tab:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.acct-tab-n { display: inline-block; min-width: 22px; padding: 1px 6px; margin-left: 6px; background: rgba(255,255,255,.12); font-size: 11px; text-align: center; letter-spacing: 0; }
+.acct-tab.active .acct-tab-n { background: #F36523; }
+.acct-narrow { max-width: 680px; }
+.acct-panel-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.10); }
+.acct-panel-top .acct-h3 { border: 0; padding: 0; }
+.acct-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.acct-chip { background: transparent; border: 1px solid rgba(255,255,255,.18); color: rgba(255,255,255,.7); font: 700 11px 'Saira', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; padding: 0 14px; min-height: 36px; cursor: pointer; }
+.acct-chip:hover { color: #fff; border-color: rgba(255,255,255,.4); }
+.acct-chip.active { background: #F36523; border-color: #F36523; color: #fff; }
+.acct-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.acct-quick { list-style: none; margin: 0; padding: 0; }
+.acct-quick a { display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 4px; border-bottom: 1px solid rgba(255,255,255,.08); text-decoration: none; color: #fff; font-weight: 500; }
+.acct-quick a:hover { color: #F36523; }
+.acct-quick i { font-style: normal; color: #F36523; }
+.acct-more { margin-top: 10px; }
+.acct-more summary { cursor: pointer; font: 700 11px 'Saira', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.75); min-height: 32px; display: flex; align-items: center; }
+.acct-more summary:hover { color: #fff; }
+
 @media (max-width: 900px) {
   .acct-split { grid-template-columns: 1fr; }
   .acct-side { padding: 32px 26px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.08); }
@@ -103,6 +128,8 @@
   .acct-head-actions { width: 100%; }
   .acct-head-actions .btn { flex: 1; }
   .acct-stats { grid-template-columns: 1fr; gap: 10px; }
+  .acct-avatar { width: 56px; height: 56px; flex-basis: 56px; font-size: 22px; }
+  .acct-tab { padding: 12px 14px; font-size: 12px; letter-spacing: 1.5px; }
   .acct-panel { padding: 20px; }
   .acct-side-title { margin-bottom: 22px; }
   .acct-perks span span, .acct-perks div > span { font-size: 13px; }

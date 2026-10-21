@@ -243,6 +243,7 @@
       <header class="acct-head">
         <div class="acct-avatar" id="acctAvatar" aria-hidden="true">A</div>
         <div class="acct-head-text">
+          <div class="acct-eyebrow" id="acctSince">Customer account</div>
           <h2 class="acct-h mb-0">Welcome, <span id="welcomeName"></span></h2>
           <p class="acct-muted mb-0" id="acctEmailLine"></p>
         </div>
@@ -252,27 +253,80 @@
         </div>
       </header>
 
-      <div class="acct-stats" id="acctStats" aria-label="Order summary">
-        <div class="acct-stat"><span class="acct-stat-n" id="stOrders">0</span><span class="acct-stat-l">Orders</span></div>
-        <div class="acct-stat"><span class="acct-stat-n" id="stOpen">0</span><span class="acct-stat-l">In progress</span></div>
-        <div class="acct-stat"><span class="acct-stat-n" id="stSpent">USD 0.00</span><span class="acct-stat-l">Total ordered</span></div>
-      </div>
+      <ul class="nav acct-tabs" role="tablist" aria-label="Account sections">
+        <li role="presentation"><button class="acct-tab active" id="tabOverview" data-bs-toggle="tab" data-bs-target="#paneOverview" type="button" role="tab" aria-controls="paneOverview" aria-selected="true">Overview</button></li>
+        <li role="presentation"><button class="acct-tab" id="tabOrders" data-bs-toggle="tab" data-bs-target="#paneOrders" type="button" role="tab" aria-controls="paneOrders" aria-selected="false">Orders <span class="acct-tab-n" id="tabOrdersN">0</span></button></li>
+        <li role="presentation"><button class="acct-tab" id="tabDetails" data-bs-toggle="tab" data-bs-target="#paneDetails" type="button" role="tab" aria-controls="paneDetails" aria-selected="false">Details</button></li>
+        <li role="presentation"><button class="acct-tab" id="tabSecurity" data-bs-toggle="tab" data-bs-target="#paneSecurity" type="button" role="tab" aria-controls="paneSecurity" aria-selected="false">Security</button></li>
+      </ul>
 
-      <div class="row g-4">
-        <div class="col-lg-5">
+      <div class="tab-content">
+        <!-- OVERVIEW -->
+        <div class="tab-pane fade show active" id="paneOverview" role="tabpanel" aria-labelledby="tabOverview" tabindex="0">
+          <div class="acct-stats" id="acctStats" aria-label="Order summary">
+            <div class="acct-stat"><span class="acct-stat-n" id="stOrders">0</span><span class="acct-stat-l">Orders</span></div>
+            <div class="acct-stat"><span class="acct-stat-n" id="stOpen">0</span><span class="acct-stat-l">In progress</span></div>
+            <div class="acct-stat"><span class="acct-stat-n" id="stSpent">USD 0.00</span><span class="acct-stat-l">Total ordered</span></div>
+          </div>
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="acct-panel">
+                <h3 class="acct-h3">Latest order</h3>
+                <div id="latestOrder" aria-live="polite"><p class="acct-muted">Loading…</p></div>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="acct-panel">
+                <h3 class="acct-h3">Quick links</h3>
+                <ul class="acct-quick">
+                  <li><a href="products.html"><span>Browse products</span><i aria-hidden="true">→</i></a></li>
+                  <li><a href="contact.html"><span>Request a quote</span><i aria-hidden="true">→</i></a></li>
+                  <li><a href="track.html"><span>Track a guest order</span><i aria-hidden="true">→</i></a></li>
+                  <li><a href="https://wa.me/263780793585" target="_blank" rel="noopener"><span>WhatsApp support</span><i aria-hidden="true">→</i></a></li>
+                </ul>
+                <p class="acct-muted mb-0 mt-3">Mon–Fri 08:00–17:00 · Sat 08:00–13:00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="tab-pane fade" id="paneOrders" role="tabpanel" aria-labelledby="tabOrders" tabindex="0">
           <div class="acct-panel">
+            <div class="acct-panel-top">
+              <h3 class="acct-h3 mb-0">My orders</h3>
+              <div class="acct-filters" role="group" aria-label="Filter orders">
+                <button type="button" class="acct-chip active" data-filter="all" aria-pressed="true">All</button>
+                <button type="button" class="acct-chip" data-filter="open" aria-pressed="false">In progress</button>
+                <button type="button" class="acct-chip" data-filter="delivered" aria-pressed="false">Delivered</button>
+                <button type="button" class="acct-chip" data-filter="cancelled" aria-pressed="false">Cancelled</button>
+              </div>
+            </div>
+            <div id="ordersList" aria-live="polite"></div>
+          </div>
+          <p class="acct-help">Questions about an order? <a href="https://wa.me/263780793585" target="_blank" rel="noopener">WhatsApp us</a> or <a href="contact.html">send an enquiry</a>. Ordered as a guest? <a href="track.html">Track it here</a>.</p>
+        </div>
+
+        <!-- DETAILS -->
+        <div class="tab-pane fade" id="paneDetails" role="tabpanel" aria-labelledby="tabDetails" tabindex="0">
+          <div class="acct-panel acct-narrow">
             <h3 class="acct-h3">Your details</h3>
+            <p class="acct-muted">These are filled in for you at checkout.</p>
             <form id="profileForm" class="row g-3" novalidate>
               <div class="col-12"><label class="form-label" for="pf-email">Email</label>
                 <input type="email" id="pf-email" class="form-control" readonly aria-readonly="true"></div>
-              <div class="col-12"><label class="form-label" for="pf-name">Full name</label>
+              <div class="col-md-6"><label class="form-label" for="pf-name">Full name</label>
                 <input type="text" id="pf-name" class="form-control" autocomplete="name" maxlength="100" required></div>
-              <div class="col-12"><label class="form-label" for="pf-phone">Phone</label>
+              <div class="col-md-6"><label class="form-label" for="pf-phone">Phone</label>
                 <input type="tel" id="pf-phone" class="form-control" autocomplete="tel" maxlength="30" required></div>
               <div class="col-12"><button type="submit" class="btn btn-brand" id="pfBtn">Save details</button></div>
             </form>
           </div>
-          <div class="acct-panel mt-4">
+        </div>
+
+        <!-- SECURITY -->
+        <div class="tab-pane fade" id="paneSecurity" role="tabpanel" aria-labelledby="tabSecurity" tabindex="0">
+          <div class="acct-panel acct-narrow">
             <h3 class="acct-h3">Change password</h3>
             <form id="pwForm" class="row g-3" novalidate>
               <div class="col-12"><label class="form-label" for="pw-new">New password</label>
@@ -282,13 +336,6 @@
               <div class="col-12"><button type="submit" class="btn btn-outline-light" id="pwBtn">Update password</button></div>
             </form>
           </div>
-        </div>
-        <div class="col-lg-7">
-          <div class="acct-panel">
-            <h3 class="acct-h3">My orders</h3>
-            <div id="ordersList" aria-live="polite"></div>
-          </div>
-          <p class="acct-help">Questions about an order? <a href="https://wa.me/263780793585" target="_blank" rel="noopener">WhatsApp us</a> or <a href="contact.html">send an enquiry</a>. Ordered as a guest? <a href="track.html">Track it here</a>.</p>
         </div>
       </div>
     </section>

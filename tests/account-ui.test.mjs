@@ -49,10 +49,29 @@ const fake = (list, session = { user: { id: 'u1', email: 'alice@x.com', user_met
   ok(t('stOrders') === '3', 'stats: order count');
   ok(t('stOpen') === '1', 'stats: only pending/confirmed/shipped counted as in progress');
   ok(t('stSpent') === 'USD 50.50', 'stats: cancelled orders excluded from total');
-  ok(t('acctAvatar') === 'A' && t('acctEmailLine') === 'alice@x.com', 'header: avatar initial and email shown');
-  ok(w.document.querySelectorAll('.acct-steps').length === 3, 'orders: progress tracker on every order');
-  ok(w.document.querySelectorAll('.acct-steps')[0].querySelectorAll('li.on').length === 3, 'orders: shipped order highlights 3 of 4 steps');
+  ok(t('acctAvatar') === 'AM' && t('acctEmailLine') === 'alice@x.com', 'header: two-letter initials and email shown');
+  ok(t('welcomeName') === 'Alice' && t('tabOrdersN') === '3', 'header: first name and orders tab count');
+  ok(w.document.querySelectorAll('#latestOrder .acct-order').length === 1 && /Order #101/.test(t('latestOrder')), 'overview: latest order card shown');
+  ok(w.document.querySelectorAll('#ordersList .acct-steps').length === 3, 'orders: progress tracker on every order');
+  ok(w.document.querySelectorAll('#ordersList .acct-steps')[0].querySelectorAll('li.on').length === 3, 'orders: shipped order highlights 3 of 4 steps');
   ok(w.document.querySelector('.acct-steps.cancelled'), 'orders: cancelled order is styled as cancelled');
+}
+{ // order filters
+  const w = page(fake(orders)); await tick(); await tick();
+  const d = w.document, n = () => d.querySelectorAll('#ordersList .acct-order').length;
+  ok(n() === 3, 'filter: All shows every order');
+  d.querySelector('[data-filter="open"]').click();
+  ok(n() === 1 && d.querySelector('[data-filter="open"]').getAttribute('aria-pressed') === 'true', 'filter: In progress shows 1 and sets aria-pressed');
+  d.querySelector('[data-filter="cancelled"]').click();
+  ok(n() === 1, 'filter: Cancelled shows 1');
+  d.querySelector('[data-filter="delivered"]').click(); d.querySelector('[data-filter="all"]').click();
+  ok(n() === 3, 'filter: back to All');
+}
+{ // initials fallbacks
+  const one = fake([], { user: { id: 'u2', email: 'bob@x.com', user_metadata: {} } });
+  one.from = () => ({ select() { return this; }, eq() { return this; }, order() { return this; }, limit() { return Promise.resolve({ data: [], error: null }); }, maybeSingle: async () => ({ data: null }), update() { return this; } });
+  const w = page(one); await tick(); await tick();
+  ok(w.document.getElementById('acctAvatar').textContent === 'B', 'initials: no name falls back to email letter');
 }
 { // empty state
   const w = page(fake([])); await tick(); await tick();

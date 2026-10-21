@@ -1552,3 +1552,16 @@ body { background: #EEF0F2; }
 [hidden] { display: none !important; }
 .field-error { color: #ff8a7a; font-size: 12.5px; line-height: 1.4; margin-top: 2px; }
 .cf-input[aria-invalid="true"] { border-color: #e0584a; }
+
+/* ═══ NAV ACCOUNT BADGE (initials when signed in) ═══ */
+.nav-acct { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex: 0 0 38px; border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.7); font: 800 13px 'Saira', sans-serif; letter-spacing: 1px; text-decoration: none; transition: all 0.25s; }
+.nav-acct:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.nav-acct.is-in { background: var(--brand-orange, #F36523); border-color: var(--brand-orange, #F36523); color: #fff; }
+.nav-acct.is-in:hover { background: var(--brand-orange-dk, #C8470F); border-color: var(--brand-orange-dk, #C8470F); }
+.nav-acct:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.nav-acct:not(.is-in) { display: none; }
+.mnp-who { display: flex; align-items: center; gap: 14px; padding: 16px 0; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.12); color: #fff; text-decoration: none; }
+.mnp-who b { display: grid; place-items: center; width: 44px; height: 44px; background: var(--brand-orange, #F36523); font: 800 16px 'Saira', sans-serif; letter-spacing: 1px; }
+.mnp-who span { display: block; font: 700 15px 'Saira', sans-serif; }
+.mnp-who small { display: block; color: rgba(255,255,255,0.6); font-size: 12px; }
+@media (max-width: 1040px) { .nav-acct:not(.is-in) { display: inline-flex; } }
