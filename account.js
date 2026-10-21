@@ -103,6 +103,7 @@
     if (!sb) { banner('Cannot reach the account service. Please try again later.', 'err'); return; }
 
     const btn = $('regBtn'); busy(btn, true, 'Creating account…');
+    try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {}   // never keep an older login (e.g. admin) in this browser
     const { data, error } = await sb.auth.signUp({
       email: f.email, password: f.pass,
       options: { data: { full_name: f.name, phone: f.phone }, emailRedirectTo: location.origin + location.pathname },
@@ -254,11 +255,12 @@
     renderOrders();
   }));
 
-  async function loadOrders() {
+  async function loadOrders(userId) {
     const list = $('ordersList');
     list.innerHTML = '<p class="acct-muted">Loading your orders…</p>';
     const { data, error } = await sb.from('orders')
       .select('id, created_at, status, total, payment_method, items')
+      .eq('user_id', userId)                                  // only this customer's orders, even for an admin session
       .order('created_at', { ascending: false }).limit(50);
     if (error) {
       list.innerHTML = '<p class="acct-muted">Could not load your orders. Please refresh the page.</p>';
@@ -305,7 +307,7 @@
     if (!session) { show('viewAuth'); return; }
     show('viewAccount');
     tabFromHash();
-    await Promise.all([loadProfile(session.user), loadOrders()]);
+    await Promise.all([loadProfile(session.user), loadOrders(session.user.id)]);
   }
 
   if (sb) {

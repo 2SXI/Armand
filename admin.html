@@ -621,7 +621,7 @@ const CFG = {
 };
 
 const sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
-  auth: { persistSession: true, autoRefreshToken: true }
+  auth: { persistSession: true, autoRefreshToken: true, storageKey: 'armand-admin-auth' }
 });
 
 /* ── MOBILE SIDEBAR ─────────────────────────────────────────── */

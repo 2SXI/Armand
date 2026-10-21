@@ -1563,18 +1563,18 @@ body { background: #EEF0F2; }
 .nav-acct-name { font: 600 12px 'Saira', sans-serif; letter-spacing: 1px; text-transform: uppercase; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nav-acct-caret { opacity: .7; transition: transform .2s; }
 .nav-acct[aria-expanded="true"] .nav-acct-caret { transform: rotate(180deg); }
-.nav-user-menu { position: absolute; right: 0; top: calc(100% + 10px); width: 270px; background: #2a282b; border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 24px 60px rgba(0,0,0,.55); z-index: 1200; padding-bottom: 6px; }
+.nav-user-menu { position: absolute; right: 0; top: calc(100% + 10px); width: 270px; background: #fff; border: 1px solid #DFE3E7; box-shadow: 0 20px 50px rgba(30,34,40,.28); z-index: 1200; padding-bottom: 6px; }
 .nav-user-menu[hidden] { display: none; }
-.nav-user-menu::before { content: ''; position: absolute; right: 22px; top: -6px; width: 10px; height: 10px; background: #3a383b; border-left: 1px solid rgba(255,255,255,0.14); border-top: 1px solid rgba(255,255,255,0.14); transform: rotate(45deg); }
-.num-head { display: flex; align-items: center; gap: 12px; padding: 16px; background: #3a383b; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.nav-user-menu::before { content: ''; position: absolute; right: 22px; top: -6px; width: 10px; height: 10px; background: #F6F7F9; border-left: 1px solid #DFE3E7; border-top: 1px solid #DFE3E7; transform: rotate(45deg); }
+.num-head { position: relative; display: flex; align-items: center; gap: 12px; padding: 16px; background: #F6F7F9; border-bottom: 1px solid #DFE3E7; }
 .num-head b { flex: 0 0 44px; height: 44px; display: grid; place-items: center; background: var(--brand-orange, #F36523); color: #fff; font: 800 16px 'Saira', sans-serif; letter-spacing: 1px; }
 .num-head div { min-width: 0; }
-.num-head span { display: block; color: #fff; font: 700 14px 'Saira', sans-serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.num-head small { display: block; color: rgba(255,255,255,.6); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nav-user-menu a, .nav-user-menu .num-out { display: flex; align-items: center; width: 100%; min-height: 44px; padding: 0 16px; background: transparent; border: 0; color: rgba(255,255,255,.85); font: 600 12px 'Saira', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; text-align: left; cursor: pointer; }
-.nav-user-menu a:hover, .nav-user-menu .num-out:hover, .nav-user-menu a:focus-visible, .nav-user-menu .num-out:focus-visible { background: rgba(255,255,255,.07); color: #fff; outline: none; box-shadow: inset 3px 0 0 var(--brand-orange, #F36523); }
-.num-sep { height: 1px; background: rgba(255,255,255,.1); margin: 6px 0; }
-.nav-user-menu .num-out { color: #ff9b9b; }
+.num-head span { display: block; color: #2a282b; font: 700 14px 'Saira', sans-serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.num-head small { display: block; color: #5C6570; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-user-menu a, .nav-user-menu .num-out { display: flex; align-items: center; width: 100%; min-height: 44px; padding: 0 16px; background: transparent; border: 0; color: #2a282b; font: 600 12px 'Saira', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; text-align: left; cursor: pointer; }
+.nav-user-menu a:hover, .nav-user-menu .num-out:hover, .nav-user-menu a:focus-visible, .nav-user-menu .num-out:focus-visible { background: #EEF0F2; color: #2a282b; outline: none; box-shadow: inset 3px 0 0 var(--brand-orange, #F36523); }
+.num-sep { height: 1px; background: #DFE3E7; margin: 6px 0; }
+.nav-user-menu .num-out { color: #c62828; }
 .mnp-acct-links { margin-bottom: 8px; }
 .mnp-who { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.12); color: #fff; text-decoration: none; }
 .mnp-who b { display: grid; place-items: center; flex: 0 0 44px; height: 44px; background: var(--brand-orange, #F36523); font: 800 16px 'Saira', sans-serif; letter-spacing: 1px; }
