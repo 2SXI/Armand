@@ -26,3 +26,5 @@ then replace `.bs :root` with `.bs` and `.bs [data-bs-theme=dark]` with
 `.bs[data-bs-theme=dark],.bs [data-bs-theme=dark]` in the output.
 
 Bootstrap is MIT licensed (c) The Bootstrap Authors.
+
+Account page styling lives in `account.css` (loaded after `styles.css`).

@@ -48,6 +48,28 @@
   AV.live($('reg-pass2'), () => AV.match($('reg-pass').value, $('reg-pass2').value));
   AV.live($('log-email'), () => AV.email($('log-email').value));
 
+  /* ── show / hide password ─────────────────────────────── */
+  document.querySelectorAll('[data-toggle-pw]').forEach(b => b.addEventListener('click', () => {
+    const inp = $(b.dataset.togglePw), show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    b.textContent = show ? 'Hide' : 'Show';
+    b.setAttribute('aria-pressed', String(show));
+    b.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  }));
+
+  /* ── password strength meter ──────────────────────────── */
+  $('reg-pass').addEventListener('input', () => {
+    const v = $('reg-pass').value;
+    let n = 0;
+    if (v.length >= 8) n++;
+    if (/[A-Za-z]/.test(v) && /[0-9]/.test(v)) n++;
+    if (v.length >= 12) n++;
+    if (/[^A-Za-z0-9]/.test(v) && /[A-Z]/.test(v)) n++;
+    const bar = $('pwBar');
+    bar.style.width = (v ? Math.max(n, 1) * 25 : 0) + '%';
+    bar.style.background = ['#d9534f', '#d9534f', '#f0ad4e', '#8bc34a', '#2e9e5b'][v ? Math.max(n, 1) : 0];
+  });
+
   /* ── register ─────────────────────────────────────────── */
   $('registerForm').addEventListener('submit', async e => {
     e.preventDefault();
@@ -137,7 +159,10 @@
     $('pf-name').value  = (data && data.full_name) || (user.user_metadata && user.user_metadata.full_name) || '';
     $('pf-phone').value = (data && data.phone)     || (user.user_metadata && user.user_metadata.phone)     || '';
     $('pf-email').value = user.email || '';
-    $('welcomeName').textContent = ($('pf-name').value || user.email || '').split(' ')[0];
+    const first = ($('pf-name').value || user.email || '').split(' ')[0];
+    $('welcomeName').textContent = first;
+    $('acctAvatar').textContent = (first.charAt(0) || 'A').toUpperCase();
+    $('acctEmailLine').textContent = user.email || '';
   }
 
   $('profileForm').addEventListener('submit', async e => {
@@ -150,7 +175,20 @@
     busy(btn, false);
     if (error) { banner('Could not save your details. Please try again.', 'err'); return; }
     $('welcomeName').textContent = name.split(' ')[0];
+    $('acctAvatar').textContent = (name.charAt(0) || 'A').toUpperCase();
     banner('Details saved.', 'ok');
+  });
+
+  $('pwForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const p1 = $('pw-new').value, p2 = $('pw-new2').value;
+    if (!AV.check([[$('pw-new'), AV.password(p1)], [$('pw-new2'), AV.match(p1, p2)]])) return;
+    const btn = $('pwBtn'); busy(btn, true, 'Updating…');
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    busy(btn, false);
+    if (error) { banner(friendly(error), 'err'); return; }
+    $('pwForm').reset();
+    banner('Password updated.', 'ok');
   });
 
   const money = n => 'USD ' + Number(n || 0).toFixed(2);
@@ -161,8 +199,12 @@
       .select('id, created_at, status, total, payment_method, items')
       .order('created_at', { ascending: false }).limit(50);
     if (error) { list.innerHTML = '<p class="acct-muted">Could not load your orders. Please refresh the page.</p>'; return; }
+    const sum = data.filter(o => o.status !== 'cancelled');
+    $('stOrders').textContent = data.length;
+    $('stOpen').textContent = data.filter(o => ['pending', 'confirmed', 'shipped'].includes(o.status || 'pending')).length;
+    $('stSpent').textContent = money(sum.reduce((t, o) => t + Number(o.total || 0), 0));
     if (!data.length) {
-      list.innerHTML = '<p class="acct-muted">No orders yet. Orders you place while signed in will appear here. <a href="products.html">Browse products</a>.</p>';
+      list.innerHTML = '<div class="acct-empty"><strong>No orders yet</strong>No orders yet. Orders you place while signed in will appear here.<br><a class="btn btn-brand" href="products.html">Browse products</a></div>';
       return;
     }
     const BADGE = { pending: 'secondary', confirmed: 'primary', shipped: 'info', delivered: 'success', cancelled: 'danger' };
@@ -170,11 +212,14 @@
       const when = new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       const items = (o.items || []).map(i => `<li class="py-1">${esc(i.name)} <b>× ${esc(i.qty)}</b></li>`).join('');
       const st = esc(o.status || 'pending');
+      const STEPS = ['pending', 'confirmed', 'shipped', 'delivered'], at = STEPS.indexOf(st);
+      const steps = '<ol class="acct-steps' + (st === 'cancelled' ? ' cancelled' : '') + '" aria-label="Order progress">' +
+        STEPS.map((x, i) => '<li' + (at >= i ? ' class="on"' : '') + '>' + x + '</li>').join('') + '</ol>';
       return `<article class="card mb-3 acct-order">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center"><strong>Order #${esc(o.id)}</strong><span class="badge bg-${BADGE[st] || 'secondary'}">${st}</span></div>
+          <div class="d-flex justify-content-between align-items-center"><strong class="acct-order-no">Order #${esc(o.id)}</strong><span class="badge bg-${BADGE[st] || 'secondary'}">${st}</span></div>
           <div class="acct-muted">${when} · ${esc(o.payment_method || '')}</div>
-          <ul class="list-unstyled my-3">${items}</ul>
+          ${steps}<ul class="list-unstyled my-3">${items}</ul>
           <div class="d-flex justify-content-between border-top pt-2"><span>Total</span><strong>${money(o.total)}</strong></div>
         </div>
       </article>`;

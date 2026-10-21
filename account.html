@@ -23,6 +23,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="stylesheet" href="bootstrap-scoped.css">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="account.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -67,8 +68,8 @@
       <li><a href="products.html" class="nav-link">Products</a></li>
       <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
       <li><a href="trade.html" class="nav-link">Trade</a></li>
-      <li><a href="contact.html" class="nav-link active">Contact</a></li>
-      <li><a href="account.html" class="nav-link">Account</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li><a href="account.html" class="nav-link active" aria-current="page">Account</a></li>
     </ul>
 
     <div class="nav-actions">
@@ -118,115 +119,176 @@
   <div class="container page-hero-inner">
     <div class="eyebrow">Customer Account</div>
     <h1>My <span class="accent">Account</span></h1>
-    <p>Sign in to see your orders. Checking out as a guest still works, you never need an account to buy.</p>
+    <p>Track orders, save your details and check out faster. Prefer not to sign up? Guest checkout always works.</p>
   </div>
 </section>
 
-<main class="contact-section acct-wrap">
+<main class="acct-wrap">
 <div class="bs" data-bs-theme="dark">
   <div class="container acct-container">
     <div id="acctMsg" role="status" aria-live="polite" hidden></div>
 
     <!-- SIGNED OUT -->
     <section id="viewAuth" aria-label="Sign in or create an account">
-      <ul class="nav nav-tabs mb-4" role="tablist" aria-label="Account options">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="tabLogin" data-bs-toggle="tab" data-bs-target="#panelLogin" type="button" role="tab" aria-controls="panelLogin" aria-selected="true">Sign in</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tabRegister" data-bs-toggle="tab" data-bs-target="#panelRegister" type="button" role="tab" aria-controls="panelRegister" aria-selected="false">Create account</button>
-        </li>
-      </ul>
+      <div class="acct-split">
+        <aside class="acct-side" aria-label="Why create an account">
+          <div class="acct-side-eyebrow">Armand Customer Account</div>
+          <h2 class="acct-side-title">Your orders, <span>all in one place.</span></h2>
+          <ul class="acct-perks">
+            <li><span class="acct-perk-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></span><div><strong>Live order tracking</strong><span>See every order and its status from pending to delivered.</span></div></li>
+            <li><span class="acct-perk-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><strong>Faster checkout</strong><span>Your name and phone are filled in for you every time.</span></div></li>
+            <li><span class="acct-perk-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><strong>Private and secure</strong><span>Passwords are encrypted. Only you can see your orders.</span></div></li>
+          </ul>
+          <div class="acct-side-foot">Need help? <a href="https://wa.me/263780793585" target="_blank" rel="noopener">WhatsApp 078 079 3585</a><br>Mon–Fri 08:00–17:00 · Sat 08:00–13:00</div>
+        </aside>
 
-      <div class="tab-content">
-        <div class="tab-pane active" id="panelLogin" role="tabpanel" aria-labelledby="tabLogin" tabindex="0">
-          <form id="loginForm" class="row g-3 acct-narrow" novalidate>
-            <div class="col-12">
-              <label class="form-label" for="log-email">Email</label>
-              <input type="email" id="log-email" class="form-control" autocomplete="email" maxlength="200" required>
-            </div>
-            <div class="col-12">
-              <label class="form-label" for="log-pass">Password</label>
-              <input type="password" id="log-pass" class="form-control" autocomplete="current-password" maxlength="72" required>
-            </div>
-            <div class="col-12 d-flex flex-wrap align-items-center gap-3">
-              <button type="submit" class="btn btn-brand btn-lg" id="logBtn">Sign in →</button>
-              <a href="#" id="forgotLink" class="acct-link">Forgot password?</a>
-            </div>
-            <p class="col-12 acct-muted mb-0">We only use your details to manage your account and orders. <a href="legal.html#privacy" target="_blank" rel="noopener">Read our Privacy Policy</a> (opens in a new tab).</p>
-          </form>
-        </div>
+        <div class="acct-card">
+          <ul class="nav nav-tabs nav-fill" role="tablist" aria-label="Account options">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="tabLogin" data-bs-toggle="tab" data-bs-target="#panelLogin" type="button" role="tab" aria-controls="panelLogin" aria-selected="true">Sign in</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tabRegister" data-bs-toggle="tab" data-bs-target="#panelRegister" type="button" role="tab" aria-controls="panelRegister" aria-selected="false">Create account</button>
+            </li>
+          </ul>
 
-        <div class="tab-pane" id="panelRegister" role="tabpanel" aria-labelledby="tabRegister" tabindex="0">
-          <form id="registerForm" class="row g-3 acct-narrow" novalidate>
-            <div aria-hidden="true" class="acct-hp"><label for="reg-website">Leave this field empty</label><input type="text" id="reg-website" tabindex="-1" autocomplete="off"></div>
-            <div class="col-12">
-              <label class="form-label" for="reg-name">Full name</label>
-              <input type="text" id="reg-name" class="form-control" autocomplete="name" maxlength="100" required>
+          <div class="tab-content acct-card-body">
+            <div class="tab-pane active" id="panelLogin" role="tabpanel" aria-labelledby="tabLogin" tabindex="0">
+              <h2 class="acct-form-title">Welcome back</h2>
+              <p class="acct-form-sub">Sign in to view your orders and details.</p>
+              <form id="loginForm" class="row g-3" novalidate>
+                <div class="col-12">
+                  <label class="form-label" for="log-email">Email</label>
+                  <input type="email" id="log-email" class="form-control" autocomplete="email" maxlength="200" placeholder="name@example.com" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="log-pass">Password</label>
+                  <div class="acct-pw">
+                    <input type="password" id="log-pass" class="form-control" autocomplete="current-password" maxlength="72" required>
+                    <button type="button" class="acct-eye" data-toggle-pw="log-pass" aria-label="Show password" aria-pressed="false">Show</button>
+                  </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end"><a href="#" id="forgotLink" class="acct-link">Forgot password?</a></div>
+                <div class="col-12"><button type="submit" class="btn btn-brand btn-lg w-100" id="logBtn">Sign in →</button></div>
+                <p class="col-12 acct-muted mb-0">We only use your details to manage your account and orders. <a href="legal.html#privacy" target="_blank" rel="noopener">Privacy Policy</a> (opens in a new tab).</p>
+              </form>
             </div>
-            <div class="col-md-6">
-              <label class="form-label" for="reg-email">Email</label>
-              <input type="email" id="reg-email" class="form-control" autocomplete="email" maxlength="200" required>
+
+            <div class="tab-pane" id="panelRegister" role="tabpanel" aria-labelledby="tabRegister" tabindex="0">
+              <h2 class="acct-form-title">Create your account</h2>
+              <p class="acct-form-sub">Takes under a minute. No card details needed.</p>
+              <form id="registerForm" class="row g-3" novalidate>
+                <div aria-hidden="true" class="acct-hp"><label for="reg-website">Leave this field empty</label><input type="text" id="reg-website" tabindex="-1" autocomplete="off"></div>
+                <div class="col-12">
+                  <label class="form-label" for="reg-name">Full name</label>
+                  <input type="text" id="reg-name" class="form-control" autocomplete="name" maxlength="100" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="reg-email">Email</label>
+                  <input type="email" id="reg-email" class="form-control" autocomplete="email" maxlength="200" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="reg-phone">Phone</label>
+                  <input type="tel" id="reg-phone" class="form-control" autocomplete="tel" placeholder="+263 xxx xxx xxx" maxlength="30" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="reg-pass">Password</label>
+                  <div class="acct-pw">
+                    <input type="password" id="reg-pass" class="form-control" autocomplete="new-password" maxlength="72" required>
+                    <button type="button" class="acct-eye" data-toggle-pw="reg-pass" aria-label="Show password" aria-pressed="false">Show</button>
+                  </div>
+                  <div class="acct-meter" aria-hidden="true"><span id="pwBar"></span></div>
+                  <div class="form-text acct-muted" id="pwHint">8+ characters, with a letter and a number.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="reg-pass2">Confirm password</label>
+                  <div class="acct-pw">
+                    <input type="password" id="reg-pass2" class="form-control" autocomplete="new-password" maxlength="72" required>
+                    <button type="button" class="acct-eye" data-toggle-pw="reg-pass2" aria-label="Show password" aria-pressed="false">Show</button>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="reg-terms" required>
+                    <label class="form-check-label" for="reg-terms">I have read the <a href="legal.html#privacy" target="_blank" rel="noopener">Privacy Policy</a> (opens in a new tab).</label>
+                  </div>
+                </div>
+                <div class="col-12"><button type="submit" class="btn btn-brand btn-lg w-100" id="regBtn">Create account →</button></div>
+              </form>
             </div>
-            <div class="col-md-6">
-              <label class="form-label" for="reg-phone">Phone</label>
-              <input type="tel" id="reg-phone" class="form-control" autocomplete="tel" placeholder="+263 xxx xxx xxx" maxlength="30" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label" for="reg-pass">Password</label>
-              <input type="password" id="reg-pass" class="form-control" autocomplete="new-password" maxlength="72" required>
-              <div class="form-text acct-muted">8+ characters, with a letter and a number.</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label" for="reg-pass2">Confirm password</label>
-              <input type="password" id="reg-pass2" class="form-control" autocomplete="new-password" maxlength="72" required>
-            </div>
-            <div class="col-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="reg-terms" required>
-                <label class="form-check-label" for="reg-terms">I have read the <a href="legal.html#privacy" target="_blank" rel="noopener">Privacy Policy</a> (opens in a new tab).</label>
-              </div>
-            </div>
-            <div class="col-12"><button type="submit" class="btn btn-brand btn-lg" id="regBtn">Create account →</button></div>
-          </form>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- SET NEW PASSWORD (from the reset email) -->
     <section id="viewRecover" aria-label="Choose a new password" hidden>
-      <h2 class="acct-h mb-4">Choose a new password</h2>
-      <form id="recoverForm" class="row g-3 acct-narrow" novalidate>
-        <div class="col-12"><label class="form-label" for="rec-pass">New password</label>
-          <input type="password" id="rec-pass" class="form-control" autocomplete="new-password" maxlength="72" required></div>
-        <div class="col-12"><label class="form-label" for="rec-pass2">Confirm new password</label>
-          <input type="password" id="rec-pass2" class="form-control" autocomplete="new-password" maxlength="72" required></div>
-        <div class="col-12"><button type="submit" class="btn btn-brand btn-lg" id="recBtn">Save password →</button></div>
-      </form>
+      <div class="acct-card acct-card-center">
+        <div class="acct-card-body">
+          <h2 class="acct-form-title">Choose a new password</h2>
+          <p class="acct-form-sub">Pick something you have not used elsewhere.</p>
+          <form id="recoverForm" class="row g-3" novalidate>
+            <div class="col-12"><label class="form-label" for="rec-pass">New password</label>
+              <input type="password" id="rec-pass" class="form-control" autocomplete="new-password" maxlength="72" required></div>
+            <div class="col-12"><label class="form-label" for="rec-pass2">Confirm new password</label>
+              <input type="password" id="rec-pass2" class="form-control" autocomplete="new-password" maxlength="72" required></div>
+            <div class="col-12"><button type="submit" class="btn btn-brand btn-lg w-100" id="recBtn">Save password →</button></div>
+          </form>
+        </div>
+      </div>
     </section>
 
     <!-- SIGNED IN -->
     <section id="viewAccount" aria-label="Your account" hidden>
-      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <h2 class="acct-h mb-0">Welcome, <span id="welcomeName"></span></h2>
-        <button type="button" class="btn btn-outline-light" id="logoutBtn">Sign out</button>
+      <header class="acct-head">
+        <div class="acct-avatar" id="acctAvatar" aria-hidden="true">A</div>
+        <div class="acct-head-text">
+          <h2 class="acct-h mb-0">Welcome, <span id="welcomeName"></span></h2>
+          <p class="acct-muted mb-0" id="acctEmailLine"></p>
+        </div>
+        <div class="acct-head-actions">
+          <a href="products.html" class="btn btn-outline-light">Shop products</a>
+          <button type="button" class="btn btn-outline-light" id="logoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <div class="acct-stats" id="acctStats" aria-label="Order summary">
+        <div class="acct-stat"><span class="acct-stat-n" id="stOrders">0</span><span class="acct-stat-l">Orders</span></div>
+        <div class="acct-stat"><span class="acct-stat-n" id="stOpen">0</span><span class="acct-stat-l">In progress</span></div>
+        <div class="acct-stat"><span class="acct-stat-n" id="stSpent">USD 0.00</span><span class="acct-stat-l">Total ordered</span></div>
       </div>
-      <div class="row g-5">
+
+      <div class="row g-4">
         <div class="col-lg-5">
-          <h3 class="acct-h3">Your details</h3>
-          <form id="profileForm" class="row g-3" novalidate>
-            <div class="col-12"><label class="form-label" for="pf-email">Email</label>
-              <input type="email" id="pf-email" class="form-control" readonly aria-readonly="true"></div>
-            <div class="col-12"><label class="form-label" for="pf-name">Full name</label>
-              <input type="text" id="pf-name" class="form-control" autocomplete="name" maxlength="100" required></div>
-            <div class="col-12"><label class="form-label" for="pf-phone">Phone</label>
-              <input type="tel" id="pf-phone" class="form-control" autocomplete="tel" maxlength="30" required></div>
-            <div class="col-12"><button type="submit" class="btn btn-brand" id="pfBtn">Save details</button></div>
-          </form>
+          <div class="acct-panel">
+            <h3 class="acct-h3">Your details</h3>
+            <form id="profileForm" class="row g-3" novalidate>
+              <div class="col-12"><label class="form-label" for="pf-email">Email</label>
+                <input type="email" id="pf-email" class="form-control" readonly aria-readonly="true"></div>
+              <div class="col-12"><label class="form-label" for="pf-name">Full name</label>
+                <input type="text" id="pf-name" class="form-control" autocomplete="name" maxlength="100" required></div>
+              <div class="col-12"><label class="form-label" for="pf-phone">Phone</label>
+                <input type="tel" id="pf-phone" class="form-control" autocomplete="tel" maxlength="30" required></div>
+              <div class="col-12"><button type="submit" class="btn btn-brand" id="pfBtn">Save details</button></div>
+            </form>
+          </div>
+          <div class="acct-panel mt-4">
+            <h3 class="acct-h3">Change password</h3>
+            <form id="pwForm" class="row g-3" novalidate>
+              <div class="col-12"><label class="form-label" for="pw-new">New password</label>
+                <input type="password" id="pw-new" class="form-control" autocomplete="new-password" maxlength="72" required></div>
+              <div class="col-12"><label class="form-label" for="pw-new2">Confirm new password</label>
+                <input type="password" id="pw-new2" class="form-control" autocomplete="new-password" maxlength="72" required></div>
+              <div class="col-12"><button type="submit" class="btn btn-outline-light" id="pwBtn">Update password</button></div>
+            </form>
+          </div>
         </div>
         <div class="col-lg-7">
-          <h3 class="acct-h3">My orders</h3>
-          <div id="ordersList" aria-live="polite"></div>
+          <div class="acct-panel">
+            <h3 class="acct-h3">My orders</h3>
+            <div id="ordersList" aria-live="polite"></div>
+          </div>
+          <p class="acct-help">Questions about an order? <a href="https://wa.me/263780793585" target="_blank" rel="noopener">WhatsApp us</a> or <a href="contact.html">send an enquiry</a>. Ordered as a guest? <a href="track.html">Track it here</a>.</p>
         </div>
       </div>
     </section>

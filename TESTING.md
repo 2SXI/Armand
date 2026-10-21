@@ -34,7 +34,7 @@
 | T32 | Guest order tracking by order number + phone | delivered / nothing for wrong phone | ✔ |
 | — | Migration is safe to run repeatedly | 3 runs, no errors | ✔ |
 
-Run the front-end tests with `node tests/frontend.test.mjs` and `node tests/checkout-account.test.mjs`.
+Run the front-end tests with `node tests/frontend.test.mjs`, `node tests/checkout-account.test.mjs`, `node tests/account-ui.test.mjs` and the site-wide `node tests/site-audit.mjs`. See FINAL-CHECKS.md for the launch checklist.
 
 Bug found by testing and fixed: the first version of the migration failed when run a second time (missing `DROP POLICY IF EXISTS`).
 
