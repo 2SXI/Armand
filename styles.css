@@ -173,7 +173,7 @@ ul { list-style: none; }
 .topbar-wa:hover { color: var(--accent-green); }
 
 /* ── NAV ──────────────────────────────────────────────────── */
-nav {
+nav:not([aria-label="Breadcrumb"]) {
   position: sticky; top: 0; z-index: 500;
   background: rgba(30,29,31,0.96);
   backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
@@ -1069,7 +1069,7 @@ footer { background: var(--black); border-top: 3px solid rgba(255,255,255,0.04);
   .announcement-bar { padding: 10px 20px; }
   .ab-inner { flex-direction: column; gap: 4px; text-align: center; }
   .topbar { display: none; }
-  nav { position: sticky; top: 0; }
+  nav:not([aria-label="Breadcrumb"]) { position: sticky; top: 0; }
   .nav-inner { padding: 0 20px; height: 64px; }
   .nav-menu, .nav-wa { display: none; }
   .nav-hamburger { display: flex; }
@@ -1354,7 +1354,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 /* ── Tablet / small-laptop nav fix: switch to the menu button before the full nav runs out of room ── */
 @media (max-width: 1040px) {
   .topbar { display: none; }
-  nav { position: sticky; top: 0; }
+  nav:not([aria-label="Breadcrumb"]) { position: sticky; top: 0; }
   .nav-inner { padding: 0 20px; height: 64px; }
   .nav-menu, .nav-wa { display: none; }
   .nav-hamburger { display: flex; }
@@ -1547,3 +1547,27 @@ body { background: #EEF0F2; }
 .mnp-wa:hover{background:var(--brand-orange-dk);}
 .mnp-contact{min-height:46px;padding:0 14px;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,.35);}
 @media (min-width:1041px){.mobile-nav-panel,.mnp-overlay{display:none;}}
+
+/* ── Form validation messages + customer account page ───────── */
+[hidden] { display: none !important; }
+.field-error { color: #ff8a7a; font-size: 12.5px; line-height: 1.4; margin-top: 2px; }
+.cf-input[aria-invalid="true"] { border-color: #e0584a; }
+.acct-wrap { padding: 56px 0 80px; }
+.acct-container { max-width: 980px; }
+.acct-narrow { max-width: 600px; }
+.bs { --bs-body-bg: #2a292b; --bs-body-color: #fff; --bs-border-color: rgba(255,255,255,0.18); color: #fff; font-family: 'Barlow', sans-serif; }
+.bs .form-control { min-height: 48px; }
+.bs .form-control:focus { border-color: #fff; box-shadow: 0 0 0 .2rem rgba(255,255,255,.18); }
+.bs .nav-tabs .nav-link { font: 700 13px 'Saira', sans-serif; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); min-height: 48px; }
+.bs .nav-tabs .nav-link.active { color: #fff; background: transparent; border-color: transparent transparent #F36523; border-bottom-width: 3px; }
+.bs .btn-brand { --bs-btn-color:#fff; --bs-btn-bg:#F36523; --bs-btn-border-color:#F36523; --bs-btn-hover-color:#fff; --bs-btn-hover-bg:#C8470F; --bs-btn-hover-border-color:#C8470F; --bs-btn-active-bg:#C8470F; --bs-btn-active-border-color:#C8470F; --bs-btn-disabled-bg:#F36523; --bs-btn-disabled-border-color:#F36523; font: 800 13px 'Saira', sans-serif; letter-spacing: 2.5px; text-transform: uppercase; border-radius: 0; }
+.bs .btn-outline-light { border-radius: 0; font: 700 12px 'Saira', sans-serif; letter-spacing: 2px; text-transform: uppercase; min-height: 44px; }
+.bs .btn:focus-visible, .bs .nav-link:focus-visible, .bs a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.acct-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.acct-muted { color: rgba(255,255,255,0.65) !important; font-size: 13px; }
+.bs a, .acct-link { color: #fff; }
+.acct-link { font-size: 13px; }
+.acct-h { font: 800 30px 'Saira', sans-serif; color: #fff; }
+.acct-h3 { font: 700 15px 'Saira', sans-serif; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.8); margin: 0 0 16px; }
+.bs .card-body { padding: 16px 18px; }
+@media (max-width: 760px) { .acct-wrap { padding: 36px 0 60px; } }

@@ -693,7 +693,10 @@ const Checkout = {
     const btn = document.getElementById('broc-place-btn');
     const fail = html => { errEl.innerHTML = html; errEl.style.display = 'block'; };
 
-    if (!name || !phone) return fail('Please enter your name and phone number.');
+    if (!name || name.length < 2) return fail('Please enter your full name.');
+    if (!phone || !/^[0-9+() -]{7,30}$/.test(phone) || phone.replace(/\D/g, '').length < 7)
+      return fail('Please enter a valid phone number, e.g. +263 78 079 3585.');
+    if (mode === 'deliver' && address.length > 300) return fail('That address is too long (300 characters maximum).');
     if (mode === 'deliver' && !address) return fail('Please enter a delivery address, or choose collection.');
     errEl.style.display = 'none';
 
@@ -1070,6 +1073,50 @@ document.addEventListener('DOMContentLoaded', () => {
   window.Checkout = Checkout;
   window.Products = Products;
   window.SHOP     = SHOP;
+
+  /* ── Customer account experience ─────────────────────────────
+     Signed in: menu says "Hi, Name", checkout is prefilled and the order is saved to My orders.
+     Guest: checkout works exactly as before, with a gentle note about signing in. */
+  const acctSB = getSB();
+  const firstName = u => String((u.user_metadata && u.user_metadata.full_name) || '').trim().split(' ')[0];
+  async function currentUser() {
+    try { const { data } = await acctSB.auth.getSession(); return data.session ? data.session.user : null; }
+    catch (e) { return null; }
+  }
+  async function refreshNavAccount() {
+    if (!acctSB) return;
+    const u = await currentUser();
+    document.querySelectorAll('a.nav-link[href="account.html"]').forEach(a => {
+      a.textContent = u ? ('Hi, ' + (firstName(u) || 'there')) : 'Account';
+      a.setAttribute('aria-label', u ? 'My account and orders' : 'Sign in or create an account');
+    });
+  }
+  if (acctSB) {
+    refreshNavAccount();
+    acctSB.auth.onAuthStateChange(() => refreshNavAccount());
+
+    if (Checkout._acctWrapped) return;
+    Checkout._acctWrapped = true;
+    const baseOpen = Checkout.open;
+    Checkout.open = async function () {
+      baseOpen.call(this);
+      const sub = document.querySelector('#broc-step-details .sub');
+      if (!sub) return;
+      let note = document.getElementById('broc-acct-note');
+      if (!note) { note = document.createElement('p'); note.id = 'broc-acct-note'; note.className = 'sub'; sub.insertAdjacentElement('afterend', note); }
+      const u = await currentUser();
+      if (!u) {
+        note.innerHTML = 'Want to track this order in your account? <a href="account.html">Sign in or create an account</a> first. Your cart is kept.';
+        return;
+      }
+      note.textContent = 'Signed in as ' + u.email + '. This order will appear under My orders.';
+      const nameEl = document.getElementById('broc-co-name'), phoneEl = document.getElementById('broc-co-phone');
+      if (nameEl && phoneEl && (!nameEl.value || !phoneEl.value)) {
+        const { data } = await acctSB.from('profiles').select('full_name, phone').eq('user_id', u.id).maybeSingle();
+        if (data) { if (!nameEl.value && data.full_name) nameEl.value = data.full_name; if (!phoneEl.value && data.phone) phoneEl.value = data.phone; }
+      }
+    };
+  }
 
   // Handle ?payment=success return from Paynow
   if (window.location.search.includes('payment=success')) {

@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Armand Admin — Management Console</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="validate.js"></script>
 <style>
 @font-face{font-family:'Saira';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/saira-latin-500-normal.woff2') format('woff2');}
 @font-face{font-family:'Saira';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/saira-latin-600-normal.woff2') format('woff2');}
@@ -662,6 +663,21 @@ async function adminLogin() {
     document.getElementById('adm-pass').focus();
     return;
   }
+  await enterIfAdmin();
+}
+
+/* Being signed in is not enough: the account must also be in the admins table.
+   (The database enforces this too, via is_admin() in every policy; this is the friendly front door.) */
+async function enterIfAdmin() {
+  const { data: ok, error } = await sb.rpc('is_admin');
+  if (error || ok !== true) {
+    await sb.auth.signOut();
+    showLogin();
+    const err = document.getElementById('login-err');
+    err.textContent = 'This account does not have admin access. Customers can sign in at My Account instead.';
+    err.style.display = 'block';
+    return;
+  }
   showApp();
 }
 
@@ -676,7 +692,7 @@ document.getElementById('adm-user').addEventListener('keydown', e => { if (e.key
 /* Check for an existing session on load (handles refresh / persisted login) */
 (async () => {
   const { data } = await sb.auth.getSession();
-  if (data.session) { showApp(); } else { showLogin(); }
+  if (data.session) { await enterIfAdmin(); } else { showLogin(); }
 })();
 
 /* Keep the UI in sync if the session expires or the user signs out elsewhere */
@@ -916,9 +932,19 @@ async function saveProduct() {
   const errEl    = document.getElementById('pm-error');
   const saveBtn  = document.getElementById('pm-save-btn');
 
-  if (!name)                 { errEl.textContent = 'Product name is required.'; errEl.style.display = 'block'; return; }
-  if (!priceVal || isNaN(price) || price < 0) { errEl.textContent = 'Please enter a valid price.'; errEl.style.display = 'block'; return; }
-  if (!category)             { errEl.textContent = 'Please select a category.'; errEl.style.display = 'block'; return; }
+  const oldRaw = document.getElementById('pm-old-price').value;
+  const stkRaw = document.getElementById('pm-stock').value;
+  const problem =
+      AV.text(name, 1, 200, 'Product name')
+   || AV.number(priceVal, { min: 0, max: 1000000, label: 'Price' })
+   || AV.number(oldRaw,  { min: 0, max: 1000000, label: 'Old price', required: false })
+   || (oldRaw && parseFloat(oldRaw) <= price ? 'Old price should be higher than the price (or leave it empty).' : '')
+   || AV.number(stkRaw,  { min: 0, max: 1000000, label: 'Stock', required: false })
+   || (stkRaw !== '' && !/^\d+$/.test(stkRaw) ? 'Stock must be a whole number.' : '')
+   || (category ? '' : 'Please select a category.')
+   || AV.text(document.getElementById('pm-sku').value, 0, 60, 'SKU')
+   || AV.text(document.getElementById('pm-description').value, 0, 5000, 'Description');
+  if (problem) { errEl.textContent = problem; errEl.style.display = 'block'; errEl.scrollIntoView({ block: 'nearest' }); return; }
   errEl.style.display = 'none';
 
   const stockRaw    = document.getElementById('pm-stock').value;

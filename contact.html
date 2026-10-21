@@ -121,6 +121,7 @@
       <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
       <li><a href="trade.html" class="nav-link">Trade</a></li>
       <li><a href="contact.html" class="nav-link active">Contact</a></li>
+      <li><a href="account.html" class="nav-link">Account</a></li>
     </ul>
 
     <div class="nav-actions">
@@ -239,7 +240,7 @@
 
       <div class="contact-right">
         <div class="eyebrow" style="color:var(--steel-lt);margin-bottom:24px;">Product & Trade Enquiry</div>
-        <form class="contact-form" id="enquiryForm" onsubmit="submitEnquiry(event)">
+        <form class="contact-form" id="enquiryForm" novalidate onsubmit="submitEnquiry(event)">
 <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"><label for="cf-website">Leave this field empty</label><input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off"></div>
 
           <div class="cf-row">
@@ -375,6 +376,7 @@
   <button class="cn-accept" onclick="acceptCookies()">Accept</button>
 </div>
 
+<script src="validate.js"></script>
 <script src="app.js"></script>
 
 

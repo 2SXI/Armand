@@ -55,7 +55,16 @@ async function submitEnquiry(e) {
   const cat       = document.getElementById('cf-cat')?.value;
   const message   = document.getElementById('cf-message')?.value?.trim();
 
-  if (!name || !phone || !type || !message) { showToast('Please fill in all required fields.'); return; }
+  if (window.AV) {
+    const ok = AV.check([
+      [document.getElementById('cf-name'),    AV.name(name, 'name')],
+      [document.getElementById('cf-phone'),   AV.phone(phone)],
+      [document.getElementById('cf-email'),   AV.email(email, false)],
+      [document.getElementById('cf-type'),    type ? '' : 'Please choose an enquiry type.'],
+      [document.getElementById('cf-message'), AV.text(message, 5, 3000, 'Your message')],
+    ]);
+    if (!ok) return;
+  } else if (!name || !phone || !type || !message) { showToast('Please fill in all required fields.'); return; }
 
   submitBtn.textContent = 'Submitting...';
   submitBtn.disabled    = true;
