@@ -228,6 +228,7 @@
         ${steps}
         ${expanded ? `<ul class="list-unstyled my-3">${items}</ul>` : (items ? `<details class="acct-more"><summary>View items</summary><ul class="list-unstyled my-2">${items}</ul></details>` : '')}
         <div class="d-flex justify-content-between border-top pt-2 mt-2"><span>Total</span><strong>${money(o.total)}</strong></div>
+        <div class="acct-order-act"><button type="button" class="btn btn-outline-dark btn-sm" data-act="reorder" data-id="${esc(o.id)}">Order again</button><button type="button" class="btn btn-outline-dark btn-sm" data-act="receipt" data-id="${esc(o.id)}">Receipt</button></div>
       </div>
     </article>`;
   }
@@ -235,9 +236,11 @@
   function renderOrders() {
     const list = $('ordersList');
     const f = activeFilter;
+    const q = (($('orderSearch') || {}).value || '').toLowerCase().trim();
     const rows = allOrders.filter(o => {
       const st = o.status || 'pending';
-      return f === 'all' || (f === 'open' ? OPEN.includes(st) : st === f);
+      const hit = !q || String(o.id).includes(q.replace('#', '')) || (o.items || []).some(i => String(i.name || '').toLowerCase().includes(q));
+      return hit && (f === 'all' || (f === 'open' ? OPEN.includes(st) : st === f));
     });
     if (!allOrders.length) {
       list.innerHTML = '<div class="acct-empty"><strong>No orders yet</strong>No orders yet. Orders you place while signed in will appear here.<br><a class="btn btn-brand" href="products.html">Browse products</a></div>';
@@ -254,6 +257,29 @@
     });
     renderOrders();
   }));
+
+  if ($('orderSearch')) $('orderSearch').addEventListener('input', renderOrders);
+
+  function receipt(o) {
+    const w = window.open('', '_blank'); if (!w) { banner('Allow pop-ups to print your receipt.', 'err'); return; }
+    const rows = (o.items || []).map(i => `<tr><td>${esc(i.name)}</td><td>${esc(i.qty)}</td><td>${money(i.price)}</td><td>${money((+i.price || 0) * (+i.qty || 0))}</td></tr>`).join('');
+    w.document.write(`<!doctype html><title>Order #${esc(o.id)}</title><style>body{font:14px Arial,sans-serif;padding:32px;max-width:720px;margin:auto;color:#222}h1{font-size:20px;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin:18px 0}td,th{border-bottom:1px solid #ddd;padding:8px;text-align:left}.t{text-align:right;font-weight:700;font-size:16px}</style><h1>Armand Carpentry &amp; Designs</h1><p>Order #${esc(o.id)} &middot; ${new Date(o.created_at).toLocaleDateString('en-GB')} &middot; ${esc(o.status)} &middot; ${esc(o.payment_method || '')}</p><table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>${rows}</table><p class="t">Total: ${money(o.total)}</p>`);
+    w.document.close(); setTimeout(() => w.print(), 300);
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const o = allOrders.find(x => String(x.id) === b.dataset.id); if (!o) return;
+    if (b.dataset.act === 'receipt') return receipt(o);
+    if (!window.Cart) { location.href = 'products.html'; return; }
+    (o.items || []).forEach(i => {
+      if (!i.id) return;
+      const ex = Cart._items.find(c => String(c.id) === String(i.id));
+      if (ex) ex.qty = (ex.qty || 1) + (+i.qty || 1);
+      else Cart._items.push({ id: String(i.id), name: i.name, price: +i.price || 0, qty: +i.qty || 1, image: i.image || null });
+    });
+    Cart.save(); Cart.syncUI(); Cart.renderSidebar();
+    banner('Items added to your cart. Open the cart to check out; prices are confirmed at checkout.', 'ok');
+  });
 
   async function loadOrders(userId) {
     const list = $('ordersList');

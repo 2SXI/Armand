@@ -37,7 +37,7 @@
 
 
   const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-  const CAT_ICON = {
+  const CAT_BASE = {
     all:svg('<rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/>'),
     boards:svg('<rect x="3" y="7" width="18" height="10"/><path d="M3 11h18"/>'),
     edging:svg('<path d="M4 18h16M4 14h16M4 10h10"/>'),
@@ -51,7 +51,29 @@
     construction:svg('<path d="M3 20h18M5 20V9l7-5 7 5v11"/>'),
     tools:svg('<path d="M14 6a4 4 0 0 0-5 5L3 17l4 4 6-6a4 4 0 0 0 5-5l-3 3-3-1-1-3z"/>'),
     box:svg('<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>'),
+    general:svg('<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12.5 9 5 9-5M3 17l9 5 9-5"/>'),
+    fasteners:svg('<path d="M8 3h8l1.5 3L16 9H8L6.5 6z"/><path d="M12 9v12M9.5 12h5M9.5 15h5M9.5 18h5"/>'),
+    brackets:svg('<path d="M5 4v16h15v-4H9V4z"/><circle cx="7" cy="8" r=".9"/><circle cx="16.5" cy="18" r=".9"/>'),
+    adhesives:svg('<path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/>'),
+    sinks:svg('<path d="M3 12h18v1.5A5.5 5.5 0 0 1 15.5 19h-7A5.5 5.5 0 0 1 3 13.5z"/><path d="M9 12V6.5a2.5 2.5 0 0 1 5 0V8"/>'),
+    storage:svg('<path d="M3 8h18l-1.6 11H4.6z"/><path d="M8 8l2-4h4l2 4M9 12v4M12 12v4M15 12v4"/>'),
+    paint:svg('<rect x="4" y="3" width="13" height="5" rx="1"/><path d="M17 5.5h3v5h-8v3"/><rect x="10.5" y="13.5" width="3" height="7" rx="1"/>'),
+    wheels:svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 4v5.5M12 14.5V20M4 12h5.5M14.5 12H20"/>'),
+    glass:svg('<rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="m9 15 6-6M9 11l2-2"/>'),
+    abrasives:svg('<rect x="3" y="8" width="18" height="8" rx="1"/><path d="M6.5 12h.01M10 12h.01M13.5 12h.01M17 12h.01"/>'),
+    worktops:svg('<path d="M3 10h18v4H3z"/><path d="M5 14v5M19 14v5M3 10l2-4h14l2 4"/>'),
+    electrical:svg('<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>'),
+    safety:svg('<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-4"/>'),
+    doors:svg('<rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="15" cy="12" r=".9"/>'),
+    furniture:svg('<path d="M4 9h16M6 9v10M18 9v10M4 9l1-3h14l1 3"/>'),
   };
+  const ICON_RULES = [['general',/gener|misc|other/],['fasteners',/fasten|screw|bolt|nail|rivet|anchor/],['brackets',/bracket|support|angle/],['adhesives',/adhes|glue|sealant|silicon|bond|epoxy/],['sinks',/sink|basin|tap|plumb|bath|sanit/],['storage',/storage|organi|basket|rack|holder|shelf|shelv/],['paint',/paint|finish|varnish|stain|lacquer|brush|roller/],['wheels',/wheel|castor|caster/],['glass',/glass|mirror/],['abrasives',/abras|sand|grind|polish/],['worktops',/granite|worktop|countertop|stone|slab/],['electrical',/electr|plug|socket|switch|cable/],['safety',/safety|ppe|protect/],['doors',/door|gate/],['furniture',/furnit|table|leg|feet|chair/],['hinges',/hinge|pivot/],['handles',/handle|knob|pull/],['drawers',/drawer|slide|runner/],['locks',/lock|secur|latch/],['lighting',/light|lamp|led/],['boards',/board|panel|melamine|wood|ply/],['edging',/edg|trim/],['kitchen',/kitchen/],['closet',/closet|wardrobe/],['construction',/construct|build|cement/],['tools',/tool|fixing/]];
+  /* any department, even a new one, gets the closest matching icon instead of a generic cube */
+  const CAT_ICON = new Proxy(CAT_BASE, { get(o, k) {
+    if (typeof k !== 'string' || k in o) return o[k];
+    const r = ICON_RULES.find(x => x[1].test(k.toLowerCase()));
+    return r ? o[r[0]] : o.box;
+  } });
   const GROUPS = [
     ['Boards & materials', ['boards', 'edging']],
     ['Hardware', ['hinges', 'handles', 'drawers', 'locks']],
@@ -76,7 +98,7 @@
   };
   Wish.load();
 
-  const ph = cat => `<div class="ph" aria-hidden="true"><span class="ph-ico">${ICON.box}</span><span class="ph-lbl">${esc(catLabel(cat))}</span></div>`;
+  const ph = cat => `<div class="ph" aria-hidden="true"><span class="ph-ico">${CAT_ICON[cat] || ICON.box}</span><span class="ph-lbl">${esc(catLabel(cat))}</span></div>`;
 
   function cardHTML(p) {
     const cat = norm(p.category), st = stockState(p), out = st.cls === 'out', pct = salePct(p);

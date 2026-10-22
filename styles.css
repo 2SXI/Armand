@@ -1690,3 +1690,74 @@ body { background: #EEF0F2; }
 .hero-grid-bg { background-image: radial-gradient(ellipse 48% 66% at 76% 52%, rgba(243,101,35,.26) 0%, rgba(243,101,35,.07) 48%, transparent 74%), radial-gradient(ellipse 60% 80% at 0% 0%, rgba(255,255,255,.04) 0%, transparent 60%); background-size: auto; }
 @media (max-width: 1040px) { .hero-grid-bg { background-image: radial-gradient(ellipse 80% 40% at 50% 78%, rgba(243,101,35,.24) 0%, transparent 70%); } }
 @media (max-width: 900px) { .page-hero { padding: 48px 0 44px; } .page-hero::before { background-image: none; } }
+
+/* ═══════════════ DESIGN REFRESH v5: modern depth, rounded UI, calmer type ═══════════════ */
+:root { --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --sh-1: 0 1px 2px rgba(16,24,40,.05), 0 10px 28px -12px rgba(16,24,40,.16); --sh-2: 0 2px 4px rgba(16,24,40,.06), 0 28px 52px -18px rgba(16,24,40,.30); --ease: cubic-bezier(.22,.8,.3,1); }
+html { scroll-behavior: smooth; }
+::selection { background: #F36523; color: #fff; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+:focus-visible { outline: 2px solid #F36523; outline-offset: 3px; }
+
+/* calmer, more modern tracking on small caps labels and nav */
+.eyebrow, .hero-eyebrow, .tp-badge, .pc-cat { letter-spacing: 2px; }
+.nav-link { letter-spacing: .9px; font-size: 13px; }
+nav { box-shadow: 0 10px 34px -14px rgba(0,0,0,.55); }
+
+/* buttons */
+.btn-hero-primary, .btn-hero-ghost, .btn-primary, .btn-wa, .os-cta, .svc-cta, .view-all-btn, .pc-add, .cn-accept, .es-wa-btn, .nav-cart, .nav-wa, .nav-search-btn, .nav-acct { border-radius: var(--r-sm); }
+.btn-hero-primary, .btn-primary, .os-cta, .svc-cta, .nav-wa, .pc-add { transition: transform .25s var(--ease), box-shadow .25s var(--ease), background-color .2s, color .2s, border-color .2s; box-shadow: 0 10px 24px -10px rgba(243,101,35,.65); }
+.btn-hero-primary:hover, .btn-primary:hover, .os-cta:hover, .svc-cta:hover, .nav-wa:hover, .pc-add:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -10px rgba(243,101,35,.7); }
+.btn-hero-ghost, .view-all-btn { transition: transform .25s var(--ease), background-color .2s, color .2s, border-color .2s; }
+.btn-hero-ghost:hover, .view-all-btn:hover { transform: translateY(-2px); }
+.nav-acct-ini { border-radius: 8px; margin: 1px; width: 34px; height: 34px; }
+.nav-acct:not(.is-in) { border-radius: 10px; }
+.nav-user-menu { border-radius: var(--r-md); overflow: hidden; }
+.nav-user-menu::before { display: none; }
+.num-head b { border-radius: 12px; }
+
+/* cards: rounded, soft depth, gentle lift */
+.svc-card, .product-card, .testi-card, .director-card, .asc-card, .tsg-card, .visit-card, .how-step, .faq-item { border-radius: var(--r-md); overflow: hidden; box-shadow: var(--sh-1); transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .25s; }
+.svc-card:hover, .product-card:hover, .testi-card:hover, .director-card:hover, .tsg-card:hover { transform: translateY(-5px); box-shadow: var(--sh-2); }
+.faq-item[open] { box-shadow: var(--sh-2); }
+.why-grid { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--sh-1); }
+.svc-icon, .asc-card .asc-icon { border-radius: 14px; }
+.pc-badge { border-radius: 8px; }
+.pc-img { border-radius: var(--r-md) var(--r-md) 0 0; }
+.bp-tag { border-radius: 12px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(26,25,27,.62); border-color: rgba(255,255,255,.14); }
+.hero-stats { border-top-color: rgba(255,255,255,.10); }
+.how-n { border-radius: 14px; }
+.faq-item summary::after { border-radius: 10px; }
+.wa-fab { box-shadow: 0 14px 34px -8px rgba(37,211,102,.6); }
+
+/* form fields */
+.cf-input, .search-input, input[type="text"], input[type="email"], input[type="tel"], input[type="search"], input[type="password"], select, textarea { border-radius: var(--r-sm); }
+.cf-input, .search-input { transition: border-color .2s, box-shadow .2s; }
+.cf-input:focus, .search-input:focus { box-shadow: 0 0 0 4px rgba(243,101,35,.16); }
+
+/* cookie notice becomes a floating card, not a full-width bar */
+.cookie-notice { left: 20px; right: auto; bottom: 20px; width: min(430px, calc(100% - 40px)); border: 1px solid rgba(255,255,255,.12); border-radius: var(--r-md); box-shadow: var(--sh-2); flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px 20px; }
+.cookie-notice .cn-text { font-size: 13.5px; line-height: 1.6; }
+.cookie-notice .cn-accept { align-self: stretch; text-align: center; }
+@media (max-width: 640px) { .cookie-notice { left: 12px; bottom: 12px; width: calc(100% - 24px); } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .svc-card, .product-card, .testi-card, .director-card, .tsg-card, .btn-hero-primary, .btn-primary { transition: none; } .svc-card:hover, .product-card:hover { transform: none; } }
+
+/* ═══ CART DRAWER v5 ═══ */
+#brocCartDrawer { border-radius: 22px 0 0 22px; box-shadow: -24px 0 70px -20px rgba(0,0,0,.6); overflow: hidden; }
+#brocCartDrawer .bcd-item { grid-template-columns: 60px 1fr auto; gap: 14px; align-items: center; padding: 16px 22px; }
+#brocCartDrawer .bcd-thumb { width: 60px; height: 60px; min-width: 60px; border-radius: 12px; }
+#brocCartDrawer .bcd-iright { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
+#brocCartDrawer .bcd-itotal { white-space: nowrap; }
+#brocCartDrawer .bcd-qty-row { border-radius: 10px; overflow: hidden; width: max-content; }
+#brocCartDrawer .bcd-qbtn { border-radius: 0; }
+#brocCartDrawer .bcd-close { border-radius: 10px; }
+#brocCartDrawer .bcd-badge { border-radius: 20px; }
+#brocCartDrawer .bcd-ship-track { border-radius: 6px; overflow: hidden; }
+#brocCartDrawer .bcd-ship-fill { border-radius: 6px; }
+#brocCartDrawer .bcd-checkout, #brocCartDrawer .bcd-wa { border-radius: 12px; transition: transform .2s, box-shadow .2s; }
+#brocCartDrawer .bcd-checkout:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(255,255,255,.35); }
+@media (max-width: 640px) { #brocCartDrawer { border-radius: 0; } }
+
+/* the header shadow must only apply to the main header, not breadcrumbs or inner navs */
+nav.crumbs, nav[aria-label="Breadcrumb"], footer nav, .mnp-nav, .mobile-nav-panel nav { box-shadow: none !important; }

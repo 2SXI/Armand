@@ -272,7 +272,7 @@ table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(24
       <div class="sb-bottom">
         <div class="sb-user" id="sb-user"></div>
         <button class="sb-logout" onclick="adminLogout()">Sign Out</button>
-        <div class="sb-version">Armand Admin v4.0</div>
+        <div class="sb-version">Armand Admin v4.1</div>
       </div>
     </aside>
 
@@ -920,7 +920,6 @@ function renderProductTable(products) {
   }).join('');
 }
 
-function filterProductTable(){}
 
 /* Product modal */
 function previewProductImage(url) {
@@ -1128,7 +1127,6 @@ function renderOrderTable(orders) {
   }).join('');
 }
 
-function filterOrderTable(){}
 
 async function updateOrderStatus(id, status) {
   try {
@@ -1773,6 +1771,48 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && $g('admin-app').style.display === 'block') { e.preventDefault(); cmdOpen(); }
   else if (e.key === 'Escape') cmdClose();
 });
+
+/* ── v4.1: one-click status, packing slip, new-order alerts ── */
+const NEXT = { pending: ['confirmed', 'Confirm'], confirmed: ['shipped', 'Mark shipped'], shipped: ['delivered', 'Mark delivered'] };
+const _rot = renderOrderTable;
+renderOrderTable = function (orders) {
+  _rot(orders);
+  document.querySelectorAll('#orders-tbody tr').forEach(tr => {
+    const v = tr.querySelector('button[onclick^="openOrderModal"]'); if (!v) return;
+    const id = +v.getAttribute('onclick').match(/\d+/)[0], o = _allOrders.find(x => x.id === id), n = o && NEXT[o.status || 'pending'];
+    if (!n) return;
+    const b = document.createElement('button'); b.className = 'btn btn-primary btn-sm'; b.style.marginLeft = '6px'; b.textContent = n[1];
+    b.onclick = async () => { await updateOrderStatus(id, n[0]); filterOrderTable(); };
+    v.after(b);
+  });
+};
+const _oom = openOrderModal;
+openOrderModal = function (id) {
+  _oom(id);
+  const b = $g('order-modal-body');
+  if (b && _activeOrder) { const x = document.createElement('div'); x.style.marginTop = '16px'; x.innerHTML = '<button class="btn btn-edit btn-sm" onclick="printOrder()">Print packing slip</button>'; b.appendChild(x); }
+};
+function printOrder() {
+  const o = _activeOrder; if (!o) return;
+  const w = window.open('', '_blank'); if (!w) { adminToast('Allow pop-ups to print', true); return; }
+  const rows = _parseItems(o.items).map(i => `<tr><td>${esc(i.name)}</td><td>${esc(i.qty || 1)}</td><td>&#9744;</td></tr>`).join('');
+  w.document.write(`<!doctype html><title>Packing slip #${o.id}</title><style>body{font:14px Arial,sans-serif;padding:32px;max-width:720px;margin:auto;color:#222}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin:16px 0}td,th{border-bottom:1px solid #ccc;padding:9px;text-align:left}</style><h1>Packing slip &mdash; Order #${o.id}</h1><p><b>${esc(o.customer_name || '')}</b><br>${esc(o.customer_phone || '')}<br>${esc(o.customer_address || 'Collection')}</p><table><tr><th>Item</th><th>Qty</th><th>Packed</th></tr>${rows}</table>${o.notes ? '<p><b>Notes:</b> ' + esc(o.notes) + '</p>' : ''}`);
+  w.document.close(); setTimeout(() => w.print(), 300);
+}
+let _lastOrderId = null;
+async function pollOrders() {
+  try {
+    const { data } = await sb.from('orders').select('id,customer_name,total').order('id', { ascending: false }).limit(1);
+    const t = data && data[0]; if (!t) return;
+    if (_lastOrderId !== null && t.id > _lastOrderId) {
+      adminToast('New order #' + t.id + ' from ' + (t.customer_name || 'a customer') + ' (' + CFG.currency + ' ' + Number(t.total || 0).toFixed(2) + ')');
+      refreshDashboard(); if (_allOrders.length) loadOrders_Admin();
+    }
+    _lastOrderId = t.id;
+  } catch (e) {}
+}
+setTimeout(() => { if ($g('admin-app').style.display === 'block') pollOrders(); }, 4000);
+setInterval(() => { if ($g('admin-app').style.display === 'block' && !document.hidden) pollOrders(); }, 60000);
 </script>
 </body>
 </html>

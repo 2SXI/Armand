@@ -148,3 +148,21 @@
   .acct-perks span span, .acct-perks div > span { font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) { .acct-meter span { transition: none; } }
+
+.acct-order-act { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.bs .btn-sm.btn-outline-dark { min-height: 36px; padding: 0 14px; }
+
+/* ── Rounded to match the rest of the site ── */
+.acct-panel, .acct-head, .acct-stat, .acct-split, .acct-card-center, .acct-snav, .bs .acct-order { border-radius: 16px; overflow: hidden; }
+.acct-split { border-radius: 20px; }
+.acct-avatar { border-radius: 18px; }
+.acct-chip { border-radius: 999px; }
+.acct-tab-n, .acct-perk-ic { border-radius: 8px; }
+.bs .form-control, .acct-meter { border-radius: 10px; }
+.acct-meter span { border-radius: 10px; }
+.bs .btn-brand, .bs .btn-outline-dark, .bs .nav-tabs .nav-link { border-radius: 10px; }
+.bs .acct-order .badge { border-radius: 20px; }
+.bs .alert { border-radius: 12px; }
+.acct-quick a:hover { padding-left: 10px; transition: padding .2s; }
+.acct-stat, .bs .acct-order { transition: transform .3s, box-shadow .3s; }
+.acct-stat:hover, .bs .acct-order:hover { transform: translateY(-3px); box-shadow: 0 16px 34px -16px rgba(30,34,40,.25); }

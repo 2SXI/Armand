@@ -79,3 +79,16 @@
 #broc-checkout-modal .co-done h2{font-size:2.2rem}
 @media(max-width:1080px){#broc-checkout-modal .co{grid-template-columns:1fr}#broc-checkout-modal .co-side{order:-1}}
 @media(max-width:640px){#broc-checkout-modal{padding:0}#broc-checkout-modal .co{min-height:100%}#broc-checkout-modal .co-main,#broc-checkout-modal .co-side{padding:26px 20px}#broc-checkout-modal .opt-row{grid-template-columns:1fr}}
+
+/* ═══ CHECKOUT v5: rounded, softer ═══ */
+#broc-checkout-modal .co { border-radius: 22px !important; overflow: hidden; box-shadow: 0 40px 100px -24px rgba(0,0,0,.65); }
+#broc-checkout-modal .co .opt { border-radius: 14px !important; transition: border-color .2s, background-color .2s, box-shadow .2s; }
+#broc-checkout-modal .opt:hover { border-color: #F36523; }
+#broc-checkout-modal .field input, #broc-checkout-modal .field select, #broc-checkout-modal .field textarea { border-radius: 10px !important; }
+#broc-checkout-modal .field input:focus, #broc-checkout-modal .field select:focus, #broc-checkout-modal .field textarea:focus { box-shadow: 0 0 0 4px rgba(243,101,35,.16); }
+#broc-checkout-modal .co .btn { border-radius: 12px !important; }
+#broc-checkout-modal .x-btn { border-radius: 10px !important; }
+@media (max-width: 760px) { #broc-checkout-modal .co { border-radius: 0 !important; } }
+#broc-checkout-modal .co-err, #broc-checkout-modal .co-info { border-radius: 12px !important; }
+#broc-checkout-modal .x-btn { border-radius: 50% !important; }
+#broc-checkout-modal .co-done .ok { border-radius: 50% !important; }
