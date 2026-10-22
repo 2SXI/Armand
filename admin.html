@@ -159,6 +159,62 @@ table tr:hover td{background:var(--gray-50);}
   .modal-overlay{padding:40px 12px;}
 }
 @media(max-width:480px){.stats-row{grid-template-columns:1fr;}}
+
+/* ═══ v4 — futuristic command-centre theme ═══ */
+:root{--navy:#f2f2f5;--text:#e6e6ec;--muted:#8d8d9b;--gray-50:#15151a;--gray-100:#1d1d24;--gray-200:#2b2b35;--card:rgba(24,24,31,.72);--navy-deep:#14141a;--navy-darker:#0c0c10}
+body{background:radial-gradient(900px 500px at 88% -10%,rgba(243,101,35,.16),transparent 60%),radial-gradient(700px 500px at -10% 110%,rgba(80,120,255,.10),transparent 60%),#0d0d11;background-attachment:fixed;color:var(--text)}
+#login-screen{background:radial-gradient(600px 420px at 50% 0%,rgba(243,101,35,.28),transparent 70%),#0b0b0f}
+.login-box{border-radius:18px;background:rgba(20,20,26,.86);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.07);border-top:2px solid var(--orange);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.login-input,.f-input{border-radius:8px}
+.sidebar{background:rgba(12,12,16,.92);backdrop-filter:blur(12px);border-right:1px solid rgba(255,255,255,.06)}
+.sb-link{border-radius:0 10px 10px 0;margin-right:12px}
+.sb-link.active{background:linear-gradient(90deg,rgba(243,101,35,.24),transparent);border-left-color:var(--orange);color:#fff}
+.sb-search{margin:14px 14px 0;padding:9px 12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;cursor:pointer;background:rgba(255,255,255,.03)}
+.sb-search:hover{border-color:var(--orange);color:#fff}.sb-search kbd{font:600 10px 'Barlow Semi Condensed',sans-serif;border:1px solid rgba(255,255,255,.18);padding:1px 6px;border-radius:5px}
+.sb-user{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:11px;color:var(--muted);overflow:hidden}
+.sb-user b{flex:0 0 32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--orange);color:#fff;font:800 12px Saira,sans-serif}
+.sb-user span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.page-hdr{background:rgba(13,13,17,.78);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+.page-title{color:#fff;letter-spacing:1.5px}.page-subtitle{color:var(--muted);font-size:10px}
+.stat-card,.table-wrap,.card{background:var(--card);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);border-radius:14px}
+.stat-card{position:relative;overflow:hidden;padding:20px}
+.stat-card::after{content:'';position:absolute;right:-34px;top:-34px;width:120px;height:120px;background:radial-gradient(circle,rgba(243,101,35,.4),transparent 70%);opacity:.55;pointer-events:none}
+.sc-num{color:#fff;font-size:32px}.sc-label{font-size:10px}
+.sc-sub{font-size:11px;color:var(--muted);margin-top:8px;min-height:14px}.sc-sub b{color:#5be08b}
+table th{background:rgba(255,255,255,.03);color:var(--muted);border-color:var(--gray-200);font-size:10px}
+table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(243,101,35,.06)}
+.td-name,.td-price{color:#fff}
+.tbl-search{background:var(--gray-50);border-color:var(--gray-200);color:var(--text);border-radius:8px}
+.btn{border-radius:8px}
+.btn-primary,.btn-primary:hover{background:linear-gradient(135deg,#F36523,#d4501a);color:#fff;box-shadow:0 6px 18px rgba(243,101,35,.28)}
+.btn-primary:hover{filter:brightness(1.12)}
+.btn-edit{color:#d0d0d9;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+.badge{border-radius:20px;font-size:10px;padding:3px 10px}
+.badge-pending{background:rgba(255,200,61,.14);color:#ffc83d}.badge-confirmed{background:rgba(110,150,255,.16);color:#8fb0ff}
+.badge-shipped{background:rgba(0,200,220,.15);color:#4fdcec}.badge-delivered{background:rgba(37,211,102,.16);color:#4be08a}
+.modal-box,#confirm-box{border-radius:16px;background:#14141a}
+#bi-dropzone,#bi-summary{background:var(--card)!important;border-color:rgba(255,255,255,.14)!important;border-radius:14px!important}
+.dgrid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.dgrid.two{grid-template-columns:1fr 1fr}
+.card{padding:18px 20px}
+.card h4{display:flex;justify-content:space-between;margin-bottom:14px;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.card h4 span{letter-spacing:0;text-transform:none;color:#cfcfd8}
+.bars{display:flex;align-items:flex-end;gap:6px;height:150px}
+.bars i{flex:1;min-height:3px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#F36523,rgba(243,101,35,.2))}.bars i:hover{filter:brightness(1.3)}
+.bars-x{display:flex;gap:6px;margin-top:6px}.bars-x span{flex:1;text-align:center;font-size:9px;color:var(--muted)}
+.stbar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--gray-100);margin-bottom:14px}
+.leg{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:#cfcfd8}.leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.rank{list-style:none}.rank li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.rank li:last-child{border:0}.rank .nm{flex:0 0 46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .bar{flex:1;height:4px;border-radius:2px;background:var(--gray-100)}.rank .bar i{display:block;height:100%;border-radius:2px;background:var(--orange)}
+.rank .ct{color:#fff;font-weight:700;min-width:28px;text-align:right}.rank li.go{cursor:pointer}.rank li.go:hover{color:var(--orange)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.chip{padding:6px 14px;border-radius:20px;font-size:11px;text-transform:capitalize;background:rgba(255,255,255,.05);color:#bdbdc8;border:1px solid rgba(255,255,255,.09)}
+.chip.on{background:var(--orange);border-color:var(--orange);color:#fff}.chip b{margin-left:6px;opacity:.7}
+#cmdk{position:fixed;inset:0;z-index:400;background:rgba(5,5,8,.7);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding-top:14vh}
+#cmdk.open{display:flex}.cmdk-box{width:min(560px,92vw);background:#14141a;border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+#cmdk-in{width:100%;padding:18px 20px;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;font-size:15px;outline:none}
+.cmdk-it{padding:12px 20px;font-size:13px;color:#cfcfd8;cursor:pointer}.cmdk-it.on,.cmdk-it:hover{background:rgba(243,101,35,.16);color:#fff}
+@media(max-width:900px){.dgrid,.dgrid.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -189,6 +245,7 @@ table tr:hover td{background:var(--gray-50);}
         <div class="sb-logo-main">Armand Admin</div>
         <div class="sb-logo-sub">Management Console</div>
       </div>
+      <div class="sb-search" onclick="cmdOpen()"><span>Search / jump</span><kbd>Ctrl K</kbd></div>
       <nav class="sb-nav">
         <div class="sb-link active" onclick="showSection('dashboard')" data-section="dashboard">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -213,8 +270,9 @@ table tr:hover td{background:var(--gray-50);}
         </div>
       </nav>
       <div class="sb-bottom">
+        <div class="sb-user" id="sb-user"></div>
         <button class="sb-logout" onclick="adminLogout()">Sign Out</button>
-        <div class="sb-version">Armand Admin v3.1</div>
+        <div class="sb-version">Armand Admin v4.0</div>
       </div>
     </aside>
 
@@ -237,10 +295,18 @@ table tr:hover td{background:var(--gray-50);}
         </div>
         <div style="padding:28px 32px;">
           <div class="stats-row">
-            <div class="stat-card"><div class="sc-num" id="ds-products">&#8212;</div><div class="sc-label">Total Products</div></div>
-            <div class="stat-card"><div class="sc-num" id="ds-orders">&#8212;</div><div class="sc-label">Total Orders</div></div>
-            <div class="stat-card"><div class="sc-num" id="ds-pending">&#8212;</div><div class="sc-label">Pending Orders</div></div>
-            <div class="stat-card"><div class="sc-num" id="ds-revenue">&#8212;</div><div class="sc-label">Revenue (USD)</div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-products">&#8212;</div><div class="sc-label">Total Products</div><div class="sc-sub" id="ds-sub-prod"></div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-orders">&#8212;</div><div class="sc-label">Total Orders</div><div class="sc-sub" id="ds-sub-orders"></div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-pending">&#8212;</div><div class="sc-label">Pending Orders</div><div class="sc-sub" id="ds-sub-pending"></div></div>
+            <div class="stat-card"><div class="sc-num" id="ds-revenue">&#8212;</div><div class="sc-label">Revenue (USD)</div><div class="sc-sub" id="ds-sub-rev"></div></div>
+          </div>
+          <div class="dgrid">
+            <div class="card"><h4>Revenue &middot; last 14 days <span id="ds-rev14"></span></h4><div class="bars" id="ds-bars"></div><div class="bars-x" id="ds-barsx"></div></div>
+            <div class="card"><h4>Order status</h4><div class="stbar" id="ds-stbar"></div><div id="ds-stleg"></div></div>
+          </div>
+          <div class="dgrid two">
+            <div class="card"><h4>Top products <span>units sold</span></h4><ul class="rank" id="ds-top"></ul></div>
+            <div class="card"><h4>Needs attention</h4><ul class="rank" id="ds-attn"></ul></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
             <div class="table-wrap">
@@ -283,6 +349,8 @@ table tr:hover td{background:var(--gray-50);}
           <div class="table-wrap">
             <div class="tbl-toolbar">
               <input type="text" class="tbl-search" id="product-search" placeholder="Search name, SKU, category..." oninput="filterProductTable()">
+              <button class="btn btn-edit btn-sm" onclick="exportProducts()">Export CSV</button>
+              <div class="chips" id="product-chips"></div>
               <select class="f-input f-select" id="product-cat-filter" style="width:auto;padding:8px 14px;font-size:12px;background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text);" onchange="filterProductTable()">
                 <option value="">All Categories</option>
                 <option value="hinges">Hinges</option><option value="handles">Handles</option>
@@ -372,7 +440,7 @@ table tr:hover td{background:var(--gray-50);}
           </div>
           <select class="f-input f-select" id="order-status-filter"
             style="width:auto;padding:9px 14px;font-size:12px;background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text);"
-            onchange="loadOrders_Admin()">
+            onchange="filterOrderTable()">
             <option value="">All Statuses</option>
             <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
             <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
@@ -382,7 +450,9 @@ table tr:hover td{background:var(--gray-50);}
         <div style="padding:28px 32px;">
           <div class="table-wrap">
             <div class="tbl-toolbar">
-              <input type="text" class="tbl-search" id="order-search" placeholder="Search customer name or phone..." oninput="filterOrderTable()">
+              <input type="text" class="tbl-search" id="order-search" placeholder="Search name, phone or #order..." oninput="filterOrderTable()">
+              <button class="btn btn-edit btn-sm" onclick="exportOrders()">Export CSV</button>
+              <div class="chips" id="order-chips"></div>
               <button class="btn btn-primary btn-sm" onclick="loadOrders_Admin()">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 Refresh
@@ -602,6 +672,7 @@ table tr:hover td{background:var(--gray-50);}
   </div>
 </div>
 
+<div id="cmdk"><div class="cmdk-box"><input id="cmdk-in" placeholder="Jump to a page, or search products and orders…" autocomplete="off"><div id="cmdk-list"></div></div></div>
 <div id="admin-toast"></div>
 
 <script>
@@ -641,6 +712,10 @@ function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-app').style.display    = 'block';
   refreshDashboard();
+  sb.auth.getSession().then(({ data }) => {
+    const m = (data.session && data.session.user && data.session.user.email) || '';
+    document.getElementById('sb-user').innerHTML = '<b>' + esc(m.slice(0,2).toUpperCase()) + '</b><span>' + esc(m) + '</span>';
+  });
 }
 function showLogin() {
   document.getElementById('login-screen').style.display = 'flex';
@@ -845,17 +920,7 @@ function renderProductTable(products) {
   }).join('');
 }
 
-function filterProductTable() {
-  const q      = (document.getElementById('product-search')?.value || '').toLowerCase();
-  const cat    = document.getElementById('product-cat-filter')?.value  || '';
-  const active = document.getElementById('product-active-filter')?.value || '';
-  renderProductTable(_allProducts.filter(p => {
-    const mQ = !q || (p.name||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q);
-    const mC = !cat    || (p.category||'') === cat;
-    const mA = !active || (active === 'active' ? p.active !== false : p.active === false);
-    return mQ && mC && mA;
-  }));
-}
+function filterProductTable(){}
 
 /* Product modal */
 function previewProductImage(url) {
@@ -1018,11 +1083,10 @@ async function loadOrders_Admin() {
   tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Loading...</td></tr>';
   try {
     let query = sb.from('orders').select('*').order('created_at', { ascending: false });
-    if (statusFilter) query = query.eq('status', statusFilter);
     const { data, error } = await query;
     if (error) throw error;
     _allOrders = data || [];
-    renderOrderTable(_allOrders);
+    filterOrderTable();
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="9" class="empty-state" style="color:var(--red);">
       Error: ${esc(err.message)}
@@ -1064,13 +1128,7 @@ function renderOrderTable(orders) {
   }).join('');
 }
 
-function filterOrderTable() {
-  const q = (document.getElementById('order-search')?.value || '').toLowerCase();
-  renderOrderTable(_allOrders.filter(o => {
-    const phone = o.customer_phone || '';
-    return (o.customer_name||'').toLowerCase().includes(q) || phone.toLowerCase().includes(q);
-  }));
-}
+function filterOrderTable(){}
 
 async function updateOrderStatus(id, status) {
   try {
@@ -1615,6 +1673,106 @@ async function biStartUpload() {
 }
 
 biInit();
+
+/* ── v4: insights, chips, export, command palette ───────────── */
+const $g = id => document.getElementById(id);
+const ST = ['pending','confirmed','shipped','delivered','cancelled'];
+const ST_COL = { pending:'#ffc83d', confirmed:'#8fb0ff', shipped:'#4fdcec', delivered:'#4be08a', cancelled:'#e84343' };
+const _rd = refreshDashboard;
+refreshDashboard = async function () { await _rd(); await renderInsights(); };
+
+async function renderInsights() {
+  try {
+    const [{ data: orders }, { data: enq }, { data: prods }] = await Promise.all([
+      sb.from('orders').select('id,total,status,created_at,items').order('created_at', { ascending: false }).limit(1000),
+      sb.from('enquiries').select('id,created_at'),
+      sb.from('products').select('id,stock,image,active').limit(1000)
+    ]);
+    const O = orders || [], P = prods || [], now = Date.now(), day = 864e5, live = O.filter(o => o.status !== 'cancelled');
+    const days = [...Array(14)].map((_, i) => { const d = new Date(now - (13 - i) * day); return { k: d.toDateString(), l: d.getDate(), v: 0 }; });
+    live.forEach(o => { const d = days.find(x => x.k === new Date(o.created_at).toDateString()); if (d) d.v += +o.total || 0; });
+    const max = Math.max(1, ...days.map(d => d.v)), tot14 = days.reduce((a, d) => a + d.v, 0);
+    $g('ds-rev14').textContent = CFG.currency + ' ' + tot14.toFixed(2);
+    $g('ds-bars').innerHTML = days.map(d => `<i style="height:${Math.max(2, d.v / max * 100)}%" title="${d.k}: ${CFG.currency} ${d.v.toFixed(2)}"></i>`).join('');
+    $g('ds-barsx').innerHTML = days.map(d => `<span>${d.l}</span>`).join('');
+    const cnt = s => O.filter(o => (o.status || 'pending') === s).length;
+    $g('ds-stbar').innerHTML = ST.map(s => `<i style="width:${O.length ? cnt(s) / O.length * 100 : 0}%;background:${ST_COL[s]}"></i>`).join('');
+    $g('ds-stleg').innerHTML = ST.map(s => `<div class="leg"><span><i style="background:${ST_COL[s]}"></i>${s}</span><b>${cnt(s)}</b></div>`).join('');
+    const units = {}; live.forEach(o => _parseItems(o.items).forEach(i => { if (i.name) units[i.name] = (units[i.name] || 0) + (+i.qty || 1); }));
+    const top = Object.entries(units).sort((a, b) => b[1] - a[1]).slice(0, 6), tm = top.length ? top[0][1] : 1;
+    $g('ds-top').innerHTML = top.length ? top.map(([n, c]) => `<li><span class="nm">${esc(n)}</span><span class="bar"><i style="width:${c / tm * 100}%"></i></span><span class="ct">${c}</span></li>`).join('') : '<li style="color:var(--muted)">No sales yet.</li>';
+    const rev30 = live.filter(o => now - new Date(o.created_at) < 30 * day).reduce((s, o) => s + (+o.total || 0), 0);
+    const today = O.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString()).length;
+    const stale = O.filter(o => o.status === 'pending' && now - new Date(o.created_at) > day).length;
+    const out = P.filter(p => p.stock === 0).length, low = P.filter(p => p.stock > 0 && p.stock <= 5).length;
+    const noimg = P.filter(p => !p.image).length, hid = P.filter(p => p.active === false).length;
+    const enq7 = (enq || []).filter(e => now - new Date(e.created_at) < 7 * day).length;
+    $g('ds-sub-rev').innerHTML = '30 days: <b>' + CFG.currency + ' ' + rev30.toFixed(2) + '</b>';
+    $g('ds-sub-orders').innerHTML = 'Today: <b>' + today + '</b>';
+    $g('ds-sub-pending').innerHTML = stale ? '<b style="color:#ffc83d">' + stale + ' waiting 24h+</b>' : 'Nothing overdue';
+    $g('ds-sub-prod').textContent = hid + ' hidden · ' + noimg + ' without image';
+    const A = [[stale, 'pending orders older than 24h', 'orders'], [out, 'products out of stock', 'products'], [low, 'products low on stock (5 or fewer)', 'products'], [enq7, 'enquiries in the last 7 days', 'enquiries'], [noimg, 'products without an image', 'bulk-images']].filter(a => a[0] > 0);
+    $g('ds-attn').innerHTML = A.length ? A.map(a => `<li class="go" onclick="showSection('${a[2]}')"><span class="ct" style="text-align:left">${a[0]}</span><span class="nm" style="flex:1;white-space:normal">${a[1]}</span><span>&rarr;</span></li>`).join('') : '<li style="color:#4be08a">All clear. Nothing needs attention.</li>';
+  } catch (e) { console.error('[Admin] insights', e); }
+}
+
+function filterOrderTable() {
+  const q = ($g('order-search')?.value || '').toLowerCase(), st = $g('order-status-filter')?.value || '';
+  $g('order-chips').innerHTML = ['', ...ST].map(s => `<button class="chip${s === st ? ' on' : ''}" onclick="$g('order-status-filter').value='${s}';filterOrderTable()">${s || 'all'}<b>${s ? _allOrders.filter(o => (o.status || 'pending') === s).length : _allOrders.length}</b></button>`).join('');
+  renderOrderTable(_allOrders.filter(o => (!st || (o.status || 'pending') === st) && ((o.customer_name || '').toLowerCase().includes(q) || (o.customer_phone || '').toLowerCase().includes(q) || ('#' + o.id).includes(q))));
+}
+
+let _pChip = '';
+function filterProductTable() {
+  const q = ($g('product-search')?.value || '').toLowerCase(), cat = $g('product-cat-filter')?.value || '', act = $g('product-active-filter')?.value || '';
+  const F = { low: p => p.stock > 0 && p.stock <= 10, out: p => p.stock === 0, noimg: p => !p.image, hidden: p => p.active === false };
+  const defs = [['', 'All', () => true], ['low', 'Low stock', F.low], ['out', 'Out of stock', F.out], ['noimg', 'No image', F.noimg], ['hidden', 'Hidden', F.hidden]];
+  $g('product-chips').innerHTML = defs.map(([k, l, fn]) => `<button class="chip${k === _pChip ? ' on' : ''}" onclick="_pChip='${k}';filterProductTable()">${l}<b>${_allProducts.filter(fn).length}</b></button>`).join('');
+  renderProductTable(_allProducts.filter(p =>
+    (!q || (p.name || '').toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q)) &&
+    (!cat || (p.category || '') === cat) && (!act || (act === 'active' ? p.active !== false : p.active === false)) && (!_pChip || F[_pChip](p))));
+}
+loadProducts_Admin = (f => async function () { await f(); filterProductTable(); })(loadProducts_Admin);
+
+function exportCSV(name, head, rows) {
+  const e = v => { let t = String(v ?? ''); if (/^[=+\-@]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff' + [head, ...rows].map(r => r.map(e).join(',')).join('\r\n')], { type: 'text/csv' }));
+  a.download = name + '-' + new Date().toISOString().slice(0, 10) + '.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000); adminToast('Exported ' + rows.length + ' rows');
+}
+function exportOrders() { exportCSV('orders', ['Order','Date','Customer','Phone','Items','Total','Payment','Status'], _allOrders.map(o => [o.id, o.created_at, o.customer_name, o.customer_phone, _parseItems(o.items).reduce((s, i) => s + (i.qty || 1), 0), o.total, o.payment_method, o.status])); }
+function exportProducts() { exportCSV('products', ['ID','Name','SKU','Category','Price','Stock','Active'], _allProducts.map(p => [p.id, p.name, p.sku, p.category, p.price, p.stock, p.active !== false])); }
+
+/* Command palette (Ctrl/Cmd + K) */
+const CMD = [['Dashboard','dashboard'],['Products','products'],['Bulk Images','bulk-images'],['Orders','orders'],['Enquiries','enquiries']];
+let _ci = 0, _cr = [];
+function cmdOpen() { if (!_allProducts.length) loadProducts_Admin(); if (!_allOrders.length) loadOrders_Admin(); $g('cmdk').classList.add('open'); $g('cmdk-in').value = ''; cmdRender(); $g('cmdk-in').focus(); }
+function cmdClose() { $g('cmdk').classList.remove('open'); }
+function cmdRender() {
+  const q = $g('cmdk-in').value.toLowerCase().trim();
+  _cr = CMD.filter(c => c[0].toLowerCase().includes(q)).map(c => ({ t: 'Go to ' + c[0], a: () => showSection(c[1]) }));
+  if (!q || 'add product'.includes(q)) _cr.push({ t: 'Add product', a: () => { showSection('products'); openProductModal(null); } });
+  if (q.length > 1) {
+    _allProducts.filter(p => (p.name || '').toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q)).slice(0, 5).forEach(p => _cr.push({ t: 'Product · ' + p.name, a: () => { showSection('products'); openProductModal(p.id); } }));
+    _allOrders.filter(o => (o.customer_name || '').toLowerCase().includes(q) || String(o.id) === q.replace('#', '')).slice(0, 5).forEach(o => _cr.push({ t: 'Order #' + o.id + ' · ' + (o.customer_name || ''), a: () => { showSection('orders'); openOrderModal(o.id); } }));
+  }
+  _ci = 0; $g('cmdk-list').innerHTML = _cr.map((c, i) => `<div class="cmdk-it${i ? '' : ' on'}" data-i="${i}">${esc(c.t)}</div>`).join('') || '<div class="cmdk-it">No results</div>';
+}
+function cmdMark() { [...$g('cmdk-list').children].forEach((n, i) => n.classList.toggle('on', i === _ci)); }
+function cmdRun(i) { const c = _cr[i]; if (c) { cmdClose(); c.a(); } }
+$g('cmdk-in').addEventListener('input', cmdRender);
+$g('cmdk-in').addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); _ci = Math.min(_cr.length - 1, _ci + 1); cmdMark(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); _ci = Math.max(0, _ci - 1); cmdMark(); }
+  else if (e.key === 'Enter') cmdRun(_ci);
+});
+$g('cmdk-list').addEventListener('click', e => { const n = e.target.closest('[data-i]'); if (n) cmdRun(+n.dataset.i); });
+$g('cmdk').addEventListener('click', e => { if (e.target.id === 'cmdk') cmdClose(); });
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && $g('admin-app').style.display === 'block') { e.preventDefault(); cmdOpen(); }
+  else if (e.key === 'Escape') cmdClose();
+});
 </script>
 </body>
 </html>
