@@ -285,11 +285,15 @@ th[data-s]:hover{color:#fff}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Enquiries
         </div>
+        <div class="sb-link" onclick="showSection('reports')" data-section="reports">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+          Reports
+        </div>
       </nav>
       <div class="sb-bottom">
         <div class="sb-user" id="sb-user"></div>
         <button class="sb-logout" onclick="adminLogout()">Sign Out</button>
-        <div class="sb-version">Armand Admin v5.0</div>
+        <div class="sb-version">Armand Admin v5.1</div>
       </div>
     </aside>
 
@@ -446,6 +450,39 @@ th[data-s]:hover{color:#fff}
         </div>
       </div>
 
+
+      <div id="section-reports" class="section">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="mob-menu-btn" onclick="openSidebar()" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+            <div><div class="page-title">Reports</div><div class="page-subtitle">Sales &middot; Products &middot; Customers</div></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <select id="rp-preset" class="f-input f-select" style="width:auto;padding:9px 14px;font-size:12px;background:var(--gray-50);border:1px solid var(--gray-200);color:var(--text)" onchange="rpPresetChange()" aria-label="Period">
+              <option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="ytd">This year</option><option value="all">All time</option><option value="custom">Custom range</option>
+            </select>
+            <input type="date" id="rp-from" class="tbl-search" style="display:none;width:auto" onchange="rpPresetChange()" aria-label="From">
+            <input type="date" id="rp-to" class="tbl-search" style="display:none;width:auto" onchange="rpPresetChange()" aria-label="To">
+            <button class="btn btn-edit btn-sm" onclick="rpExport('orders')">Orders CSV</button>
+            <button class="btn btn-edit btn-sm" onclick="rpExport('products')">Product sales CSV</button>
+          </div>
+        </div>
+        <div style="padding:28px 32px;">
+          <div class="stats-row" id="rp-kpis" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))"></div>
+          <div class="dgrid">
+            <div class="card"><h4>Revenue over time <span id="rp-gran"></span></h4><div class="bars" id="rp-bars"></div><div class="bars-x" id="rp-barsx"></div></div>
+            <div class="card"><h4>Payment methods</h4><div class="stbar" id="rp-paybar"></div><div id="rp-payleg"></div></div>
+          </div>
+          <div class="dgrid two">
+            <div class="card"><h4>Top products <span>by revenue</span></h4><ul class="rank" id="rp-top"></ul></div>
+            <div class="card"><h4>Revenue by category</h4><ul class="rank" id="rp-cat"></ul></div>
+          </div>
+          <div class="dgrid two">
+            <div class="card"><h4>Top customers <span id="rp-cust"></span></h4><ul class="rank" id="rp-topcust"></ul></div>
+            <div class="card"><h4>Orders by weekday <span id="rp-busy"></span></h4><div class="bars" id="rp-wd" style="height:120px"></div><div class="bars-x" id="rp-wdx"></div></div>
+          </div>
+        </div>
+      </div>
 
       <div id="section-orders" class="section">
         <div class="page-hdr">
@@ -1954,6 +1991,79 @@ setInterval(async () => {
   else if (m >= 29 && !_warned) { _warned = true; adminToast('Signing out in 1 minute due to inactivity. Move the mouse to stay signed in.'); }
   else if (m < 29) _warned = false;
 }, 15000);
+
+/* ── v5.1: Reports ── */
+const RP_COL = ['#F36523', '#8fb0ff', '#4fdcec', '#4be08a', '#ffc83d', '#c58bff', '#ff8a8a'];
+const rpMoney = n => CFG.currency + ' ' + (+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let _rpRows = [], _rpProd = [];
+function rpPresetChange() {
+  const c = $g('rp-preset').value === 'custom';
+  $g('rp-from').style.display = $g('rp-to').style.display = c ? '' : 'none';
+  if (!c || ($g('rp-from').value && $g('rp-to').value)) loadReports();
+}
+function rpRange() {
+  const v = $g('rp-preset').value, to = new Date(); let from = new Date(); to.setHours(23, 59, 59, 999);
+  if (v === 'custom') { from = $g('rp-from').value ? new Date($g('rp-from').value + 'T00:00:00') : new Date(2000, 0, 1); if ($g('rp-to').value) to.setTime(new Date($g('rp-to').value + 'T23:59:59').getTime()); }
+  else if (v === 'ytd') from = new Date(to.getFullYear(), 0, 1);
+  else if (v === 'all') from = new Date(2000, 0, 1);
+  else { from.setDate(from.getDate() - (+v - 1)); from.setHours(0, 0, 0, 0); }
+  const len = to - from; return { from, to, pf: new Date(from - len - 1), pt: new Date(from - 1), all: v === 'all' };
+}
+const rpList = (rows, fmt) => { const m = Math.max(1, ...rows.map(r => r[1])); return rows.length ? rows.map(r => `<li><span class="nm">${esc(r[0])}</span><span class="bar"><i style="width:${r[1] / m * 100}%"></i></span><span class="ct" style="min-width:96px">${fmt(r)}</span></li>`).join('') : '<li style="color:var(--muted)">No data in this period.</li>'; };
+async function loadReports() {
+  const r = rpRange(), pad = n => String(n).padStart(2, '0'), ld = x => x.getFullYear() + '-' + pad(x.getMonth() + 1) + '-' + pad(x.getDate());
+  const q = (a, b, cols) => fetchAllRows(() => sb.from('orders').select(cols).gte('created_at', a.toISOString()).lte('created_at', b.toISOString()).order('created_at', { ascending: false }));
+  $g('rp-kpis').innerHTML = '<p style="color:var(--muted)">Loading report\u2026</p>';
+  const [cur, prev] = await Promise.all([q(r.from, r.to, 'id,created_at,status,total,payment_method,customer_name,customer_phone,items'), r.all ? { data: [] } : q(r.pf, r.pt, 'id,total,status')]);
+  if (cur.error) { adminToast('Could not load report: ' + cur.error.message, true); return; }
+  if (!_allProducts.length) { try { await loadProducts_Admin(); } catch (e) {} }
+  const sum = (a, k) => a.reduce((s, o) => s + (+o[k] || 0), 0);
+  const O = cur.data, live = O.filter(o => o.status !== 'cancelled'), rev = sum(live, 'total'), n = live.length;
+  const pl = (prev.data || []).filter(o => o.status !== 'cancelled'), pRev = sum(pl, 'total'), pN = pl.length;
+  const catOf = {}; _allProducts.forEach(p => { catOf[String(p.id)] = p.category || 'Uncategorised'; });
+  let units = 0; const prod = {}, cat = {}, cust = {}, pay = {}, wd = [0, 0, 0, 0, 0, 0, 0], hr = Array(24).fill(0);
+  live.forEach(o => {
+    const pm = o.payment_method || 'Unknown'; (pay[pm] = pay[pm] || { n: 0, v: 0 }).n++; pay[pm].v += +o.total || 0;
+    const ck = String(o.customer_phone || '').replace(/\D/g, '') || o.customer_name || '?', c = cust[ck] = cust[ck] || { name: o.customer_name || ck, n: 0, v: 0 }; c.n++; c.v += +o.total || 0;
+    const dt = new Date(o.created_at); wd[(dt.getDay() + 6) % 7]++; hr[dt.getHours()]++;
+    _parseItems(o.items).forEach(i => { const qy = +i.qty || 1, v = (+i.price || 0) * qy; units += qy; const k = i.name || 'Item', p = prod[k] = prod[k] || { q: 0, v: 0 }; p.q += qy; p.v += v; const cg = catOf[String(i.id)] || 'Uncategorised'; cat[cg] = (cat[cg] || 0) + v; });
+  });
+  _rpRows = O; _rpProd = Object.entries(prod).map(([k, p]) => [k, p.q, p.v]).sort((a, b) => b[2] - a[2]);
+  const dl = (c, p) => (r.all || !p) ? '' : `<span style="color:${c >= p ? '#5be08b' : '#ff8a8a'}">${c >= p ? '\u25B2' : '\u25BC'} ${Math.abs((c - p) / p * 100).toFixed(1)}%</span> vs previous period`;
+  const aov = n ? rev / n : 0, stockVal = _allProducts.reduce((s, p) => s + (+p.stock || 0) * (+p.price || 0), 0);
+  const K = [['Revenue', rpMoney(rev), dl(rev, pRev)], ['Orders', n, dl(n, pN) + (O.length > n ? ' \u00B7 ' + (O.length - n) + ' cancelled' : '')], ['Average order', rpMoney(aov), dl(aov, pN ? pRev / pN : 0)], ['Units sold', units, ''], ['Customers', Object.keys(cust).length, Object.values(cust).filter(c => c.n > 1).length + ' repeat'], ['Stock value (retail)', rpMoney(stockVal), _allProducts.filter(p => p.stock === 0).length + ' out of stock']];
+  $g('rp-kpis').innerHTML = K.map(k => `<div class="stat-card"><div class="sc-num" style="font-size:24px">${k[1]}</div><div class="sc-label">${k[0]}</div><div class="sc-sub">${k[2]}</div></div>`).join('');
+  // revenue over time (daily / weekly / monthly by period length)
+  const days = Math.max(1, Math.round((r.to - r.from) / 864e5) + 1), gran = days <= 31 ? 'd' : days <= 120 ? 'w' : 'm';
+  const key = x => { x = new Date(x); if (gran === 'm') return x.getFullYear() + '-' + pad(x.getMonth() + 1); if (gran === 'w') { const m = new Date(x); m.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return ld(m); } return ld(x); };
+  const B = new Map(); let s0 = new Date(r.all && live.length ? live[live.length - 1].created_at : r.from); s0.setHours(0, 0, 0, 0);
+  if (gran === 'w') s0.setDate(s0.getDate() - ((s0.getDay() + 6) % 7)); if (gran === 'm') s0.setDate(1);
+  for (let x = new Date(s0); x <= r.to; gran === 'm' ? x.setMonth(x.getMonth() + 1) : x.setDate(x.getDate() + (gran === 'w' ? 7 : 1))) B.set(key(x), 0);
+  live.forEach(o => { const k = key(o.created_at); if (B.has(k)) B.set(k, B.get(k) + (+o.total || 0)); });
+  const bv = [...B], bm = Math.max(1, ...bv.map(b => b[1])), step = Math.ceil(bv.length / 12);
+  $g('rp-gran').textContent = { d: 'daily', w: 'weekly', m: 'monthly' }[gran];
+  $g('rp-bars').innerHTML = bv.map(b => `<i style="height:${Math.max(2, b[1] / bm * 100)}%" title="${b[0]}: ${rpMoney(b[1])}"></i>`).join('');
+  $g('rp-barsx').innerHTML = bv.map((b, i) => `<span>${i % step ? '' : (gran === 'd' ? b[0].slice(8) : gran === 'w' ? b[0].slice(5) : b[0].slice(2))}</span>`).join('');
+  // payment methods
+  const pe = Object.entries(pay).sort((a, b) => b[1].v - a[1].v);
+  $g('rp-paybar').innerHTML = pe.map((e, i) => `<i style="width:${rev ? e[1].v / rev * 100 : 0}%;background:${RP_COL[i % 7]}"></i>`).join('');
+  $g('rp-payleg').innerHTML = pe.map((e, i) => `<div class="leg"><span><i style="background:${RP_COL[i % 7]}"></i>${esc(e[0])} \u00B7 ${e[1].n}</span><b>${rpMoney(e[1].v)}</b></div>`).join('') || '<div class="leg" style="color:var(--muted)">No data</div>';
+  $g('rp-top').innerHTML = rpList(_rpProd.slice(0, 8).map(p => [p[0], p[2], p[1]]), r => rpMoney(r[1]) + ' \u00B7 ' + r[2] + ' units');
+  $g('rp-cat').innerHTML = rpList(Object.entries(cat).sort((a, b) => b[1] - a[1]).slice(0, 8), r => rpMoney(r[1]));
+  const tc = Object.values(cust).sort((a, b) => b.v - a.v).slice(0, 6);
+  $g('rp-cust').textContent = Object.keys(cust).length + ' customers';
+  $g('rp-topcust').innerHTML = rpList(tc.map(c => [c.name, c.v, c.n]), r => rpMoney(r[1]) + ' \u00B7 ' + r[2] + ' orders');
+  const wm = Math.max(1, ...wd), names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], bh = hr.indexOf(Math.max(...hr));
+  $g('rp-wd').innerHTML = wd.map((v, i) => `<i style="height:${Math.max(2, v / wm * 100)}%" title="${names[i]}: ${v} orders"></i>`).join('');
+  $g('rp-wdx').innerHTML = names.map(x => `<span>${x}</span>`).join('');
+  $g('rp-busy').textContent = n ? 'peak hour ' + pad(bh) + ':00' : '';
+}
+function rpExport(w) {
+  if (w === 'orders') exportCSV('sales-orders', ['Order', 'Date', 'Customer', 'Phone', 'Payment', 'Status', 'Total'], _rpRows.map(o => [o.id, o.created_at, o.customer_name, o.customer_phone, o.payment_method, o.status, o.total]));
+  else exportCSV('sales-by-product', ['Product', 'Units', 'Revenue'], _rpProd.map(p => [p[0], p[1], p[2].toFixed(2)]));
+}
+const _ss3 = showSection; showSection = function (n) { _ss3(n); if (n === 'reports') loadReports(); };
+CMD.splice(4, 0, ['Reports', 'reports']);
 </script>
 </body>
 </html>
