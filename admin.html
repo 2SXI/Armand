@@ -215,6 +215,22 @@ table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(24
 #cmdk-in{width:100%;padding:18px 20px;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;font-size:15px;outline:none}
 .cmdk-it{padding:12px 20px;font-size:13px;color:#cfcfd8;cursor:pointer}.cmdk-it.on,.cmdk-it:hover{background:rgba(243,101,35,.16);color:#fff}
 @media(max-width:900px){.dgrid,.dgrid.two{grid-template-columns:1fr}}
+
+/* ═══ v5 — industry-grade tables, bulk actions, audit ═══ */
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 4px;color:var(--muted);font-size:12px}
+.pager button{padding:6px 14px;border-radius:8px;border:1px solid var(--gray-200);background:var(--gray-100);color:var(--text);cursor:pointer}.pager button:disabled{opacity:.4;cursor:default}
+.pager select{background:var(--gray-50);color:var(--text);border:1px solid var(--gray-200);border-radius:8px;padding:5px 8px;margin-right:10px}
+.pg-all,.pg-r{accent-color:#F36523;width:16px;height:16px;cursor:pointer}
+th[data-s]:hover{color:#fff}
+#bulkbar{position:fixed;left:50%;bottom:24px;transform:translate(-50%,160%);z-index:300;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;max-width:94vw;padding:10px 14px;background:#14141a;border:1px solid rgba(243,101,35,.55);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);transition:transform .25s}
+#bulkbar.on{transform:translate(-50%,0)}
+#bulkbar b{color:#fff;font-size:13px;margin-right:6px}#bulkbar a{color:var(--orange);font-size:12px;cursor:pointer;margin-right:6px;text-decoration:underline}
+#bulkbar button{padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e6e6ec;font-size:12px;cursor:pointer}
+#bulkbar button:hover{background:var(--orange);border-color:var(--orange);color:#fff}#bulkbar button.danger{color:#ff8a8a}
+#auditov{position:fixed;inset:0;z-index:400;background:rgba(5,5,8,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
+#auditov.open{display:flex}.audit-box{width:min(720px,94vw);max-height:80vh;overflow:auto;background:#14141a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px 22px}
+.audit-box h3{color:#fff;margin:0 0 14px;display:flex;justify-content:space-between;font-size:16px}.audit-box h3 button{background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer}
+.audit-row{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:#cfcfd8}.audit-row small{color:var(--muted);display:block}.audit-row b{color:#fff}
 </style>
 </head>
 <body>
@@ -246,6 +262,7 @@ table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(24
         <div class="sb-logo-sub">Management Console</div>
       </div>
       <div class="sb-search" onclick="cmdOpen()"><span>Search / jump</span><kbd>Ctrl K</kbd></div>
+      <div class="sb-search" onclick="openAudit()" style="margin-top:8px"><span>Activity log</span></div>
       <nav class="sb-nav">
         <div class="sb-link active" onclick="showSection('dashboard')" data-section="dashboard">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -272,7 +289,7 @@ table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(24
       <div class="sb-bottom">
         <div class="sb-user" id="sb-user"></div>
         <button class="sb-logout" onclick="adminLogout()">Sign Out</button>
-        <div class="sb-version">Armand Admin v4.1</div>
+        <div class="sb-version">Armand Admin v5.0</div>
       </div>
     </aside>
 
@@ -451,6 +468,7 @@ table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(24
           <div class="table-wrap">
             <div class="tbl-toolbar">
               <input type="text" class="tbl-search" id="order-search" placeholder="Search name, phone or #order..." oninput="filterOrderTable()">
+              <input type="date" id="order-from" class="tbl-search" style="width:auto" onchange="filterOrderTable()" aria-label="From date" title="From date"><input type="date" id="order-to" class="tbl-search" style="width:auto" onchange="filterOrderTable()" aria-label="To date" title="To date">
               <button class="btn btn-edit btn-sm" onclick="exportOrders()">Export CSV</button>
               <div class="chips" id="order-chips"></div>
               <button class="btn btn-primary btn-sm" onclick="loadOrders_Admin()">
@@ -673,6 +691,8 @@ table td{border-color:rgba(255,255,255,.05)}table tr:hover td{background:rgba(24
 </div>
 
 <div id="cmdk"><div class="cmdk-box"><input id="cmdk-in" placeholder="Jump to a page, or search products and orders…" autocomplete="off"><div id="cmdk-list"></div></div></div>
+<div id="bulkbar" role="toolbar" aria-label="Bulk actions"></div>
+<div id="auditov"><div class="audit-box"><h3>Activity log <button onclick="closeAudit()" aria-label="Close">&times;</button></h3><div id="audit-list"></div></div></div>
 <div id="admin-toast"></div>
 
 <script>
@@ -1716,8 +1736,11 @@ async function renderInsights() {
 
 function filterOrderTable() {
   const q = ($g('order-search')?.value || '').toLowerCase(), st = $g('order-status-filter')?.value || '';
-  $g('order-chips').innerHTML = ['', ...ST].map(s => `<button class="chip${s === st ? ' on' : ''}" onclick="$g('order-status-filter').value='${s}';filterOrderTable()">${s || 'all'}<b>${s ? _allOrders.filter(o => (o.status || 'pending') === s).length : _allOrders.length}</b></button>`).join('');
-  renderOrderTable(_allOrders.filter(o => (!st || (o.status || 'pending') === st) && ((o.customer_name || '').toLowerCase().includes(q) || (o.customer_phone || '').toLowerCase().includes(q) || ('#' + o.id).includes(q))));
+  const f = $g('order-from')?.value, t = $g('order-to')?.value;
+  const t0 = f ? new Date(f + 'T00:00:00').getTime() : 0, t1 = t ? new Date(t + 'T23:59:59').getTime() : Infinity;
+  const base = _allOrders.filter(o => { const x = new Date(o.created_at).getTime(); return x >= t0 && x <= t1; });
+  $g('order-chips').innerHTML = ['', ...ST].map(s => `<button class="chip${s === st ? ' on' : ''}" onclick="$g('order-status-filter').value='${s}';filterOrderTable()">${s || 'all'}<b>${s ? base.filter(o => (o.status || 'pending') === s).length : base.length}</b></button>`).join('');
+  renderOrderTable(base.filter(o => (!st || (o.status || 'pending') === st) && ((o.customer_name || '').toLowerCase().includes(q) || (o.customer_phone || '').toLowerCase().includes(q) || ('#' + o.id).includes(q))));
 }
 
 let _pChip = '';
@@ -1813,6 +1836,124 @@ async function pollOrders() {
 }
 setTimeout(() => { if ($g('admin-app').style.display === 'block') pollOrders(); }, 4000);
 setInterval(() => { if ($g('admin-app').style.display === 'block' && !document.hidden) pollOrders(); }, 60000);
+
+/* ── v5: pagination, sorting, bulk actions, audit trail, idle sign-out ── */
+const PG = {
+  orders:   { page: 1, size: 25, raw: [], rows: [], sel: new Set(), sort: null, tb: 'orders-tbody',   idOf: o => o.id, cols: { '#': 'id', 'Customer': 'customer_name', 'Total': 'total', 'Status': 'status', 'Date': 'created_at' } },
+  products: { page: 1, size: 25, raw: [], rows: [], sel: new Set(), sort: null, tb: 'products-tbody', idOf: p => p.id, cols: { 'Name / SKU': 'name', 'Category': 'category', 'Price': 'price', 'Stock': 'stock', 'Status': 'active' } }
+};
+function pgSlice(k) { const g = PG[k]; return g.rows.slice((g.page - 1) * g.size, g.page * g.size); }
+function pgRender(k, rows, orig) {
+  const g = PG[k]; g.orig = orig;
+  const sig = rows.length + ':' + (rows[0] ? g.idOf(rows[0]) : ''); if (sig !== g.sig) { g.page = 1; g.sig = sig; }
+  g.raw = rows;
+  g.rows = g.sort ? [...rows].sort((a, b) => { const x = a[g.sort.f], y = b[g.sort.f]; return g.sort.d * ((typeof x === 'number' && typeof y === 'number') ? x - y : String(x ?? '').localeCompare(String(y ?? ''), undefined, { numeric: true })); }) : rows;
+  g.page = Math.min(g.page, Math.max(1, Math.ceil(g.rows.length / g.size)));
+  const slice = pgSlice(k); orig(slice);
+  const tb = $g(g.tb), table = tb.closest('table'), hr = table.querySelector('thead tr');
+  if (!hr.querySelector('.pg-all')) {
+    hr.insertAdjacentHTML('afterbegin', '<th style="width:36px"><input type="checkbox" class="pg-all" aria-label="Select all on this page"></th>');
+    hr.querySelector('.pg-all').onchange = e => { pgSlice(k).forEach(it => e.target.checked ? g.sel.add(g.idOf(it)) : g.sel.delete(g.idOf(it))); pgRender(k, g.raw, g.orig); pgBar(k); };
+  }
+  hr.querySelector('.pg-all').checked = slice.length > 0 && slice.every(it => g.sel.has(g.idOf(it)));
+  hr.querySelectorAll('th').forEach(th => {
+    const l = th.dataset.l || (th.dataset.l = th.textContent.trim()), f = g.cols[l]; if (!f) return;
+    th.style.cursor = 'pointer'; th.title = 'Sort by ' + l;
+    th.textContent = l + (g.sort && g.sort.f === f ? (g.sort.d > 0 ? ' \u25B2' : ' \u25BC') : '');
+    if (!th.dataset.s) { th.dataset.s = 1; th.addEventListener('click', () => { g.sort = g.sort && g.sort.f === f ? { f, d: -g.sort.d } : { f, d: 1 }; pgRender(k, g.raw, g.orig); }); }
+  });
+  [...tb.children].forEach((tr, i) => {
+    if (!slice[i] || tr.children.length < 3) return;
+    const id = g.idOf(slice[i]);
+    tr.insertAdjacentHTML('afterbegin', '<td><input type="checkbox" class="pg-r" aria-label="Select row"' + (g.sel.has(id) ? ' checked' : '') + '></td>');
+    tr.querySelector('.pg-r').onchange = e => { e.target.checked ? g.sel.add(id) : g.sel.delete(id); tr.style.background = e.target.checked ? 'rgba(243,101,35,.08)' : ''; pgBar(k); };
+    if (g.sel.has(id)) tr.style.background = 'rgba(243,101,35,.08)';
+  });
+  let pg = $g('pager-' + k);
+  if (!pg) { pg = document.createElement('div'); pg.id = 'pager-' + k; pg.className = 'pager'; table.parentElement.after(pg); }
+  const pages = Math.max(1, Math.ceil(g.rows.length / g.size));
+  pg.innerHTML = `<span>${g.rows.length ? ((g.page - 1) * g.size + 1) + '\u2013' + Math.min(g.page * g.size, g.rows.length) + ' of ' + g.rows.length : 'No results'}</span><span><select onchange="pgSize('${k}',+this.value)" aria-label="Rows per page">${[25, 50, 100].map(n => `<option${n === g.size ? ' selected' : ''}>${n}</option>`).join('')}</select><button ${g.page < 2 ? 'disabled' : ''} onclick="pgGo('${k}',-1)">Prev</button> <span style="margin:0 8px">Page ${g.page} / ${pages}</span> <button ${g.page >= pages ? 'disabled' : ''} onclick="pgGo('${k}',1)">Next</button></span>`;
+}
+function pgGo(k, d) { PG[k].page += d; pgRender(k, PG[k].raw, PG[k].orig); }
+function pgSize(k, n) { PG[k].size = n; PG[k].page = 1; pgRender(k, PG[k].raw, PG[k].orig); }
+function pgSelAll(k) { const g = PG[k]; g.rows.forEach(it => g.sel.add(g.idOf(it))); pgRender(k, g.raw, g.orig); pgBar(k); }
+function pgClear(k) { const g = PG[k]; g.sel.clear(); if (g.orig) pgRender(k, g.raw, g.orig); pgBar(k); }
+function pgBar(k) {
+  const g = PG[k], n = g.sel.size, b = $g('bulkbar');
+  if (!n) { b.classList.remove('on'); return; }
+  b.classList.add('on');
+  const acts = k === 'orders'
+    ? [['confirmed', 'Confirm'], ['shipped', 'Ship'], ['delivered', 'Delivered'], ['cancelled', 'Cancel']].map(a => `<button onclick="bulkOrders('${a[0]}')">${a[1]}</button>`).join('')
+    : '<button onclick="bulkProducts(\'show\')">Show</button><button onclick="bulkProducts(\'hide\')">Hide</button><button onclick="bulkProducts(\'price\')">Price %</button><button onclick="bulkProducts(\'cat\')">Category</button><button class="danger" onclick="bulkProducts(\'del\')">Delete</button>';
+  b.innerHTML = `<b>${n} selected</b>${g.rows.length > n ? `<a onclick="pgSelAll('${k}')">Select all ${g.rows.length}</a>` : ''}${acts}<button onclick="${k === 'orders' ? 'exportOrders' : 'exportProducts'}()">Export</button><button onclick="pgClear('${k}')">Clear</button>`;
+}
+const _rpt0 = renderProductTable; renderProductTable = rows => pgRender('products', rows, _rpt0);
+const _rot1 = renderOrderTable;   renderOrderTable   = rows => pgRender('orders', rows, _rot1);
+const _showSec0 = showSection; showSection = function (n) { $g('bulkbar').classList.remove('on'); _showSec0(n); if (n === 'orders') pgBar('orders'); if (n === 'products') pgBar('products'); };
+
+/* audit trail (needs supabase-admin-v2.sql; silently skipped until it is run) */
+async function audit(action, detail) {
+  try { const { data } = await sb.auth.getSession(); await sb.from('admin_audit').insert({ actor: (data.session && data.session.user.email) || null, action, detail: detail || null }); } catch (e) {}
+}
+const _uos = updateOrderStatus;
+updateOrderStatus = async function (id, s) { await _uos(id, s); const o = _allOrders.find(x => x.id === id); if (o && o.status === s) audit('order.status', '#' + id + ' \u2192 ' + s); };
+const _dp = deleteProduct;
+deleteProduct = async function (id, name) { await _dp(id, name); try { const { data } = await sb.from('products').select('id').eq('id', id).maybeSingle(); if (!data) audit('product.delete', name); } catch (e) {} };
+async function openAudit() {
+  $g('auditov').classList.add('open'); const L = $g('audit-list'); L.innerHTML = '<p style="color:var(--muted)">Loading\u2026</p>';
+  const { data, error } = await sb.from('admin_audit').select('*').order('created_at', { ascending: false }).limit(100);
+  if (error) { L.innerHTML = '<p style="color:#ffc83d">The activity log is not set up yet. Run <b>supabase-admin-v2.sql</b> in the Supabase SQL editor.</p>'; return; }
+  L.innerHTML = data.length ? data.map(r => `<div class="audit-row"><div>${new Date(r.created_at).toLocaleString('en-GB')}<small>${esc(r.actor || '')}</small></div><div><b>${esc(r.action)}</b><br>${esc(r.detail || '')}</div></div>`).join('') : '<p style="color:var(--muted)">No activity recorded yet.</p>';
+}
+function closeAudit() { $g('auditov').classList.remove('open'); }
+$g('auditov').addEventListener('click', e => { if (e.target.id === 'auditov') closeAudit(); });
+
+/* bulk executors */
+async function bulkOrders(st) {
+  const g = PG.orders, ids = [...g.sel];
+  if (st === 'cancelled' && !await confirmDialog('Cancel ' + ids.length + ' orders?')) return;
+  const { error } = await sb.from('orders').update({ status: st }).in('id', ids);
+  if (error) return adminToast('Bulk update failed: ' + error.message, true);
+  _allOrders.forEach(o => { if (g.sel.has(o.id)) o.status = st; });
+  adminToast(ids.length + ' orders \u2192 ' + st); audit('order.bulk_status', ids.length + ' orders \u2192 ' + st + ' (' + ids.slice(0, 20).map(i => '#' + i).join(' ') + ')');
+  g.sel.clear(); filterOrderTable(); pgBar('orders'); refreshDashboard();
+}
+async function bulkProducts(op) {
+  const g = PG.products, ids = [...g.sel]; let patch = null, label = op;
+  if (op === 'show' || op === 'hide') patch = { active: op === 'show' };
+  else if (op === 'cat') { const c = (prompt('Move ' + ids.length + ' products to category:') || '').trim(); if (!c) return; patch = { category: c }; label = 'category ' + c; }
+  else if (op === 'del') {
+    if (!await confirmDialog('Delete ' + ids.length + ' products?\n\nThis cannot be undone.')) return;
+    const { error } = await sb.from('products').delete().in('id', ids);
+    if (error) return adminToast('Delete failed: ' + error.message, true);
+    audit('product.bulk_delete', ids.length + ' products'); adminToast(ids.length + ' products deleted'); g.sel.clear(); pgBar('products'); return loadProducts_Admin();
+  } else if (op === 'price') {
+    const v = parseFloat(prompt('Change the price of ' + ids.length + ' products by % (e.g. 10 or -5):'));
+    if (!isFinite(v) || !v || v <= -100) return;
+    const rs = await Promise.all(_allProducts.filter(p => g.sel.has(p.id)).map(p => sb.from('products').update({ price: Math.round((+p.price || 0) * (1 + v / 100) * 100) / 100 }).eq('id', p.id)));
+    const bad = rs.filter(r => r.error).length;
+    audit('product.bulk_price', ids.length + ' products ' + (v > 0 ? '+' : '') + v + '%' + (bad ? ' (' + bad + ' failed)' : ''));
+    adminToast(bad ? bad + ' price updates failed' : 'Prices updated', !!bad); g.sel.clear(); pgBar('products'); return loadProducts_Admin();
+  }
+  const { error } = await sb.from('products').update(patch).in('id', ids);
+  if (error) return adminToast('Update failed: ' + error.message, true);
+  audit('product.bulk_' + op, ids.length + ' products (' + label + ')'); adminToast(ids.length + ' products updated'); g.sel.clear(); pgBar('products'); loadProducts_Admin();
+}
+
+/* exports honour filters, sorting and selection */
+function exportOrders() { const g = PG.orders, r = g.sel.size ? g.rows.filter(o => g.sel.has(o.id)) : g.rows; exportCSV('orders', ['Order','Date','Customer','Phone','Items','Total','Payment','Status'], r.map(o => [o.id, o.created_at, o.customer_name, o.customer_phone, _parseItems(o.items).reduce((s, i) => s + (i.qty || 1), 0), o.total, o.payment_method, o.status])); }
+function exportProducts() { const g = PG.products, r = g.sel.size ? g.rows.filter(p => g.sel.has(p.id)) : g.rows; exportCSV('products', ['ID','Name','SKU','Category','Price','Stock','Active'], r.map(p => [p.id, p.name, p.sku, p.category, p.price, p.stock, p.active !== false])); }
+
+/* auto sign-out after 30 minutes of inactivity */
+let _idle = Date.now(), _warned = false;
+['click', 'keydown', 'mousemove', 'touchstart', 'scroll'].forEach(e => document.addEventListener(e, () => { _idle = Date.now(); }, { passive: true }));
+setInterval(async () => {
+  if ($g('admin-app').style.display !== 'block') return;
+  const m = (Date.now() - _idle) / 6e4;
+  if (m >= 30) { await sb.auth.signOut(); location.reload(); }
+  else if (m >= 29 && !_warned) { _warned = true; adminToast('Signing out in 1 minute due to inactivity. Move the mouse to stay signed in.'); }
+  else if (m < 29) _warned = false;
+}, 15000);
 </script>
 </body>
 </html>

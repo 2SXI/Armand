@@ -750,10 +750,10 @@ function initMobileNav() {
         <nav class="mnp-nav" aria-label="Pages">
           ${item('index.html','Home')}
           ${item('products.html','Products')}
-          ${item('about.html','About')}
           ${item('portfolio.html','Portfolio')}
           ${item('trade.html','Trade accounts')}
           ${item('contact.html','Contact')}
+          ${item('about.html','About')}
           ${item('account.html','Sign in / Account')}
         </nav>
         <div class="mnp-group">
