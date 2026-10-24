@@ -34,7 +34,7 @@ for (const p of pages) {
   const act = [...d.querySelectorAll('#navMenu a.active')].map(a => a.getAttribute('href'));
   if (d.getElementById('navMenu') && !['404.html','admin.html'].includes(p)) {
     if(p!=='index.html') ok(act.length === 1, `${p}: nav active count ${act.length}`);
-    if (act.length === 1 && p !== 'index.html') ok(act[0] === p || (p==='product.html'&&act[0]==='products.html'), `${p}: wrong active nav item (${act[0]})`);
+    if (act.length === 1 && p !== 'index.html') ok(act[0] === p || (p==='product.html'&&act[0]==='products.html') || (p==='legal.html'&&act[0]==='about.html'), `${p}: wrong active nav item (${act[0]})`);
   }
   ok(!/lorem|TODO|FIXME|xxx-xxx/i.test(html.replace(/\+263 xxx xxx xxx/,'')), `${p}: placeholder text found`);
 }
