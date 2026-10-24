@@ -22,6 +22,22 @@
     $('setEmail').textContent = email || '';
   }
 
+  /* ── password policy: length, common-password and breach check (k-anonymity: only 5 hash characters leave the browser) ── */
+  const COMMON = ['password', '12345678', '123456789', 'qwerty', 'iloveyou', 'admin123', 'welcome1', 'letmein', 'zimbabwe', 'harare', 'bulawayo', 'passw0rd', 'abcd1234', 'changeme', '11111111', '00000000'];
+  async function pwProblem(pw, email) {
+    const l = String(pw).toLowerCase(), local = String(email || '').split('@')[0].toLowerCase();
+    if (pw.length < 10) return 'Use at least 10 characters.';
+    if (COMMON.some(c => l.includes(c))) return 'That password is too easy to guess. Choose something less common.';
+    if (local.length > 3 && l.includes(local)) return 'Do not include your email name in your password.';
+    try {
+      const h = [...new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(pw)))].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      const r = await fetch('https://api.pwnedpasswords.com/range/' + h.slice(0, 5), { headers: { 'Add-Padding': 'true' } });
+      if (r.ok && (await r.text()).split('\n').some(x => x.startsWith(h.slice(5) + ':') && +x.split(':')[1] > 0)) return 'This password has appeared in a known data breach. Please choose a different one.';
+    } catch (e) { /* offline or blocked: the other checks still apply */ }
+    return '';
+  }
+  let fails = 0, lockUntil = 0, mfaPending = null;
+
   const views = ['viewAuth', 'viewAccount', 'viewRecover'];
   function show(id) { views.forEach(v => { $(v).hidden = v !== id; }); }
 
@@ -102,6 +118,7 @@
     if (!ok) return;
     if (!sb) { banner('Cannot reach the account service. Please try again later.', 'err'); return; }
 
+    const weak = await pwProblem(f.pass, f.email); if (weak) { banner(weak, 'err'); return; }
     const btn = $('regBtn'); busy(btn, true, 'Creating account…');
     try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {}   // never keep an older login (e.g. admin) in this browser
     const { data, error } = await sb.auth.signUp({
@@ -113,11 +130,11 @@
 
     // Supabase returns a user with no identities when the email is already taken.
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      banner('An account with this email already exists. Try signing in.', 'err'); return;
+      selectTab('Login'); banner('If this email is new, we have sent a confirmation link to ' + f.email + '. If you already have an account, sign in or use "Forgot password".', 'ok'); return;
     }
     $('registerForm').reset();
     if (data.session) { await render(); }                  // email confirmation is switched off
-    else { selectTab('Login'); banner('Account created. We sent a confirmation link to ' + f.email + '. Open it, then sign in.', 'ok'); }
+    else { selectTab('Login'); banner('If this email is new, we have sent a confirmation link to ' + f.email + '. If you already have an account, sign in or use "Forgot password".', 'ok'); }
   });
 
   /* ── sign in ──────────────────────────────────────────── */
@@ -131,10 +148,31 @@
     ]);
     if (!ok) return;
     if (!sb) { banner('Cannot reach the account service. Please try again later.', 'err'); return; }
+    if (Date.now() < lockUntil) { banner('Too many attempts. Try again in ' + Math.ceil((lockUntil - Date.now()) / 1000) + ' seconds.', 'err'); return; }
+    if (mfaPending) {
+      const code = $('log-code').value.trim();
+      if (!/^\d{6}$/.test(code)) { banner('Enter the 6-digit code from your authenticator app.', 'err'); return; }
+      const ch = await sb.auth.mfa.challenge({ factorId: mfaPending });
+      if (ch.error) { banner(friendly(ch.error), 'err'); return; }
+      const v = await sb.auth.mfa.verify({ factorId: mfaPending, challengeId: ch.data.id, code });
+      if (v.error) { if (++fails >= 5) { lockUntil = Date.now() + 60000; fails = 0; } banner('That code is not correct or has expired.', 'err'); $('log-code').value = ''; return; }
+      mfaPending = null; fails = 0; $('mfaLogin').hidden = true; $('loginForm').reset(); await render(); return;
+    }
     const btn = $('logBtn'); busy(btn, true, 'Signing in…');
     const { error } = await sb.auth.signInWithPassword({ email, password: pass });
     busy(btn, false);
-    if (error) { banner(friendly(error), 'err'); $('log-pass').value = ''; return; }
+    if (error) {
+      if (++fails >= 5) { lockUntil = Date.now() + 60000; fails = 0; }
+      banner(friendly(error), 'err'); $('log-pass').value = ''; return;
+    }
+    fails = 0;
+    if (sb.auth.mfa) {                       // two-factor: password alone is not enough
+      const aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal.data && aal.data.nextLevel === 'aal2' && aal.data.currentLevel !== 'aal2') {
+        const f = await sb.auth.mfa.listFactors(), t = f.data && f.data.totp && f.data.totp[0];
+        if (t) { mfaPending = t.id; $('mfaLogin').hidden = false; $('log-code').focus(); banner('Enter the 6-digit code from your authenticator app.', 'ok'); return; }
+      }
+    }
     $('loginForm').reset();
     await render();
   });
@@ -157,6 +195,7 @@
     e.preventDefault();
     const p1 = $('rec-pass').value, p2 = $('rec-pass2').value;
     if (!AV.check([[$('rec-pass'), AV.password(p1)], [$('rec-pass2'), AV.match(p1, p2)]])) return;
+    const weakR = await pwProblem(p1, ''); if (weakR) { banner(weakR, 'err'); return; }
     const btn = $('recBtn'); busy(btn, true, 'Saving…');
     const { error } = await sb.auth.updateUser({ password: p1 });
     busy(btn, false);
@@ -197,14 +236,75 @@
 
   $('pwForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const p1 = $('pw-new').value, p2 = $('pw-new2').value;
+    const cur = $('pw-cur').value, p1 = $('pw-new').value, p2 = $('pw-new2').value;
+    if (!cur) { banner('Enter your current password.', 'err'); return; }
     if (!AV.check([[$('pw-new'), AV.password(p1)], [$('pw-new2'), AV.match(p1, p2)]])) return;
+    const { data: { session } } = await sb.auth.getSession();
+    const weak = await pwProblem(p1, session && session.user.email); if (weak) { banner(weak, 'err'); return; }
     const btn = $('pwBtn'); busy(btn, true, 'Updating…');
+    // verify the current password on a throw-away client so this session (and its 2FA level) is untouched
+    const vc = (window.supabase && sb.supabaseUrl) ? window.supabase.createClient(sb.supabaseUrl, sb.supabaseKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } }) : sb;
+    const re = await vc.auth.signInWithPassword({ email: session.user.email, password: cur });
+    if (re.error) { busy(btn, false); banner('Your current password is incorrect.', 'err'); $('pw-cur').value = ''; return; }
     const { error } = await sb.auth.updateUser({ password: p1 });
     busy(btn, false);
     if (error) { banner(friendly(error), 'err'); return; }
     $('pwForm').reset();
     banner('Password updated.', 'ok');
+  });
+
+
+  /* ── two-factor authentication (TOTP) ── */
+  async function loadMfa() {
+    const box = $('mfaStatus'); if (!box) return;
+    if (!sb.auth || !sb.auth.mfa) { box.textContent = 'Two-factor authentication is not available right now.'; return; }
+    const { data, error } = await sb.auth.mfa.listFactors();
+    if (error) { box.textContent = 'Could not load two-factor status.'; return; }
+    const f = (data.totp || [])[0];
+    box.innerHTML = f
+      ? '<p><span class="badge bg-success">On</span> Authenticator app enabled.</p><button type="button" class="btn btn-outline-dark" id="mfaOff">Turn off</button>'
+      : '<p><span class="badge bg-secondary">Off</span></p><button type="button" class="btn btn-brand" id="mfaOn">Set up authenticator app</button><div id="mfaSetup" class="mt-3" hidden></div>';
+    if (f) $('mfaOff').onclick = async () => {
+      if (!confirm('Turn off two-factor authentication?')) return;
+      const r = await sb.auth.mfa.unenroll({ factorId: f.id });
+      if (r.error) { banner(friendly(r.error), 'err'); return; }
+      banner('Two-factor authentication turned off.', 'ok'); loadMfa();
+    };
+    else $('mfaOn').onclick = async () => {
+      const r = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Armand ' + Date.now() });
+      if (r.error) { banner(friendly(r.error), 'err'); return; }
+      const s = $('mfaSetup'); s.hidden = false;
+      s.innerHTML = '<p class="acct-muted">1. Scan this QR code with your authenticator app, or type the key in.</p><img alt="QR code for setting up two-factor authentication" width="180" height="180" src="' + esc(r.data.totp.qr_code) + '"><p class="acct-muted">Key: <code>' + esc(r.data.totp.secret) + '</code></p><label class="form-label" for="mfaCode">2. Enter the 6-digit code</label><input id="mfaCode" class="form-control mb-2" inputmode="numeric" autocomplete="one-time-code" maxlength="6" style="max-width:200px"><button type="button" class="btn btn-brand" id="mfaVerify">Verify and turn on</button>';
+      $('mfaVerify').onclick = async () => {
+        const code = $('mfaCode').value.trim();
+        if (!/^\d{6}$/.test(code)) { banner('Enter the 6-digit code.', 'err'); return; }
+        const ch = await sb.auth.mfa.challenge({ factorId: r.data.id });
+        if (ch.error) { banner(friendly(ch.error), 'err'); return; }
+        const v = await sb.auth.mfa.verify({ factorId: r.data.id, challengeId: ch.data.id, code });
+        if (v.error) { banner('That code is not correct. Try again.', 'err'); return; }
+        banner('Two-factor authentication is on. You will be asked for a code each time you sign in.', 'ok'); loadMfa();
+      };
+    };
+  }
+  $('signOutOthers').addEventListener('click', async () => {
+    const { error } = await sb.auth.signOut({ scope: 'others' });
+    banner(error ? friendly(error) : 'You have been signed out on all other devices.', error ? 'err' : 'ok');
+  });
+  $('exportData').addEventListener('click', async () => {
+    const { data: { session } } = await sb.auth.getSession(); if (!session) return;
+    const prof = (await sb.from('profiles').select('*').maybeSingle()).data;
+    const out = { exported_at: new Date().toISOString(), account: { id: session.user.id, email: session.user.email, created_at: session.user.created_at }, profile: prof, orders: allOrders };
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
+    a.download = 'my-armand-data.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  $('deleteAcct').addEventListener('click', async () => {
+    const t = prompt('This permanently deletes your account and sign-in. The shop keeps past orders for its records, no longer linked to you.\n\nType DELETE to confirm.');
+    if (t !== 'DELETE') return;
+    const { error } = await sb.rpc('delete_my_account');
+    if (error) { banner('We could not delete your account right now. Please contact us and we will do it for you.', 'err'); return; }
+    try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {}
+    await render(); banner('Your account has been deleted.', 'ok');
   });
 
   const money = n => 'USD ' + Number(n || 0).toFixed(2);
@@ -331,8 +431,13 @@
     if (!sb) { show('viewAuth'); banner('Cannot reach the account service. Please try again later.', 'err'); return; }
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { show('viewAuth'); return; }
+    if (sb.auth && sb.auth.mfa) {
+      const a = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (a.data && a.data.nextLevel === 'aal2' && a.data.currentLevel !== 'aal2') { try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {} show('viewAuth'); return; }
+    }
     show('viewAccount');
     tabFromHash();
+    loadMfa();
     await Promise.all([loadProfile(session.user), loadOrders(session.user.id)]);
   }
 

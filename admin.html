@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Armand Admin — Management Console</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="vendor/supabase-js-2.118.0.js"></script>
 <script src="validate.js"></script>
 <style>
 @font-face{font-family:'Saira';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/saira-latin-500-normal.woff2') format('woff2');}
@@ -231,6 +231,17 @@ th[data-s]:hover{color:#fff}
 #auditov.open{display:flex}.audit-box{width:min(720px,94vw);max-height:80vh;overflow:auto;background:#14141a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px 22px}
 .audit-box h3{color:#fff;margin:0 0 14px;display:flex;justify-content:space-between;font-size:16px}.audit-box h3 button{background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer}
 .audit-row{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:#cfcfd8}.audit-row small{color:var(--muted);display:block}.audit-row b{color:#fff}
+
+/* ═══ v5.2 fixes ═══ */
+#sb-pending-badge{background:var(--orange)!important;color:#fff!important;border-radius:20px!important;padding:2px 8px!important;font-size:10px!important;letter-spacing:0!important}
+.pg-all,.pg-r{-webkit-appearance:none;appearance:none;width:18px;height:18px;border:1.5px solid rgba(255,255,255,.4);border-radius:5px;background:transparent;cursor:pointer;display:inline-grid;place-content:center;vertical-align:middle}
+.pg-all:checked,.pg-r:checked{background:var(--orange);border-color:var(--orange)}
+.pg-all:checked::after,.pg-r:checked::after{content:'';width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.pg-all:focus-visible,.pg-r:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+input[type=date]{color-scheme:dark}
+table select{border-radius:8px}
+#order-from,#order-to,#rp-from,#rp-to{flex:0 0 160px!important;width:160px!important}
+.tbl-toolbar .chips{order:10}
 </style>
 </head>
 <body>
@@ -468,7 +479,7 @@ th[data-s]:hover{color:#fff}
           </div>
         </div>
         <div style="padding:28px 32px;">
-          <div class="stats-row" id="rp-kpis" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))"></div>
+          <div class="stats-row" id="rp-kpis" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"></div>
           <div class="dgrid">
             <div class="card"><h4>Revenue over time <span id="rp-gran"></span></h4><div class="bars" id="rp-bars"></div><div class="bars-x" id="rp-barsx"></div></div>
             <div class="card"><h4>Payment methods</h4><div class="stbar" id="rp-paybar"></div><div id="rp-payleg"></div></div>
@@ -2048,11 +2059,11 @@ async function loadReports() {
   const pe = Object.entries(pay).sort((a, b) => b[1].v - a[1].v);
   $g('rp-paybar').innerHTML = pe.map((e, i) => `<i style="width:${rev ? e[1].v / rev * 100 : 0}%;background:${RP_COL[i % 7]}"></i>`).join('');
   $g('rp-payleg').innerHTML = pe.map((e, i) => `<div class="leg"><span><i style="background:${RP_COL[i % 7]}"></i>${esc(e[0])} \u00B7 ${e[1].n}</span><b>${rpMoney(e[1].v)}</b></div>`).join('') || '<div class="leg" style="color:var(--muted)">No data</div>';
-  $g('rp-top').innerHTML = rpList(_rpProd.slice(0, 8).map(p => [p[0], p[2], p[1]]), r => rpMoney(r[1]) + ' \u00B7 ' + r[2] + ' units');
+  $g('rp-top').innerHTML = rpList(_rpProd.slice(0, 8).map(p => [p[0], p[2], p[1]]), r => rpMoney(r[1]) + ' \u00B7 ' + r[2] + (r[2] === 1 ? ' unit' : ' units'));
   $g('rp-cat').innerHTML = rpList(Object.entries(cat).sort((a, b) => b[1] - a[1]).slice(0, 8), r => rpMoney(r[1]));
   const tc = Object.values(cust).sort((a, b) => b.v - a.v).slice(0, 6);
   $g('rp-cust').textContent = Object.keys(cust).length + ' customers';
-  $g('rp-topcust').innerHTML = rpList(tc.map(c => [c.name, c.v, c.n]), r => rpMoney(r[1]) + ' \u00B7 ' + r[2] + ' orders');
+  $g('rp-topcust').innerHTML = rpList(tc.map(c => [c.name, c.v, c.n]), r => rpMoney(r[1]) + ' \u00B7 ' + r[2] + (r[2] === 1 ? ' order' : ' orders'));
   const wm = Math.max(1, ...wd), names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], bh = hr.indexOf(Math.max(...hr));
   $g('rp-wd').innerHTML = wd.map((v, i) => `<i style="height:${Math.max(2, v / wm * 100)}%" title="${names[i]}: ${v} orders"></i>`).join('');
   $g('rp-wdx').innerHTML = names.map(x => `<span>${x}</span>`).join('');

@@ -1,0 +1,9 @@
+# Internal files must never be public
+/supabase-*  /404.html  404!
+/tests/*  /404.html  404!
+/tools/*  /404.html  404!
+/vendor/README.txt  /404.html  404!
+/node_modules/*  /404.html  404!
+/FRAMEWORK.md  /404.html  404!
+/FINAL-CHECKS.md  /404.html  404!
+/TESTING.md  /404.html  404!

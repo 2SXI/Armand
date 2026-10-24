@@ -55,7 +55,7 @@ const mk=(o={})=>({ calls:[], auth:{
 { // happy path, email confirmation on
   const o={}; const w=page(mk(o)); await tick();
   set(w,'reg-name','Alice Moyo'); set(w,'reg-email','alice@x.com'); set(w,'reg-phone','+263 78 111 2222');
-  set(w,'reg-pass','abcdefg1'); set(w,'reg-pass2','abcdefg1'); set(w,'reg-terms',true); submit(w,'registerForm'); await tick();
+  set(w,'reg-pass','Cedar-Plank-4417'); set(w,'reg-pass2','Cedar-Plank-4417'); set(w,'reg-terms',true); submit(w,'registerForm'); await tick();
   const c=(o.calls||[]).find(x=>x[0]==='signUp');
   ok(c && c[1].email==='alice@x.com' && c[1].options.data.full_name==='Alice Moyo','register: valid form calls signUp with name/phone metadata');
   ok(!w.document.getElementById('acctMsg').hidden && /confirmation link/.test(w.document.getElementById('acctMsg').textContent),'register: tells user to confirm email');
@@ -65,11 +65,17 @@ const mk=(o={})=>({ calls:[], auth:{
   const o={}; const w=page(mk(o)); await tick(); set(w,'reg-website','bot'); submit(w,'registerForm'); await tick();
   ok(!(o.calls||[]).length,'register: honeypot silently blocks bots');
 }
+{ // password policy beyond the basic validator
+  const o={}; const w=page(mk(o)); await tick();
+  set(w,'reg-name','Test User'); set(w,'reg-email','t@x.com'); set(w,'reg-phone','0771234567');
+  set(w,'reg-pass','Abcdefg12'); set(w,'reg-pass2','Abcdefg12'); set(w,'reg-terms',true); submit(w,'registerForm'); await tick();
+  ok(!(o.calls||[]).some(c=>c[0]==='signUp'),'register: 9-character password refused by policy (min 10)');
+}
 { // duplicate email (Supabase returns empty identities)
   const o={signUpResult:{data:{user:{identities:[]},session:null},error:null}}; const w=page(mk(o)); await tick();
   set(w,'reg-name','Alice Moyo'); set(w,'reg-email','alice@x.com'); set(w,'reg-phone','0781112222');
-  set(w,'reg-pass','abcdefg1'); set(w,'reg-pass2','abcdefg1'); set(w,'reg-terms',true); submit(w,'registerForm'); await tick();
-  ok(/already exists/.test(w.document.getElementById('acctMsg').textContent),'register: duplicate email reported clearly');
+  set(w,'reg-pass','Cedar-Plank-4417'); set(w,'reg-pass2','Cedar-Plank-4417'); set(w,'reg-terms',true); submit(w,'registerForm'); await tick();
+  ok(/If this email is new/.test(w.document.getElementById('acctMsg').textContent) && !/already exists/.test(w.document.getElementById('acctMsg').textContent),'register: duplicate email does not reveal that the account exists');
 }
 { // bad login
   const o={signInResult:{data:{},error:{message:'Invalid login credentials'}}}; const w=page(mk(o)); await tick();

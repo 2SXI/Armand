@@ -19,7 +19,7 @@ const orders = [
 ];
 let updated = null;
 const fake = (list, session = { user: { id: 'u1', email: 'alice@x.com', user_metadata: {} } }) => ({
-  auth: { getSession: async () => ({ data: { session } }), onAuthStateChange() {}, signOut: async () => {},
+  auth: { getSession: async () => ({ data: { session } }), onAuthStateChange() {}, signOut: async () => {}, signInWithPassword: async () => ({ data: {}, error: null }),
     updateUser: async a => { updated = a; return { error: null }; } },
   from() { return { select() { return this; }, eq() { return this; }, order() { return this; }, limit() { return Promise.resolve({ data: list, error: null }); },
     maybeSingle: async () => ({ data: { full_name: 'Alice Moyo', phone: '+263781112222' } }), update() { return this; } }; },
@@ -62,6 +62,11 @@ const fake = (list, session = { user: { id: 'u1', email: 'alice@x.com', user_met
   ok(d.getElementById('paneSettings').contains(d.getElementById('profileForm')) && d.getElementById('paneSettings').contains(d.getElementById('pwForm')), 'settings: profile and password live in one Settings tab');
   ok(d.getElementById('setEmail').textContent === 'alice@x.com', 'settings: session section shows email');
 }
+{ // security controls exist in the page
+  const w = page(fake([])); await tick();
+  const d = w.document;
+  ok(d.getElementById('pw-cur') && d.getElementById('mfaStatus') && d.getElementById('signOutOthers') && d.getElementById('exportData') && d.getElementById('deleteAcct') && d.getElementById('mfaLogin'), 'security: current-password, 2FA, sessions, export and delete controls are present');
+}
 { // order filters
   const w = page(fake(orders)); await tick(); await tick();
   const d = w.document, n = () => d.querySelectorAll('#ordersList .acct-order').length;
@@ -87,12 +92,17 @@ const fake = (list, session = { user: { id: 'u1', email: 'alice@x.com', user_met
   updated = null;
   const w = page(fake([])); await tick(); await tick();
   const d = w.document;
+  d.getElementById('pw-new').value = 'Cedar-Plank-4417'; d.getElementById('pw-new2').value = 'Cedar-Plank-4417'; submit(w, 'pwForm'); await tick();
+  ok(updated === null, 'change password: current password is required');
+  d.getElementById('pw-cur').value = 'old-password-1';
   d.getElementById('pw-new').value = 'abc'; d.getElementById('pw-new2').value = 'abc'; submit(w, 'pwForm'); await tick();
   ok(updated === null, 'change password: weak password blocked');
-  d.getElementById('pw-new').value = 'abcdefg1'; d.getElementById('pw-new2').value = 'abcdefg2'; submit(w, 'pwForm'); await tick();
+  d.getElementById('pw-new').value = 'Abcdefg12'; d.getElementById('pw-new2').value = 'Abcdefg12'; submit(w, 'pwForm'); await tick(); await tick();
+  ok(updated === null, 'change password: 9-character password refused by policy');
+  d.getElementById('pw-new').value = 'Cedar-Plank-4417'; d.getElementById('pw-new2').value = 'Cedar-Plank-4418'; submit(w, 'pwForm'); await tick();
   ok(updated === null, 'change password: mismatch blocked');
-  d.getElementById('pw-new').value = 'abcdefg1'; d.getElementById('pw-new2').value = 'abcdefg1'; submit(w, 'pwForm'); await tick();
-  ok(updated && updated.password === 'abcdefg1', 'change password: valid change sent to Supabase');
+  d.getElementById('pw-new').value = 'Cedar-Plank-4417'; d.getElementById('pw-new2').value = 'Cedar-Plank-4417'; submit(w, 'pwForm'); await tick(); await tick(); await tick();
+  ok(updated && updated.password === 'Cedar-Plank-4417', 'change password: valid change sent to Supabase');
   ok(/Password updated/.test(d.getElementById('acctMsg').textContent), 'change password: success message shown');
 }
 console.log(`\n${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);

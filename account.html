@@ -141,7 +141,12 @@
                   </div>
                 </div>
                 <div class="col-12 d-flex justify-content-end"><a href="#" id="forgotLink" class="acct-link">Forgot password?</a></div>
-                <div class="col-12"><button type="submit" class="btn btn-brand btn-lg w-100" id="logBtn">Sign in →</button></div>
+                <div class="col-12" id="mfaLogin" hidden>
+                <label class="form-label" for="log-code">Authentication code</label>
+                <input type="text" id="log-code" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" aria-describedby="log-code-help">
+                <div class="acct-muted mt-1" id="log-code-help">From your authenticator app. Then press Sign in again.</div>
+              </div>
+              <div class="col-12"><button type="submit" class="btn btn-brand btn-lg w-100" id="logBtn">Sign in →</button></div>
                 <p class="col-12 acct-muted mb-0">We only use your details to manage your account and orders. <a href="legal.html#privacy" target="_blank" rel="noopener">Privacy Policy</a> (opens in a new tab).</p>
               </form>
             </div>
@@ -285,7 +290,9 @@
             <nav class="acct-snav" aria-label="Settings sections">
               <a href="#set-profile">Profile</a>
               <a href="#set-password">Password</a>
-              <a href="#set-session">Session</a>
+              <a href="#set-2fa">Two-factor</a>
+              <a href="#set-session">Sessions</a>
+              <a href="#set-data">Your data</a>
             </nav>
             <div class="acct-sbody">
               <div class="acct-panel" id="set-profile">
@@ -303,8 +310,10 @@
               </div>
               <div class="acct-panel" id="set-password">
                 <h3 class="acct-h3">Password</h3>
-                <p class="acct-muted">Use 8+ characters with a letter and a number.</p>
+                <p class="acct-muted">Use 10 or more characters. Common and previously breached passwords are rejected.</p>
                 <form id="pwForm" class="row g-3" novalidate>
+                  <div class="col-12"><label class="form-label" for="pw-cur">Current password</label>
+                    <input type="password" id="pw-cur" class="form-control" autocomplete="current-password" maxlength="72" required></div>
                   <div class="col-md-6"><label class="form-label" for="pw-new">New password</label>
                     <input type="password" id="pw-new" class="form-control" autocomplete="new-password" maxlength="72" required></div>
                   <div class="col-md-6"><label class="form-label" for="pw-new2">Confirm new password</label>
@@ -312,10 +321,20 @@
                   <div class="col-12"><button type="submit" class="btn btn-outline-dark" id="pwBtn">Update password</button></div>
                 </form>
               </div>
+              <div class="acct-panel" id="set-2fa">
+                <h3 class="acct-h3">Two-factor authentication</h3>
+                <p class="acct-muted">Protect your account with a code from an authenticator app (Google Authenticator, Microsoft Authenticator or Authy) each time you sign in.</p>
+                <div id="mfaStatus" aria-live="polite"></div>
+              </div>
               <div class="acct-panel" id="set-session">
-                <h3 class="acct-h3">Session</h3>
-                <p class="acct-muted">Signed in as <strong id="setEmail"></strong>. On a shared computer, sign out when you are done.</p>
-                <button type="button" class="btn btn-outline-dark" id="logoutBtn2">Sign out</button>
+                <h3 class="acct-h3">Sessions</h3>
+                <p class="acct-muted">Signed in as <strong id="setEmail"></strong>. If you used a shared or public computer, sign out everywhere else.</p>
+                <div class="d-flex gap-2 flex-wrap"><button type="button" class="btn btn-outline-dark" id="logoutBtn2">Sign out</button><button type="button" class="btn btn-outline-dark" id="signOutOthers">Sign out other devices</button></div>
+              </div>
+              <div class="acct-panel" id="set-data">
+                <h3 class="acct-h3">Your data</h3>
+                <p class="acct-muted">Download a copy of your profile and order history, or permanently delete your account. Deleting removes your sign-in and profile; the shop keeps past orders for its records, no longer linked to you.</p>
+                <div class="d-flex gap-2 flex-wrap"><button type="button" class="btn btn-outline-dark" id="exportData">Download my data</button><button type="button" class="btn btn-outline-dark" id="deleteAcct" style="--bs-btn-color:#c62828;--bs-btn-border-color:#e3b5b5;--bs-btn-hover-bg:#c62828;--bs-btn-hover-border-color:#c62828">Delete my account</button></div>
               </div>
             </div>
           </div>
@@ -402,7 +421,7 @@
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="vendor/supabase-js-2.118.0.js"></script>
 <script src="armand-shop.js"></script>
 <script src="account.js"></script>
 </body>
