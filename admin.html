@@ -277,6 +277,17 @@ table select{border-radius:8px}
 #bulkbar{visibility:hidden;pointer-events:none;transform:translate(-50%,calc(100% + 48px));transition:transform .25s,visibility 0s .25s}
 #bulkbar.on{visibility:visible;pointer-events:auto;transform:translate(-50%,0);transition:transform .25s,visibility 0s}
 :root[data-theme="light"] [style*="#ffc83d"]{color:#9a6200!important}
+
+/* v5.4: native dropdown lists must be readable in both themes */
+:root{color-scheme:dark}
+select,select option,select optgroup{background-color:#1d1d24;color:#e6e6ec}
+select option:checked,select option:hover{background-color:#F36523;color:#fff}
+:root[data-theme="light"] select,:root[data-theme="light"] select option,:root[data-theme="light"] select optgroup{background-color:#fff;color:#2a282b}
+:root[data-theme="light"] select option:checked,:root[data-theme="light"] select option:hover{background-color:#F36523;color:#fff}
+/* popups, login and sidebar stay dark in both themes, so their dropdowns stay dark too */
+.modal-box,#confirm-box,.audit-box,#login-screen,.sidebar{color-scheme:dark}
+:root[data-theme="light"] .modal-box select,:root[data-theme="light"] .modal-box select option,:root[data-theme="light"] #confirm-box select,:root[data-theme="light"] #confirm-box select option{background-color:#1d1d24;color:#e6e6ec}
+:root[data-theme="light"] .modal-box select option:checked,:root[data-theme="light"] .modal-box select option:hover{background-color:#F36523;color:#fff}
 </style>
 </head>
 <body>
@@ -340,7 +351,7 @@ table select{border-radius:8px}
         <button type="button" class="sb-theme" id="themeBtn" onclick="toggleTheme()"></button>
         <div class="sb-user" id="sb-user"></div>
         <button class="sb-logout" onclick="adminLogout()">Sign Out</button>
-        <div class="sb-version">Armand Admin v5.3</div>
+        <div class="sb-version">Armand Admin v5.4</div>
       </div>
     </aside>
 
