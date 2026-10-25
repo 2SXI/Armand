@@ -461,3 +461,8 @@ body .sx .fcat .ic { width: 32px; height: 32px; flex: 0 0 32px; display: grid; p
 body .sx .fcat .ic svg { width: 18px; height: 18px; }
 body .sx .fcat:hover .ic { background: rgba(243,101,35,.10); color: #C8470F; }
 body .sx .fcat.on .ic { background: #F36523; color: #fff; }
+
+/* Desktop: the filters stay in view while the products scroll. Long lists scroll inside the sidebar. */
+@media (min-width: 1081px) {
+  body .sx .filters { position: sticky; top: calc(var(--head) + 20px); align-self: start; max-height: calc(100vh - var(--head) - 40px); overflow-x: hidden; overflow-y: auto; }
+}
