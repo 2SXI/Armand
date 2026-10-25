@@ -199,3 +199,33 @@
 
   window.SX = { lines, kv, CAT_ICON, GROUPS, imagesOf, recent, esc, money, ICON, CATS, norm, catLabel, stockState, salePct, Wish, ph, cardHTML, skeletons, byId, loadAll, loadById, addToCart, openCart, toast, WA };
 })();
+
+/* Photos on a white background carry a baked-in grey floor shadow: tag them so only they get the bottom fade.
+   Full-bleed photos (wood, boards, textures) are left alone. Unknown or unreadable images get no fade. */
+(function () {
+  const cache = new Map();
+  function lightBg(src) {
+    if (!cache.has(src)) cache.set(src, new Promise(res => {
+      const im = new Image(); im.crossOrigin = 'anonymous';
+      im.onload = () => {
+        try {
+          const w = 28, h = 28, c = document.createElement('canvas'); c.width = w; c.height = h;
+          const x = c.getContext('2d', { willReadFrequently: true });
+          x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(im, 0, 0, w, h);
+          const d = x.getImageData(0, 0, w, h).data; let sum = 0, n = 0, dark = 0;
+          const px = (i, j) => { const k = (j * w + i) * 4, l = 0.299 * d[k] + 0.587 * d[k + 1] + 0.114 * d[k + 2]; sum += l; n++; if (l < 200) dark++; };
+          for (let i = 0; i < w; i++) { px(i, 0); px(i, 1); }                                  // top edge
+          for (let j = 0; j < Math.floor(h * 0.7); j++) { px(0, j); px(w - 1, j); }             // sides (not the bottom, where the shadow strip is)
+          res(sum / n > 228 && dark / n < 0.12);
+        } catch (e) { res(false); }
+      };
+      im.onerror = () => res(false); im.src = src;
+    }));
+    return cache.get(src);
+  }
+  document.addEventListener('load', e => {
+    const el = e.target;
+    if (!el || el.tagName !== 'IMG' || !el.closest || !el.closest('.pimg, .galwrap .gal')) return;
+    lightBg(el.currentSrc || el.src).then(ok => { if (ok) el.classList.add('lightbg'); });
+  }, true);
+})();

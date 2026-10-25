@@ -452,7 +452,7 @@ body .sx .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 30
 /* product photos carry a baked-in grey floor shadow: fade it into the white card */
 body .sx .pimg, body .sx .galwrap .gal { background: #fff; }
 body .sx .pimg:not(:has(img)) { background: var(--stone); }
-body .sx .pimg img, body .sx .galwrap .gal img { -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 97%); mask-image: linear-gradient(to bottom, #000 78%, transparent 97%); }
+body .sx .pimg img.lightbg, body .sx .galwrap .gal img.lightbg { -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 92%); mask-image: linear-gradient(to bottom, #000 72%, transparent 92%); }
 body .sx .pcard .pmedia, body .sx .pcard .pimg { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) { body .sx .pcard, body .sx .btn-primary { transition: none; } body .sx .pcard:hover { transform: none; } }
 
