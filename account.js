@@ -293,7 +293,8 @@
   $('exportData').addEventListener('click', async () => {
     const { data: { session } } = await sb.auth.getSession(); if (!session) return;
     const prof = (await sb.from('profiles').select('*').maybeSingle()).data;
-    const out = { exported_at: new Date().toISOString(), account: { id: session.user.id, email: session.user.email, created_at: session.user.created_at }, profile: prof, orders: allOrders };
+    let saved = []; try { saved = ((await sb.from('wishlist').select('product_id,created_at')).data) || []; } catch (e) {}
+    const out = { exported_at: new Date().toISOString(), account: { id: session.user.id, email: session.user.email, created_at: session.user.created_at }, profile: prof, saved_items: saved, orders: allOrders };
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
     a.download = 'my-armand-data.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);

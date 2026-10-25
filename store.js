@@ -11,14 +11,14 @@ const phTile=cat=>SX.ph(cat);
 
   const q = new URLSearchParams(location.search);
   st.cat = normaliseCat(q.get('cat') || ''); st.q = q.get('q') || ''; st.sort = q.get('sort') || 'featured';
-  st.min = q.get('min') || ''; st.max = q.get('max') || ''; st.stock = q.get('stock') === '1'; st.sale = q.get('sale') === '1';
+  st.min = q.get('min') || ''; st.max = q.get('max') || ''; st.stock = q.get('stock') === '1'; st.sale = q.get('sale') === '1'; st.wish = q.get('saved') === '1';
 
   function sync() {
     const p = new URLSearchParams();
     if (st.cat) p.set('cat', st.cat); if (st.q) p.set('q', st.q);
     if (st.sort !== 'featured') p.set('sort', st.sort);
     if (st.min) p.set('min', st.min); if (st.max) p.set('max', st.max);
-    if (st.stock) p.set('stock', '1'); if (st.sale) p.set('sale', '1');
+    if (st.stock) p.set('stock', '1'); if (st.sale) p.set('sale', '1'); if (st.wish) p.set('saved', '1');
     history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
   }
   function filtered(ignoreCat) {
@@ -94,7 +94,7 @@ const phTile=cat=>SX.ph(cat);
     if (reset) shown = PAGE;
     const list = sorted(filtered()), total = list.length;
     const title = st.cat ? catLabel(st.cat) : 'Shop';
-    $('shopTitle').textContent = title; $('crumbCat').textContent = title;
+    $('shopTitle').textContent = title; if ($('crumbCat')) { $('crumbCat').textContent = title; }
     document.title = (st.cat ? title + ' | ' : '') + 'Shop | Armand Carpentry & Designs';
     $('count').innerHTML = `<b>${total}</b> ${total === 1 ? 'product' : 'products'}`;
     $('fClose').textContent = total ? `Show ${total} ${total === 1 ? 'result' : 'results'}` : 'No results';
@@ -102,7 +102,7 @@ const phTile=cat=>SX.ph(cat);
     renderNav(); renderActive(); sync();
     const g = $('grid');
     if (!total) {
-      g.innerHTML = `<div class="empty"><h3>No products match</h3><p>Try removing a filter, or tell us what you are looking for and we will check what we have.</p><div class="row"><button class="btn btn-dark" data-clear="all">Clear filters</button><a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/263780793585?text=${encodeURIComponent('Hi Armand, do you have: ' + st.q)}">Ask on WhatsApp</a></div></div>`;
+      g.innerHTML = `<div class="empty">${st.wish && !Wish.ids.size ? '<h3>Nothing saved yet</h3><p>Tap the heart on any product to save it here for later. Saved items stay on this device.</p>' : '<h3>No products match</h3><p>Try removing a filter, or tell us what you are looking for and we will check what we have.</p>'}<div class="row"><button class="btn btn-dark" data-clear="all">Clear filters</button><a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/263780793585?text=${encodeURIComponent('Hi Armand, do you have: ' + st.q)}">Ask on WhatsApp</a></div></div>`;
       $('more').hidden = true; return;
     }
     g.innerHTML = list.slice(0, shown).map(cardHTML).join('');
@@ -195,6 +195,7 @@ const phTile=cat=>SX.ph(cat);
   $('fStock').onchange = e => { st.stock = e.target.checked; render(true); };
   $('fSale').onchange = e => { st.sale = e.target.checked; render(true); };
   $('fWish').onchange = e => { st.wish = e.target.checked; render(true); };
+  document.addEventListener('wish:merged', () => { if (all && all.length) render(false); });
   let PMAX = 0;
   function initRange() {
     const ps = all.map(p => parseFloat(p.price) || 0).sort((x, y) => x - y);
@@ -237,7 +238,7 @@ const phTile=cat=>SX.ph(cat);
 
   /* init */
   $('shopQ').value = st.q; $('shopQClear').classList.toggle('show', !!st.q);
-  $('sort').value = st.sort; $('fStock').checked = st.stock; $('fSale').checked = st.sale;
+  $('sort').value = st.sort; $('fStock').checked = st.stock; $('fSale').checked = st.sale; $('fWish').checked = st.wish;
   $('pMin').value = st.min; $('pMax').value = st.max;
   document.addEventListener('DOMContentLoaded', async () => {
     try {

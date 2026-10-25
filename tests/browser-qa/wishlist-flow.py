@@ -1,0 +1,16 @@
+exec(open('/tmp/shopqa.py').read().split("log=[]")[0])
+with sync_playwright() as p:
+    b=p.chromium.launch(); ctx=b.new_context(viewport={'width':1280,'height':800}); pg=ctx.new_page(); errs=[]
+    pg.on('pageerror',lambda e:errs.append(str(e)[:150])); ctx.route('**/*',handler)
+    pg.goto('http://localhost:8765/products.html?saved=1'); pg.wait_for_timeout(1500)
+    print('saved view, nothing saved ->',pg.inner_text('.empty h3'))
+    print('saved switch checked:',pg.evaluate("document.getElementById('fWish').checked"),'| heart count hidden:',pg.evaluate("document.getElementById('navWishN').hidden"))
+    pg.goto('http://localhost:8765/products.html'); pg.wait_for_timeout(1500)
+    hearts=pg.locator('.pcard .wish'); hearts.nth(1).click(); hearts.nth(2).click(); pg.wait_for_timeout(300)
+    print('after saving 2 -> nav count:',pg.inner_text('#navWishN'),'| aria:',pg.get_attribute('#navWish','aria-label'))
+    pg.click('#navWish'); pg.wait_for_timeout(1500)
+    print('clicked heart -> url:',pg.url.split('/')[-1],'| cards shown:',pg.locator('.pcard').count(),'| header says:',pg.inner_text('#count') if pg.locator('#count').count() else '')
+    pg.goto('http://localhost:8765/index.html'); pg.wait_for_timeout(1200)
+    print('count persists on home:',pg.inner_text('#navWishN'))
+    print('errors:',errs)
+    b.close()

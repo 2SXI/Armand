@@ -750,6 +750,7 @@ function initMobileNav() {
         <nav class="mnp-nav" aria-label="Pages">
           ${item('index.html','Home')}
           ${item('products.html','Products')}
+          ${item('products.html?saved=1','Saved items')}
           ${item('portfolio.html','Portfolio')}
           ${item('trade.html','Trade accounts')}
           ${item('contact.html','Contact')}
@@ -1340,4 +1341,21 @@ window.brocImgFallback     = brocImgFallback;
     document.body.classList.add('has-wa-fab');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addWaFab); else addWaFab();
+})();
+
+/* ── Saved items: heart with live count in the header ── */
+(function () {
+  function count() { try { return JSON.parse(localStorage.getItem('armand_wish') || '[]').length; } catch (e) { return 0; } }
+  function paint() { var n = count(), b = document.getElementById('navWishN'); if (!b) return; b.textContent = n > 99 ? '99+' : n; b.hidden = !n; var a = document.getElementById('navWish'); if (a) a.setAttribute('aria-label', n ? 'Saved items (' + n + ')' : 'Saved items'); }
+  function add() {
+    if (document.getElementById('navWish') || /admin/i.test(location.pathname)) return;
+    var host = document.querySelector('.nav-actions'); if (!host) return;
+    var a = document.createElement('a');
+    a.id = 'navWish'; a.className = 'nav-wish'; a.href = 'products.html?saved=1'; a.title = 'Saved items';
+    a.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="nav-wish-n" id="navWishN" hidden>0</span>';
+    host.insertBefore(a, document.getElementById('cartBtn') || host.firstChild);
+    paint();
+  }
+  document.addEventListener('wish:change', paint); window.addEventListener('storage', paint);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add); else add();
 })();

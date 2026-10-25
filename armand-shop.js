@@ -1183,6 +1183,41 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+  /* ── Wishlist sync: saved items follow the customer's account (needs supabase-wishlist-v2.sql) ── */
+  const WL_KEY = 'armand_wish', WL_FLAG = 'armand_wish_acct';
+  const wlRead = () => { try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]').map(String); } catch (e) { return []; } };
+  function wlPaint() {
+    const s = new Set(wlRead());
+    document.querySelectorAll('.wish[data-pid]').forEach(el => { const on = s.has(String(el.dataset.pid)); el.classList.toggle('on', on); el.setAttribute('aria-pressed', String(on)); });
+  }
+  function wlRefresh() { if (window.SX && SX.Wish) SX.Wish.load(); wlPaint(); document.dispatchEvent(new CustomEvent('wish:merged')); document.dispatchEvent(new CustomEvent('wish:change')); }
+  let wlBusy = false;
+  async function wlSync() {
+    if (!acctSB || wlBusy) return; wlBusy = true;
+    try {
+      const u = await currentUser(); if (!u) return;
+      const { data, error } = await acctSB.from('wishlist').select('product_id').limit(1000);
+      if (error) return;                                   // table not created yet: stay on this device only
+      const server = new Set(data.map(r => String(r.product_id))), local = wlRead();
+      const up = local.filter(id => !server.has(id));
+      if (up.length) await acctSB.from('wishlist').upsert(up.map(id => ({ user_id: u.id, product_id: id })), { onConflict: 'user_id,product_id', ignoreDuplicates: true });
+      const merged = [...new Set([...server, ...local])];
+      try { localStorage.setItem(WL_FLAG, '1'); } catch (e) {}
+      if (merged.length !== new Set(local).size) { try { localStorage.setItem(WL_KEY, JSON.stringify(merged)); } catch (e) {} wlRefresh(); }
+    } catch (e) {} finally { wlBusy = false; }
+  }
+  document.addEventListener('wish:change', async ev => {
+    const d = ev.detail; if (!d || !d.id || !acctSB) return;
+    const u = await currentUser(); if (!u) return;
+    try {
+      if (d.on) await acctSB.from('wishlist').upsert({ user_id: u.id, product_id: String(d.id) }, { onConflict: 'user_id,product_id', ignoreDuplicates: true });
+      else await acctSB.from('wishlist').delete().eq('user_id', u.id).eq('product_id', String(d.id));
+    } catch (e) {}
+  });
+  if (acctSB) acctSB.auth.onAuthStateChange(ev => {
+    if (ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') setTimeout(wlSync, 0);
+    if (ev === 'SIGNED_OUT') setTimeout(() => { try { if (localStorage.getItem(WL_FLAG)) { localStorage.removeItem(WL_KEY); localStorage.removeItem(WL_FLAG); wlRefresh(); } } catch (e) {} }, 0);   // an account's list must not stay on a shared device
+  });
   window.refreshNavAccount = refreshNavAccount;
   if (acctSB) {
     refreshNavAccount();

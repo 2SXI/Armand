@@ -539,6 +539,10 @@ select option:checked,select option:hover{background-color:#F36523;color:#fff}
             <div class="card"><h4>Top customers <span id="rp-cust"></span></h4><ul class="rank" id="rp-topcust"></ul></div>
             <div class="card"><h4>Orders by weekday <span id="rp-busy"></span></h4><div class="bars" id="rp-wd" style="height:120px"></div><div class="bars-x" id="rp-wdx"></div></div>
           </div>
+          <div class="dgrid two">
+            <div class="card"><h4>Most saved products <span id="rp-savedsum"></span></h4><ul class="rank" id="rp-saved"></ul></div>
+            <div class="card"><h4>About saved items</h4><p style="color:var(--muted);font-size:13px;line-height:1.7">Products that signed-in customers have added to their wishlist. A product that is saved often but rarely bought may need a better price, photo or stock; a popular one that is out of stock is a restock priority.</p></div>
+          </div>
         </div>
       </div>
 
@@ -2116,6 +2120,16 @@ async function loadReports() {
   $g('rp-wd').innerHTML = wd.map((v, i) => `<i style="height:${Math.max(2, v / wm * 100)}%" title="${names[i]}: ${v} orders"></i>`).join('');
   $g('rp-wdx').innerHTML = names.map(x => `<span>${x}</span>`).join('');
   $g('rp-busy').textContent = n ? 'peak hour ' + pad(bh) + ':00' : '';
+  try { await rpSaved(); } catch (e) {}
+}
+async function rpSaved() {
+  const L = $g('rp-saved'), { data, error } = await sb.from('wishlist').select('product_id,user_id').limit(5000);
+  if (error) { L.innerHTML = '<li style="color:var(--muted)">Not set up yet. Run supabase-wishlist-v2.sql in Supabase.</li>'; $g('rp-savedsum').textContent = ''; return; }
+  const c = {}, users = new Set(), nm = {}; _allProducts.forEach(p => { nm[String(p.id)] = p.name; });
+  data.forEach(r => { c[r.product_id] = (c[r.product_id] || 0) + 1; users.add(r.user_id); });
+  const top = Object.entries(c).sort((x, y) => y[1] - x[1]).slice(0, 8);
+  L.innerHTML = rpList(top.map(([id, n]) => [nm[id] || ('Product #' + id), n]), r => r[1] + (r[1] === 1 ? ' save' : ' saves'));
+  $g('rp-savedsum').textContent = users.size + ' customers \u00B7 ' + data.length + ' saved';
 }
 function rpExport(w) {
   if (w === 'orders') exportCSV('sales-orders', ['Order', 'Date', 'Customer', 'Phone', 'Payment', 'Status', 'Total'], _rpRows.map(o => [o.id, o.created_at, o.customer_name, o.customer_phone, o.payment_method, o.status, o.total]));

@@ -94,7 +94,7 @@
     load() { try { this.ids = new Set(JSON.parse(localStorage.getItem(this.k) || '[]').map(String)); } catch { this.ids = new Set(); } },
     has(id) { return this.ids.has(String(id)); },
     toggle(id) { id = String(id); this.ids.has(id) ? this.ids.delete(id) : this.ids.add(id);
-      try { localStorage.setItem(this.k, JSON.stringify([...this.ids])); } catch {} return this.ids.has(id); },
+      try { localStorage.setItem(this.k, JSON.stringify([...this.ids])); } catch {} try { document.dispatchEvent(new CustomEvent('wish:change', { detail: { id, on: this.ids.has(id) } })); } catch {} return this.ids.has(id); },
   };
   Wish.load();
 
