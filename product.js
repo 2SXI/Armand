@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = p.name + ' | Armand Carpentry & Designs';
   document.querySelector('meta[name="description"]')?.setAttribute('content', (p.short_description || p.description || p.name).slice(0, 155));
   $('bcCat').textContent = catLabel(cat) || 'Category'; $('bcCat').href = 'products.html?cat=' + cat; $('bcName').textContent = p.name;
-  const wa = 'https://wa.me/263780793585?text=' + encodeURIComponent('Hi Armand, enquiry about ' + p.name + (p.sku ? ' (' + p.sku + ')' : '') + ': ');
-  const waBack = 'https://wa.me/263780793585?text=' + encodeURIComponent('Hi Armand, when will ' + p.name + (p.sku ? ' (' + p.sku + ')' : '') + ' be back in stock?');
+  const wa = 'https://wa.me/263790331511?text=' + encodeURIComponent('Hi Armand, enquiry about ' + p.name + (p.sku ? ' (' + p.sku + ')' : '') + ': ');
+  const waBack = 'https://wa.me/263790331511?text=' + encodeURIComponent('Hi Armand, when will ' + p.name + (p.sku ? ' (' + p.sku + ')' : '') + ' be back in stock?');
   const specs = [['SKU', p.sku], ['Department', catLabel(cat)], ['Availability', stt.text || 'Ask us']].filter(r => r[1]);
 
   root.innerHTML = `
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const matchKeys = String(p.matching || '').split(/[\n,]+/).map(x => x.trim().toLowerCase()).filter(Boolean);
     const guide = L(p.install_guide);
     const isLink = guide.length === 1 && /^https?:\/\//i.test(guide[0]);
-    const waFit = 'https://wa.me/263780793585?text=' + encodeURIComponent('Hi Armand, I would like a quote for fitting/installation. Product: ' + p.name + (p.sku ? ' (' + p.sku + ')' : ''));
+    const waFit = 'https://wa.me/263790331511?text=' + encodeURIComponent('Hi Armand, I would like a quote for fitting/installation. Product: ' + p.name + (p.sku ? ' (' + p.sku + ')' : ''));
 
     const tabs = [['info', 'Product Info', 1], ['specs', 'Specifications', 1], ['matching', 'Matching Products', matchKeys.length], ['collect', 'Click & Collect', 1],
                   ['install', 'How To Install', guide.length], ['fitting', 'Installation Services', 1], ['relatedWrap', 'Similar Products', 1]].filter(t => t[2]);

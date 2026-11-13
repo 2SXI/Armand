@@ -34,7 +34,7 @@
 const SHOP = {
   supabaseUrl  : 'https://nasbxjharopveynnwgrg.supabase.co',
   supabaseKey  : 'sb_publishable_io0oLODozq0xdUJiNT37tQ_u2PWURX0',
-  waNumber     : '263780793585',   // no + prefix
+  waNumber     : '263790331511',   // no + prefix
   currency     : 'USD',
   storageKey   : 'broc_cart_v1',
 
@@ -695,7 +695,7 @@ const Checkout = {
 
     if (!name || name.length < 2) return fail('Please enter your full name.');
     if (!phone || !/^[0-9+() -]{7,30}$/.test(phone) || phone.replace(/\D/g, '').length < 7)
-      return fail('Please enter a valid phone number, e.g. +263 78 079 3585.');
+      return fail('Please enter a valid phone number, e.g. +263 79 033 1511.');
     if (mode === 'deliver' && address.length > 300) return fail('That address is too long (300 characters maximum).');
     if (mode === 'deliver' && !address) return fail('Please enter a delivery address, or choose collection.');
     errEl.style.display = 'none';

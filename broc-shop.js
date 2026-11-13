@@ -34,7 +34,7 @@
 const SHOP = {
   supabaseUrl  : 'https://nasbxjharopveynnwgrg.supabase.co',
   supabaseKey  : 'sb_publishable_io0oLODozq0xdUJiNT37tQ_u2PWURX0',
-  waNumber     : '263780793585',   // no + prefix
+  waNumber     : '263790331511',   // no + prefix
   currency     : 'USD',
   storageKey   : 'broc_cart_v1',
 

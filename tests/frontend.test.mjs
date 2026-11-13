@@ -10,7 +10,7 @@ const ok=(c,m)=>{ c?pass++:fail++; console.log((c?'PASS ':'FAIL ')+m); };
   ok(A.email('a@b.co')==='' ,'email: valid accepted');
   ok(A.email('a@b')!=='' && A.email('nope')!=='' && A.email('a @b.com')!=='' ,'email: malformed rejected');
   ok(A.email('',false)==='' && A.email('')!=='' ,'email: optional vs required');
-  ok(A.phone('+263 78 079 3585')==='' && A.phone('0780793585')==='' ,'phone: Zimbabwe formats accepted');
+  ok(A.phone('+263 79 033 1511')==='' && A.phone('0790331511')==='' ,'phone: Zimbabwe formats accepted');
   ok(A.phone('abc1234')!=='' && A.phone('123')!=='' && A.phone('1234567890123456')!=='' ,'phone: letters, too short, too long rejected');
   ok(A.password('abcdefg1')==='' ,'password: 8 chars + letter + number accepted');
   ok(A.password('short1')!=='' && A.password('allletters')!=='' && A.password('12345678')!=='' ,'password: short / no number / no letter rejected');

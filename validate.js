@@ -26,7 +26,7 @@
     phone(v, required = true) {
       v = String(v || '').trim();
       if (!v) return required ? 'Please enter your phone number.' : '';
-      if (!PHONE_RE.test(v)) return 'Use digits, spaces and + ( ) - only, e.g. +263 78 079 3585.';
+      if (!PHONE_RE.test(v)) return 'Use digits, spaces and + ( ) - only, e.g. +263 79 033 1511.';
       const digits = v.replace(/\D/g, '').length;
       if (digits < 7 || digits > 15) return 'A phone number has between 7 and 15 digits.';
       return '';

@@ -102,7 +102,7 @@ const phTile=cat=>SX.ph(cat);
     renderNav(); renderActive(); sync();
     const g = $('grid');
     if (!total) {
-      g.innerHTML = `<div class="empty">${st.wish && !Wish.ids.size ? '<h3>Nothing saved yet</h3><p>Tap the heart on any product to save it here for later. Saved items stay on this device.</p>' : '<h3>No products match</h3><p>Try removing a filter, or tell us what you are looking for and we will check what we have.</p>'}<div class="row"><button class="btn btn-dark" data-clear="all">Clear filters</button><a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/263780793585?text=${encodeURIComponent('Hi Armand, do you have: ' + st.q)}">Ask on WhatsApp</a></div></div>`;
+      g.innerHTML = `<div class="empty">${st.wish && !Wish.ids.size ? '<h3>Nothing saved yet</h3><p>Tap the heart on any product to save it here for later. Saved items stay on this device.</p>' : '<h3>No products match</h3><p>Try removing a filter, or tell us what you are looking for and we will check what we have.</p>'}<div class="row"><button class="btn btn-dark" data-clear="all">Clear filters</button><a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/263790331511?text=${encodeURIComponent('Hi Armand, do you have: ' + st.q)}">Ask on WhatsApp</a></div></div>`;
       $('more').hidden = true; return;
     }
     g.innerHTML = list.slice(0, shown).map(cardHTML).join('');
@@ -127,7 +127,7 @@ const phTile=cat=>SX.ph(cat);
         <p class="desc">${escSH(p.short_description || p.description || 'Ask us for specifications and sizes.')}</p>
         <div class="buyrow"><div class="qty"><button type="button" data-q="-1" aria-label="Less">−</button><input id="qvQty" value="1" inputmode="numeric" aria-label="Quantity"><button type="button" data-q="1" aria-label="More">+</button></div>
         <button class="btn btn-primary" id="qvAdd" ${out ? 'disabled' : ''}>${out ? 'Out of stock' : 'Add to cart'}</button></div>
-        <div class="mini-links"><a href="product.html?id=${encodeURIComponent(p.id)}">View full details</a><a target="_blank" rel="noopener" href="https://wa.me/263780793585?text=${encodeURIComponent(out ? 'Hi Armand, when will ' + p.name + ' be back in stock?' : 'Hi Armand, enquiry about ' + p.name + (p.sku ? ' (' + p.sku + ')' : ''))}">${out ? 'Ask when it is back' : 'Ask on WhatsApp'}</a></div>
+        <div class="mini-links"><a href="product.html?id=${encodeURIComponent(p.id)}">View full details</a><a target="_blank" rel="noopener" href="https://wa.me/263790331511?text=${encodeURIComponent(out ? 'Hi Armand, when will ' + p.name + ' be back in stock?' : 'Hi Armand, enquiry about ' + p.name + (p.sku ? ' (' + p.sku + ')' : ''))}">${out ? 'Ask when it is back' : 'Ask on WhatsApp'}</a></div>
       </div>`;
     lastFocus = document.activeElement;
     $('qvModal').classList.add('open'); document.body.style.overflow = 'hidden';
@@ -253,7 +253,7 @@ const phTile=cat=>SX.ph(cat);
     catch (err) {
       console.error('[Armand] shop load failed', err);
       $('count').textContent = '';
-      $('grid').innerHTML = `<div class="empty"><h3>We couldn't load the catalogue</h3><p>Check your connection and try again, or message us and we will help you directly.</p><div class="row"><button class="btn btn-dark" onclick="location.reload()">Try again</button><a class="btn btn-wa" href="https://wa.me/263780793585">WhatsApp us</a></div></div>`;
+      $('grid').innerHTML = `<div class="empty"><h3>We couldn't load the catalogue</h3><p>Check your connection and try again, or message us and we will help you directly.</p><div class="row"><button class="btn btn-dark" onclick="location.reload()">Try again</button><a class="btn btn-wa" href="https://wa.me/263790331511">WhatsApp us</a></div></div>`;
     }
   });
 })();

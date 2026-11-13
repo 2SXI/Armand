@@ -59,7 +59,7 @@
     if (/email not confirmed/i.test(m))  return 'Please confirm your email first. Check your inbox for the link.';
     if (/rate limit|too many/i.test(m))  return 'Too many attempts. Please wait a few minutes and try again.';
     if (/password/i.test(m))             return m;
-    return 'Something went wrong. Please try again, or WhatsApp us on 078 079 3585.';
+    return 'Something went wrong. Please try again, or WhatsApp us on 079 033 1511.';
   }
 
   /* ── tabs (Bootstrap handles clicks and arrow keys) ───── */

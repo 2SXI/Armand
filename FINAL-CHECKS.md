@@ -16,7 +16,7 @@ exists, every `#anchor` exists, exactly one active nav item matching the page, n
 sitemap lists every public page.
 
 ## 2. Content (read each page once, out loud)
-- [ ] Phone numbers match everywhere: +263 292 265 490 and 078 079 3585
+- [ ] Phone numbers match everywhere: +263 292 265 490 and 079 033 1511
 - [ ] Email armandcarpentry@gmail.com, address 2142 Khami Rd, Iversens Complex, Bulawayo
 - [ ] Trading hours: Mon–Fri 08:00–17:00, Sat 08:00–13:00
 - [ ] Prices, stock and product photos correct in Supabase
